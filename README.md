@@ -21,6 +21,8 @@ Ejecuta en la terminal:
 Ejecuta en la terminal:
 
     npm install express mysql2 dotenv jsonwebtoken bcryptjs cors body-parser
+    
+    npm install sequelize 
 
 Instalar nodemon, recarga automáticamente los cambios:
 
