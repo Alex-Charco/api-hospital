@@ -8,7 +8,7 @@
 
 ✔️ Autenticación con jsonwebtoken (JWT) y bcryptjs
 
---
+---
 
 ## 1. Configurar el entorno de desarrollo 
 
