@@ -2,6 +2,56 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Usuario, RolUsuario } = require('../models');
 
+// Función para registrar un nuevo usuario
+async function registrarUsuario(req, res) {
+    const { nombre_usuario, password, id_rol } = req.body;
+
+    try {
+        // Verificar si el usuario actual tiene el rol de Administrador
+        const usuarioLogueado = req.usuario; 
+        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+        }
+
+        // Verificar si el nombre de usuario ya existe
+        const usuarioExistente = await Usuario.findOne({
+            where: { nombre_usuario }
+        });
+
+        if (usuarioExistente) {
+            return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
+        }
+
+        // Cifrar la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Crear el nuevo usuario
+        const nuevoUsuario = await Usuario.create({
+            nombre_usuario,
+            password: hashedPassword,
+            id_rol, 
+            fecha_creacion: new Date(),  
+            estatus: 1 
+        });
+        // Formatear la fecha de creación para un formato más legible
+        const fechaFormateada = new Date(nuevoUsuario.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ');
+
+        return res.status(201).json({
+            message: "Usuario registrado exitosamente",
+            usuario: {
+                id_usuario: nuevoUsuario.id_usuario,
+                nombre_usuario: nuevoUsuario.nombre_usuario,
+                fecha_creacion: fechaFormateada,
+                id_rol: nuevoUsuario.id_rol
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error en el servidor" });
+    }
+}
+
+// Función de login para iniciar sesión
 async function login(req, res) {
     const { nombre_usuario, password } = req.body;
 
@@ -88,4 +138,4 @@ async function login(req, res) {
     }
 }
 
-module.exports = { login };
+module.exports = { login, registrarUsuario };

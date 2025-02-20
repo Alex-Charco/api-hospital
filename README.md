@@ -8,6 +8,8 @@
 
 ✔️ Autenticación con jsonwebtoken (JWT) y bcryptjs
 
+✔️ Login (inicio de sesión) y register (registrar)
+
 ---
 
 ## 1. Configurar el entorno de desarrollo 
@@ -59,3 +61,59 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     node actualizarContraseñas.js
     
 Resultado: todo las contraseñas estan cifradas.
+
+## 3. Login 
+Endpoint: POST /api/auth/login
+
+URL: http://localhost:5000/api/auth/login
+
+Body/raw:
+
+    {
+        "nombre_usuario": "pacient",
+        "password": "pass"
+    }
+
+            {"message":"Inicio de sesión exitoso","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoyLCJub21icmVfdXN1YXJpbyI6InBhY2llbnRlMiIsInJvbCI6",
+
+            "user": {
+                "id_usuario": 2,
+                "nombre_usuario": "pacient",
+                "fecha_creacion": "2025-02-11 05:27:07",
+                "rol": {
+                    "id_rol": 1,
+                    "nombre_rol": "PACIENTE",
+                    "permiso": {
+                        "ver_turno": true,
+                        "ver_historial": true,
+                        "reservar_turno": true
+                    },
+                    "estatus": 1
+                }
+            }
+        }
+
+## 4. Register
+Endpoint: POST /api/auth/login
+
+URL: http://localhost:5000/api/auth/login
+
+Body/raw:
+
+    {
+    "nombre_usuario": "paciente6",
+    "password": "password16",
+    "id_rol": 1
+}
+
+Respuesta:
+
+    {
+        "message": "Usuario registrado exitosamente",
+        "usuario": {
+            "id_usuario": 17,
+            "nombre_usuario": "paciente7",
+            "fecha_creacion": "2025-02-20 20:35:07",
+            "id_rol": 1
+        }
+    }

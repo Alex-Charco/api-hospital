@@ -66,4 +66,22 @@ const authorizeUserAccess = async (req, res, next) => {
     next();
 };
 
-module.exports = { authenticateToken, authorizeRole, authorizeUserAccess };
+// Middleware para verificar el JWT y añadir los datos del usuario a la request
+function verificarToken(req, res, next) {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+        return res.status(401).json({ message: "No autorizado" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.usuario = decoded; 
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Token inválido" });
+    }
+}
+
+
+module.exports = { authenticateToken, authorizeRole, authorizeUserAccess, verificarToken };
