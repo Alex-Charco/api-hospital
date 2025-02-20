@@ -1,4 +1,8 @@
-<h1 align="center"><strong>Título Centrado en Negrita</strong></h1>
+<h1 align="center"><strong>API REST HOSPITAL</strong></h1>
+
+**Descripción**
+
+API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM para MySQL, JWT para autenticación, bcrypt.js para el manejo de contraseñas y CORS para control de acceso. Además, incluye dotenv para la gestión de variables de entorno y body-parser para el procesamiento de solicitudes. Nodemon está configurado para la recarga automática en desarrollo.
 
 ## Tareas completadas
 
