@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const RolUsuario = require("../models/rolUsuarioModel");
-const Usuario = require("../models/usuarioModel");
 
 // Middleware para autenticar el token
 const authenticateToken = (req, res, next) => {
@@ -79,6 +78,7 @@ function verificarToken(req, res, next) {
         req.usuario = decoded; 
         next();
     } catch (error) {
+        console.error(error);
         return res.status(401).json({ message: "Token inválido" });
     }
 }
