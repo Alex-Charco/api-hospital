@@ -14,6 +14,8 @@ API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM pa
 
 ✔️ Login (inicio de sesión) y register (registrar)
 
+✔️ Configuración de pruebas automáticas (se emplea GitHub Actions, pipeline con: node.js, eslint, sonarcloud, slack )
+
 ---
 
 ## 1. Configurar el entorno de desarrollo 
@@ -21,7 +23,7 @@ API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM pa
 ### 1.1 Instalar Node.js y npm
 
 Descargar node [aquí](https://nodejs.org/es).
-
+---
 ### 1.2. Crear un nuevo proyecto
 
 Ejecuta en la terminal:
@@ -31,40 +33,47 @@ Ejecuta en la terminal:
     cd api-rest-node
 
     npm init -y
-
-### 1.3. Instalar dependencias necesarias
+---
+### 1.3. Instalar dependencias iniciales
 
 Ejecuta en la terminal:
 
     npm install express mysql2 dotenv jsonwebtoken bcryptjs cors body-parser
     
     npm install sequelize 
-
+---
+### 1.4. Instalar dependencia nodemon
 Instalar nodemon, recarga automáticamente los cambios:
 
     npm install --save-dev nodemon
 
-### Explicación del uso de jsonwebtoken bcryptjs
+#### Explicación del uso de jsonwebtoken bcryptjs:
  Se utiliza **jsonwebtoken (JWT)**  para crear y verificar tokens de autenticación, permitiendo a los usuarios acceder a las API de manera segura.
  
  Por otro lado, **bcryptjs** se utiliza para encriptar contraseñas, asegurando que incluso si la base de datos se ve comprometida
-### 1.4 Agregar en el archivo package.json nodemon para ejecutarlo 
+
+![Actualizar](https://img.shields.io/badge/Configurar-package.json-blue?style=flat-square)
+
+Agregar en el archivo package.json nodemon para ejecutarlo 
 
     "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
     }
 
+![Actualizar](https://img.shields.io/badge/Actualizar-package.json-blue?style=flat-square)
+
 Actualización de código en el package.json:
 
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
 
-se aregaron los archivos dentro de la carpeta src y se modificó package.json.
+Se agregaron los archivos dentro de la carpeta src y se modificó el package.json.
+
 Ejecutar el servidor con nodemon:
 
     npm run dev
-
+---
 ### 1.5 Instalar dependencia eslint
 Ejecutar en la terminal:
 
@@ -79,9 +88,12 @@ Luego actualizar eslint.config.js
 Renombra eslint.config.mjs a eslint.config.cjs
 
 Ejecutar en la terminal:
+
     npm run lint
+
 Realiza prueba manualmente, pero se configuró build.yml para que haga pruebas automaticamente.
 
+---
 ## 2. Cifrar password en la base de datos
 Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los password (contraseñas) en la base de datos, luego se ejecuta el comando:
 
