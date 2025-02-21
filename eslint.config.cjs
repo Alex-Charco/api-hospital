@@ -6,9 +6,9 @@ module.exports = [
   {
     files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {
-      globals: globals.node,  // Configura el entorno de Node.js
+      globals: globals.node, 
       ecmaVersion: "latest",
-      sourceType: "commonjs",  // Asegura que ESLint entienda CommonJS
+      sourceType: "commonjs", 
     },
   },
   pluginJs.configs.recommended

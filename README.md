@@ -55,9 +55,32 @@ Instalar nodemon, recarga automáticamente los cambios:
     "dev": "nodemon index.js"
     }
 
+Actualización de código en el package.json:
+
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+
+se aregaron los archivos dentro de la carpeta src y se modificó package.json.
 Ejecutar el servidor con nodemon:
 
     npm run dev
+
+### 1.5 Instalar dependencia eslint
+Ejecutar en la terminal:
+
+    npm install eslint --save-dev
+
+Después, configura ESLint con:
+
+    npx eslint --init
+
+Luego actualizar eslint.config.js
+
+Renombra eslint.config.mjs a eslint.config.cjs
+
+Ejecutar en la terminal:
+    npm run lint
+Realiza prueba manualmente, pero se configuró build.yml para que haga pruebas automaticamente.
 
 ## 2. Cifrar password en la base de datos
 Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los password (contraseñas) en la base de datos, luego se ejecuta el comando:
