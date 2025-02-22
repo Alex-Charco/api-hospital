@@ -234,6 +234,45 @@ Respuesta:
         }
     }
 
+## 6. Registrar infoMilitar
+Registra la información mililar del paciente.
+
+Endpoint: POST /api/info-militar/registrar
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+Solo el administrador puede registrar la información militar del paciente.
+Se ingresa el no. identificación para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_paciente.
+
+URL: http://localhost:5000/api/paciente/registrar
+
+Body/raw:
+
+    {
+        "identificacion": "1234566555",
+        "cargo": "NINGUNO",
+        "grado": "CORONEL",
+        "fuerza": "TERRESTRE",
+        "unidad": "15-BAE"
+    }
+
+Respuesta:
+
+    {
+        "message": "Información militar registrada exitosamente.",
+        "infoMilitar": {
+            "id_info_militar": 5,
+            "id_paciente": 7,
+            "cargo": "NINGUNO",
+            "grado": "CORONEL",
+            "fuerza": "TERRESTRE",
+            "unidad": "15-BAE"
+        }
+    }
+
+---
 ## Principales Tecnologías utilizadas
 * JAVASCRIPT
 * Express.js
