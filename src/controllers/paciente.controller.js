@@ -1,24 +1,36 @@
-const { Paciente, Usuario } = require('../models'); // Ajusta la ruta si es necesario
+const { Paciente, Usuario, RolUsuario } = require('../models'); // Ajusta la ruta si es necesario
 
 // Función para registrar un paciente
 const registrarPaciente = async (req, res) => {
-    const { id_usuario, identificacion, fecha_nacimiento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, genero, celular, telefono, correo, estado_civil, grupo_sanguineo, instruccion, ocupacion, empresa, discapacidad, orientacion, identidad, tipo_paciente, estatus } = req.body;
+    const { nombre_usuario, identificacion, fecha_nacimiento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, genero, celular, telefono, correo, estado_civil, grupo_sanguineo, instruccion, ocupacion, empresa, discapacidad, orientacion, identidad, tipo_paciente, estatus } = req.body;
 
     try {
         // Verificar si el usuario logueado tiene el rol de ADMINISTRADOR
-        const usuarioLogueado = req.usuario; 
+        const usuarioLogueado = req.usuario;
         if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
             return res.status(403).json({ message: "No tienes permisos para registrar pacientes." });
         }
 
-        // Verificar si el usuario ingresado existe
-        const usuarioExistente = await Usuario.findByPk(id_usuario);
+        // Buscar el usuario por su nombre de usuario
+        const usuarioExistente = await Usuario.findOne({
+            where: { nombre_usuario },
+            include: [{
+                model: RolUsuario,
+                as: 'rol'
+            }]
+        });
+        
         if (!usuarioExistente) {
             return res.status(400).json({ message: "El usuario ingresado no existe." });
         }
 
-        // Verificar si el usuario ingresado ya está asignado a otro paciente
-        const pacienteExistente = await Paciente.findOne({ where: { id_usuario } });
+        // Verificar si el usuario tiene el rol PACIENTE (id_rol = 1)
+        if (usuarioExistente.id_rol !== 1) {
+            return res.status(400).json({ message: "El usuario no tiene el rol de PACIENTE." });
+        }
+
+        // Verificar si el usuario ya está asignado a otro paciente
+        const pacienteExistente = await Paciente.findOne({ where: { id_usuario: usuarioExistente.id_usuario } });
         if (pacienteExistente) {
             return res.status(400).json({ message: "Este usuario ya está registrado como paciente." });
         }
@@ -31,7 +43,7 @@ const registrarPaciente = async (req, res) => {
 
         // Crear el nuevo paciente
         const nuevoPaciente = await Paciente.create({
-            id_usuario, // Se usa el ID del usuario ingresado, no el del administrador
+            id_usuario: usuarioExistente.id_usuario, // Se obtiene el ID del usuario encontrado
             identificacion,
             fecha_nacimiento,
             primer_nombre,
@@ -54,8 +66,8 @@ const registrarPaciente = async (req, res) => {
             estatus
         });
 
-         // Formatear la fecha antes de devolver la respuesta
-         const pacienteFormateado = {
+        // Formatear la fecha antes de devolver la respuesta
+        const pacienteFormateado = {
             ...nuevoPaciente.toJSON(),
             fecha_nacimiento: new Date(nuevoPaciente.fecha_nacimiento).toISOString().split('T')[0] // Formato YYYY-MM-DD
         };
@@ -73,4 +85,3 @@ const registrarPaciente = async (req, res) => {
 };
 
 module.exports = { registrarPaciente };
-

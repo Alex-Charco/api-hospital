@@ -149,10 +149,10 @@ URL: http://localhost:5000/api/auth/register
 Body/raw:
 
     {
-    "nombre_usuario": "pac788",
-    "password": "45678",
-    "id_rol": 1
-}
+        "nombre_usuario": "pac788",
+        "password": "45678",
+        "id_rol": 1
+    }
 
 Respuesta:
 

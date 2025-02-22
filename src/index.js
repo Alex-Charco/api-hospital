@@ -28,7 +28,8 @@ const PORT = process.env.PORT || 5000;
 
 (async () => {
     try {
-        await sequelize.sync({ alter: false });
+        // Sincronización de la BD con la opción { alter: true } evita índices duplicados
+        await sequelize.sync({ force: false, alter: false });
         console.log("Modelos sincronizados con la base de datos.");
 
         // 📌 Iniciar el servidor
