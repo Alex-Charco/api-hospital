@@ -2,7 +2,7 @@
 
 **Descripción**
 
-API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM para MySQL, JWT para autenticación, bcrypt.js para el manejo de contraseñas y CORS para control de acceso. Además, incluye dotenv para la gestión de variables de entorno y body-parser para el procesamiento de solicitudes. Nodemon está configurado para la recarga automática en desarrollo.
+API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize como ORM para MySQL, JWT para autenticación, bcrypt.js para el manejo de contraseñas y CORS para control de acceso. Además, incluye dotenv para la gestión de variables de entorno y body-parser para el procesamiento de solicitudes. Nodemon está configurado para la recarga automática en desarrollo.
 
 ## Tareas completadas
 
@@ -12,10 +12,11 @@ API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM pa
 
 ✔️ Autenticación con jsonwebtoken (JWT) y bcryptjs
 
-✔️ Login (inicio de sesión) y register (registrar)
+✔️ Login (inicio de sesión) y registrar usuario
 
 ✔️ Configuración de pruebas automáticas (se emplea GitHub Actions, pipeline con: node.js, eslint, sonarcloud, slack )
 
+✔️ Registrar paciente
 ---
 
 ## 1. Configurar el entorno de desarrollo 
@@ -173,12 +174,14 @@ Endpoint: POST /api/paciente/registrar
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar paciente.
+⚠️ **IMPORTANTE:** 
+1. Solo el administrador puede registrar paciente.
+2. Se ingresa el nombre de usuario que es unico para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_usuario.
 
 URL: http://localhost:5000/api/paciente/registrar
 
     {
-        "id_usuario": 17,
+        "nombre_usuario": "pac788",
         "identificacion": "1234566555",
         "fecha_nacimiento": "1995-07-25",
         "primer_nombre": "Andrea",
@@ -230,3 +233,19 @@ Respuesta:
             "estatus": 1
         }
     }
+
+## Principales Tecnologías utilizadas
+* JAVASCRIPT
+* Express.js
+* Sequelize
+* Node.js y npm
+
+## Tecnologías secundaria
+* JWT
+* nodemon
+* VsCode
+* Git
+* GitHub
+
+## Herramientas de Gestión y Diseño
+* **Jira:** herramienta de colaboración y gestión de proyectos, para la planificación.
