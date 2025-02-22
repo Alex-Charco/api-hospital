@@ -2,6 +2,7 @@ const sequelize = require("../config/db");
 
 const Usuario = require("./usuarioModel");
 const RolUsuario = require("./rolUsuarioModel");
+const Paciente = require("./pacienteModel");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -15,6 +16,20 @@ Usuario.belongsTo(RolUsuario, {
     as: "rol",
     onDelete: "RESTRICT",
     onUpdate: "CASCADE",
+});
+
+// Relación entre Paciente y Usuario
+Usuario.hasOne(Paciente, {
+    foreignKey: "id_usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Paciente.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
 });
 
 // Función para sincronizar modelos
@@ -35,4 +50,5 @@ module.exports = {
     sequelize,
     Usuario,
     RolUsuario,
+    Paciente,
 };

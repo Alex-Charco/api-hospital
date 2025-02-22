@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
+const pacienteRoutes = require('./routes/pacienteRoutes');
+
 
 const corsOptions = {
     origin: 'http://localhost:5000'
@@ -19,6 +21,7 @@ app.use(express.json());
 
 // 📌 Rutas
 app.use("/api/auth", authRoutes);
+app.use('/api/paciente', pacienteRoutes);
 
 // 📌 Sincronizar Base de Datos con Sequelize
 const PORT = process.env.PORT || 5000;

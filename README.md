@@ -23,6 +23,7 @@ API REST desarrollada con Node.js y Express.js, utilizando Sequelize como ORM pa
 ### 1.1 Instalar Node.js y npm
 
 Descargar node [aquí](https://nodejs.org/es).
+
 ---
 ### 1.2. Crear un nuevo proyecto
 
@@ -101,7 +102,7 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     
 Resultado: todo las contraseñas estan cifradas.
 
-## 3. Login 
+## 3. Login (Iniciar sesión)
 Endpoint: POST /api/auth/login
 
 URL: http://localhost:5000/api/auth/login
@@ -110,7 +111,7 @@ Body/raw:
 
     {
         "nombre_usuario": "pacient",
-        "password": "pass"
+        "password": "pas555"
     }
 
             {"message":"Inicio de sesión exitoso","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoyLCJub21icmVfdXN1YXJpbyI6InBhY2llbnRlMiIsInJvbCI6",
@@ -132,16 +133,24 @@ Body/raw:
             }
         }
 
-## 4. Register
-Endpoint: POST /api/auth/login
+⚠️ **IMPORTANTE:** El token expira en 1 hora. Se debe renovarlo a tiempo.
 
-URL: http://localhost:5000/api/auth/login
+## 4. Registrar usuario
+Permite registrar el usuario y contraseña.
+
+Endpoint: POST /api/auth/register
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar usuario.
+
+URL: http://localhost:5000/api/auth/register
 
 Body/raw:
 
     {
-    "nombre_usuario": "paciente6",
-    "password": "password16",
+    "nombre_usuario": "pac788",
+    "password": "45678",
     "id_rol": 1
 }
 
@@ -151,8 +160,73 @@ Respuesta:
         "message": "Usuario registrado exitosamente",
         "usuario": {
             "id_usuario": 17,
-            "nombre_usuario": "paciente7",
+            "nombre_usuario": "pac788",
             "fecha_creacion": "2025-02-20 20:35:07",
             "id_rol": 1
+        }
+    }
+
+## 5. Registrar paciente
+Registra la información del paciente.
+
+Endpoint: POST /api/paciente/registrar
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar paciente.
+
+URL: http://localhost:5000/api/paciente/registrar
+
+    {
+        "id_usuario": 17,
+        "identificacion": "1234566555",
+        "fecha_nacimiento": "1995-07-25",
+        "primer_nombre": "Andrea",
+        "segundo_nombre": "Mariana",
+        "primer_apellido": "Castro",
+        "segundo_apellido": "Gonzales",
+        "genero": "FEMENINO",
+        "celular": "0987654888",
+        "telefono": "022344446",
+        "correo": "andreacastro@example.com",
+        "estado_civil": "SOLTERO/A",
+        "grupo_sanguineo": "O RH+",
+        "instruccion": "SUPERIOR",
+        "ocupacion": "MILITAR",
+        "empresa": "",
+        "discapacidad": 0,
+        "orientacion": "HETEROSEXUAL",
+        "identidad": "CISGÉNERO",
+        "tipo_paciente": "MILITAR",
+        "estatus": 1
+    }
+
+Respuesta:
+
+    {
+        "message": "Paciente registrado exitosamente",
+        "paciente": {
+            "id_paciente": 7,
+            "id_usuario": 17,
+            "identificacion": "1234566555",
+            "fecha_nacimiento": "1995-07-25",
+            "primer_nombre": "Andrea",
+            "segundo_nombre": "Mariana",
+            "primer_apellido": "Castro",
+            "segundo_apellido": "Gonzales",
+            "genero": "FEMENINO",
+            "celular": "0987654888",
+            "telefono": "022344446",
+            "correo": "andreacastro@example.com",
+            "estado_civil": "SOLTERO/A",
+            "grupo_sanguineo": "O RH+",
+            "instruccion": "SUPERIOR",
+            "ocupacion": "MILITAR",
+            "empresa": "",
+            "discapacidad": 0,
+            "orientacion": "HETEROSEXUAL",
+            "identidad": "CISGÉNERO",
+            "tipo_paciente": "MILITAR",
+            "estatus": 1
         }
     }
