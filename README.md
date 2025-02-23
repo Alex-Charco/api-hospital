@@ -18,7 +18,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 
 ✔️ Registrar, consultar, actualizar paciente
 
-✔️ egistrar, consultar, actualizar información militar
+✔️ Registrar, consultar, actualizar información militar
 
 
 ## Enpoints
@@ -26,16 +26,20 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 
 | Método  | Endpoint        | Descripción                 | Estado  |
 |---------|----------------|-----------------------------|---------|
-| POST     | `/api/auth/login`     | Login | ✅ |
+|                           Usuario                                 |
+| GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ❌ |
+| POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
-| PUT     | `/api/auth/put/:nombre-usuario` | Actualiza un usuario       | ❌ |
-| DELETE  | `/api/auth/delete/:nombre-usuario` | Elimina un usuario         | ❌ |
+| PUT     | `/api/auth/put/:nombre-usuario` | Actualizar usuario       | ❌ |
+| DELETE  | `/api/auth/delete/:nombre-usuario` | Eliminar usuario         | ❌ |
+|                           Paciente                                 |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
-| PUT     | `/api/paciente/put/:identificacion` | Actualiza un paciente       | ✅ |
-| GET     | `/api/info-militar/get/:identificacion` | Condulta información       | ✅ |
-| POST    | `/api/info-militar/registrar`     | Registrar paciente      | ✅ |
-| PUT     | `/api/info-militar/put/:identificacion` | Actualiza un paciente       | ✅ |
+| PUT     | `/api/paciente/put/:identificacion` | Actualizar paciente       | ✅ |
+| Info militar                                                         |
+| GET     | `/api/info-militar/get/:identificacion` | Consultar info militar       | ✅ |
+| POST    | `/api/info-militar/registrar`     | Registrar info militar      | ✅ |
+| PUT     | `/api/info-militar/put/:identificacion` | Actualiza info militar       | ✅ |
 
 ---
 
@@ -46,7 +50,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 Descargar node [aquí](https://nodejs.org/es).
 
 ---
-### 1.2. Crear un nuevo proyecto
+### 1.2 Crear un nuevo proyecto
 
 Ejecuta en la terminal:
 
@@ -56,23 +60,20 @@ Ejecuta en la terminal:
 
     npm init -y
 ---
-### 1.3. Instalar dependencias iniciales
-
+### 1.3 Instalar dependencias
+#### 1.3.1 Instalar dependencias iniciales
 Ejecuta en la terminal:
 
     npm install express mysql2 dotenv jsonwebtoken bcryptjs cors body-parser
     
     npm install sequelize 
 ---
-### 1.4. Instalar dependencia nodemon
+#### 1.3.2 Instalar dependencia nodemon
 Instalar nodemon, recarga automáticamente los cambios:
 
     npm install --save-dev nodemon
 
-#### Explicación del uso de jsonwebtoken bcryptjs:
- Se utiliza **jsonwebtoken (JWT)**  para crear y verificar tokens de autenticación, permitiendo a los usuarios acceder a las API de manera segura.
- 
- Por otro lado, **bcryptjs** se utiliza para encriptar contraseñas, asegurando que incluso si la base de datos se ve comprometida
+
 
 ![Actualizar](https://img.shields.io/badge/Configurar-package.json-blue?style=flat-square)
 
@@ -83,20 +84,7 @@ Agregar en el archivo package.json nodemon para ejecutarlo
     "dev": "nodemon index.js"
     }
 
-![Actualizar](https://img.shields.io/badge/Actualizar-package.json-blue?style=flat-square)
-
-Actualización de código en el package.json:
-
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
-
-Se agregaron los archivos dentro de la carpeta src y se modificó el package.json.
-
-Ejecutar el servidor con nodemon:
-
-    npm run dev
----
-### 1.5 Instalar dependencia eslint
+#### 1.3.3 Instalar dependencia eslint
 Ejecutar en la terminal:
 
     npm install eslint --save-dev
@@ -116,6 +104,22 @@ Ejecutar en la terminal:
 Realiza prueba manualmente, pero se configuró build.yml para que haga pruebas automaticamente.
 
 ---
+
+### 1.4 Levantar el servidor
+Se agregaron los archivos dentro de la carpeta src y se modificó el package.json.
+
+![Actualizar](https://img.shields.io/badge/Actualizar-package.json-blue?style=flat-square)
+
+Actualización de código en el package.json:
+
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+
+Levanttar el servidor ejecutando en el terminal:
+
+    npm run dev
+
+---
 ## 2. Cifrar password en la base de datos
 Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los password (contraseñas) en la base de datos, luego se ejecuta el comando:
 
@@ -123,9 +127,11 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     
 Resultado: todo las contraseñas estan cifradas.
 
-## 3. ENPOINTS
+## 3. Enpoints
 
-### 3.1 Login (Iniciar sesión)
+* ### GET Consultar usuario 
+
+* ### POST Iniciar sesión usuario (Login)
 Endpoint: POST /api/auth/login
 
 URL: http://localhost:5000/api/auth/login
@@ -158,7 +164,7 @@ Body/raw:
 
 ⚠️ **IMPORTANTE:** El token expira en 1 hora. Se debe renovarlo a tiempo.
 
-### 3.2 Registrar usuario
+* ### POST Registrar usuario
 Permite registrar el usuario y contraseña.
 
 Endpoint: POST /api/auth/register
@@ -189,7 +195,28 @@ Respuesta:
         }
     }
 
-### 3.3. Registrar paciente
+---
+
+* ### GET Consultar paciente
+Buscar la información del paciente mediante número de identificación.
+
+Endpoint: GET /api/paciente/get/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador y médico puede buscar paciente.
+
+URL: http://localhost:5000/api/paciente/get/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/paciente/get/1234569222
+
+Respuesta: Se obtiene los datos del paciente
+
+* ### POST Registrar paciente
 Registra la información del paciente.
 
 Endpoint: POST /api/paciente/registrar
@@ -256,111 +283,7 @@ Respuesta:
         }
     }
 
-## 6. Registrar infoMilitar
-Registra la información mililar del paciente.
-
-Endpoint: POST /api/info-militar/registrar
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE:
-
-Solo el administrador puede registrar la información militar del paciente.
-Se ingresa el no. identificación para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_paciente.
-
-URL: http://localhost:5000/api/paciente/registrar
-
-Body/raw:
-
-    {
-        "identificacion": "1234566333",
-        "cargo": "NINGUNO",
-        "grado": "CORONEL",
-        "fuerza": "TERRESTRE",
-        "unidad": "15-BAE"
-    }
-
-Respuesta:
-
-    {
-        "message": "Información militar registrada exitosamente.",
-        "infoMilitar": {
-            "id_info_militar": 5,
-            "id_paciente": 7,
-            "cargo": "NINGUNO",
-            "grado": "CORONEL",
-            "fuerza": "TERRESTRE",
-            "unidad": "15-BAE"
-        }
-    }
-
-## 7. Obtener infoMilitar
-Buscar la información mililar del paciente mediante número de identificación.
-
-Endpoint: GET /api/info-militar/get/:identificacion
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE:
-
-El administrador y médico puede consultar la información militar del paciente.
-
-URL: http://localhost:5000/api/info-militar/get/:identificacion
-
-Se remplaza **:identificacion** por el número de identificación
-
-URL: http://localhost:5000/api/info-militar/get/1234569222
-
-Respuesta: Información militar del paciente.
-
-## 8. Actualizar infoMilitar
-Actualizar la información mililar del paciente mediante el número de identificación.
-
-Endpoint: PUT /api/info-militar/put/:identificacion
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE:
-
-El administrador puede actualizar la información militar del paciente.
-
-URL: http://localhost:5000/api/info-militar/put/:identificacion
-
-Se remplaza **:identificacion** por el número de identificación
-
-URL: http://localhost:5000/api/info-militar/put/1234569222
-
-Body/raw:
-
-    {
-        "cargo": "NINGUNO",
-        "grado": "CORONEL",
-        "fuerza": "TERRESTRE",
-        "unidad": "15-BAE"
-    }
-
-Respuesta: Información militar actualizada exitosamente
-
-# 9. Obtener paciente
-Buscar la información del paciente mediante número de identificación.
-
-Endpoint: GET /api/paciente/get/:identificacion
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE:
-
-El administrador y médico puede buscar paciente.
-
-URL: http://localhost:5000/api/paciente/get/:identificacion
-
-Se remplaza **:identificacion** por el número de identificación
-
-URL: http://localhost:5000/api/paciente/get/1234569222
-
-Respuesta: Se obtiene los datos del paciente
-
-# 10. Actualizar paciente
+* ### PUT Actualizar paciente
 
 Actualiza la información del paciente mediante número de identificación.
 
@@ -403,6 +326,93 @@ URL: http://localhost:5000/api/paciente/put/1234569222
 Respuesta: Información del paciente actualizada.
 
 ---
+
+* ### GET Consultar información militar
+Buscar la información mililar del paciente mediante número de identificación.
+
+Endpoint: GET /api/info-militar/get/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador y médico puede consultar la información militar del paciente.
+
+URL: http://localhost:5000/api/info-militar/get/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/info-militar/get/1234569222
+
+Respuesta: Información militar del paciente.
+
+* ### POST Registrar infoMilitar
+Registra la información mililar del paciente.
+
+Endpoint: POST /api/info-militar/registrar
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+Solo el administrador puede registrar la información militar del paciente.
+Se ingresa el no. identificación para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_paciente.
+
+URL: http://localhost:5000/api/paciente/registrar
+
+Body/raw:
+
+    {
+        "identificacion": "1234566333",
+        "cargo": "NINGUNO",
+        "grado": "CORONEL",
+        "fuerza": "TERRESTRE",
+        "unidad": "15-BAE"
+    }
+
+Respuesta:
+
+    {
+        "message": "Información militar registrada exitosamente.",
+        "infoMilitar": {
+            "id_info_militar": 5,
+            "id_paciente": 7,
+            "cargo": "NINGUNO",
+            "grado": "CORONEL",
+            "fuerza": "TERRESTRE",
+            "unidad": "15-BAE"
+        }
+    }
+
+* ### PUT Actualizar información militar
+Actualizar la información mililar del paciente mediante el número de identificación.
+
+Endpoint: PUT /api/info-militar/put/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador puede actualizar la información militar del paciente.
+
+URL: http://localhost:5000/api/info-militar/put/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/info-militar/put/1234569222
+
+Body/raw:
+
+    {
+        "cargo": "NINGUNO",
+        "grado": "CORONEL",
+        "fuerza": "TERRESTRE",
+        "unidad": "15-BAE"
+    }
+
+Respuesta: Información militar actualizada exitosamente
+
+---
 ## Principales Tecnologías utilizadas
 * JAVASCRIPT
 * Express.js
@@ -411,10 +421,17 @@ Respuesta: Información del paciente actualizada.
 
 ## Tecnologías secundaria
 * JWT
+* bcryptjs
 * nodemon
 * VsCode
 * Git
 * GitHub
+
+#### Explicación del uso de jsonwebtoken JWT:
+ Se utiliza **jsonwebtoken (JWT)**  para crear y verificar tokens de autenticación, permitiendo a los usuarios acceder a las API de manera segura.
+ 
+ #### Explicación del uso de bcryptjs:
+Se utiliza para encriptar contraseñas, asegurando que incluso si la base de datos se ve comprometida
 
 ## Herramientas de Gestión y Diseño
 * **Jira:** herramienta de colaboración y gestión de proyectos, para la planificación.
