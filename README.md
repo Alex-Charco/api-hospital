@@ -115,7 +115,7 @@ Actualización de código en el package.json:
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
 
-Levanttar el servidor ejecutando en el terminal:
+Levantar el servidor ejecutando en el terminal:
 
     npm run dev
 
