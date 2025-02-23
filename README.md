@@ -189,7 +189,9 @@ Iniciar sesión (copiar token)
 
 Pegar token en: Authorization/Bearer Token/Token
 
-⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar usuario.
+⚠️ **IMPORTANTE:** 
+1. Solo usuario con rol de administrador puede registrar usuario.
+2. Debe ingresar contraseña segura.
 
 URL: http://localhost:5000/api/auth/register
 
