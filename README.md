@@ -251,7 +251,7 @@ URL: http://localhost:5000/api/paciente/registrar
 Body/raw:
 
     {
-        "identificacion": "1234566555",
+        "identificacion": "1234566333",
         "cargo": "NINGUNO",
         "grado": "CORONEL",
         "fuerza": "TERRESTRE",
@@ -287,7 +287,7 @@ URL: http://localhost:5000/api/info-militar/get/:identificacion
 
 Se remplaza **:identificacion** por el número de identificación
 
-URL: http://localhost:5000/api/info-militar/get/1234569999
+URL: http://localhost:5000/api/info-militar/get/1234569222
 
 Respuesta:
 
@@ -298,6 +298,46 @@ Respuesta:
         "grado": "SOLDADO",
         "fuerza": "TERRESTRE",
         "unidad": "15-BAE"
+    }
+
+## 8. Actualizar infoMilitar
+Acctualizar la información mililar del paciente mediante el número de identificación.
+
+Endpoint: POST /api/info-militar/post/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador puede actualizar la información militar del paciente.
+
+URL: http://localhost:5000/api/info-militar/post/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/info-militar/post/1234569222
+
+Body/raw:
+
+    {
+        "cargo": "NINGUNO",
+        "grado": "CORONEL",
+        "fuerza": "TERRESTRE",
+        "unidad": "15-BAE"
+    }
+
+Respuesta:
+
+    {
+        "message": "Información militar actualizada exitosamente.",
+        "infoMilitar": {
+            "id_info_militar": 2,
+            "id_paciente": 1,
+            "cargo": "NINGUNO",
+            "grado": "CORONEL",
+            "fuerza": "TERRESTRE",
+            "unidad": "15-BAE"
+        }
     }
 
 ---

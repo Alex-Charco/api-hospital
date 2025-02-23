@@ -8,4 +8,8 @@ const { verificarToken } = require('../middlewares/auth.middleware');
 router.post('/registrar', verificarToken, infoMilitarController.registrarInfoMilitar);
 // Obtener información militar por paciente
 router.get('/get/:identificacion', verificarToken, infoMilitarController.getByInfoMilitar);
+// Actualizar información militar por paciente
+router.post('/post/:identificacion', verificarToken, infoMilitarController.actualizarInfoMilitar);
+
+
 module.exports = router;

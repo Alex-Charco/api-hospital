@@ -49,7 +49,7 @@ module.exports = {
         }
     },
 
-    // Obtener información militar por paciente con No. identificación (solo administradores) 
+    // Obtener información militar por paciente con No. identificación (administradores,y médicos) 
     async getByInfoMilitar(req, res) {
         try {
             const { identificacion } = req.params;
@@ -77,6 +77,42 @@ module.exports = {
             console.error(error);
             return res.status(500).json({ message: "Error al obtener la información militar." });
         }
-    }
+    },
 
+    // ✅ Actualizar información militar (solo administradores)
+    async actualizarInfoMilitar(req, res) {
+        const { identificacion } = req.params;
+        const { cargo, grado, fuerza, unidad } = req.body;
+
+        try {
+            // ✅ Verificar si el usuario logueado tiene el rol de ADMINISTRADOR
+            const usuarioLogueado = req.usuario;
+            if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+                return res.status(403).json({ message: "No tienes permisos para actualizar información militar." });
+            }
+
+            // ✅ Buscar al paciente por identificación
+            const paciente = await Paciente.findOne({ where: { identificacion } });
+            if (!paciente) {
+                return res.status(404).json({ message: "Paciente no encontrado." });
+            }
+
+            // ✅ Buscar la información militar del paciente
+            const infoMilitar = await InfoMilitar.findOne({ where: { id_paciente: paciente.id_paciente } });
+            if (!infoMilitar) {
+                return res.status(404).json({ message: "Información militar no encontrada." });
+            }
+
+            // ✅ Actualizar los datos de información militar
+            await infoMilitar.update({ cargo, grado, fuerza, unidad });
+
+            return res.status(200).json({
+                message: "Información militar actualizada exitosamente.",
+                infoMilitar
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Error al actualizar la información militar." });
+        }
+    }
 };
