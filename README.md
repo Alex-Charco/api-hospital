@@ -30,7 +30,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ✅ |
 | POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
-| PUT     | `/api/auth/put/:nombre-usuario` | Actualizar usuario       | ❌ |
+| PUT     | `/put/:nombre_usuario/password` | Actualizar usuario       | ❌ |
 | DELETE  | `/api/auth/delete/:nombre-usuario` | Eliminar usuario         | ❌ |
 |                           Paciente                                 |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
@@ -207,6 +207,27 @@ Respuesta:
             "id_rol": 1
         }
     }
+
+* ### PUT Actualizar contraseña
+Endpoint: PUT /api/auth/put/:nombre_usuario/password
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar usuario.
+
+URL: http://localhost:5000/api/auth/put/:nombre_usuario/password
+
+Se remplaza **:nombre_usuario** por el nombre de usuario
+
+URL: http://localhost:5000/api/auth/put/paciente8/password
+
+Body/raw:
+
+    {
+        "nueva_password": "NuevaContraseñaSegura"
+    }
+
+Respuesta: Contraseña actualizada exitosamente.
 
 ---
 

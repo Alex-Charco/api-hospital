@@ -174,4 +174,36 @@ async function login(req, res) {
     }
 }
 
-module.exports = { getUsuario, login, registrarUsuario };
+// Función para actualizar la contraseña de un usuario (solo ADMINISTRADOR)
+async function updatePassword(req, res) {
+    const { nombre_usuario } = req.params; 
+    const { nueva_password } = req.body; 
+
+    try {
+        // Verificar si el usuario actual tiene el rol de ADMINISTRADOR
+        const usuarioLogueado = req.usuario;
+        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+        }
+
+        // Buscar el usuario por nombre
+        const usuario = await Usuario.findOne({ where: { nombre_usuario } });
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        // Cifrar la nueva contraseña
+        const hashedPassword = await bcrypt.hash(nueva_password, 10);
+
+        // Actualizar la contraseña
+        await usuario.update({ password: hashedPassword });
+
+        return res.json({ message: "Contraseña actualizada exitosamente" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error en el servidor" });
+    }
+}
+
+module.exports = { getUsuario, login, registrarUsuario, updatePassword };
