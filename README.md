@@ -30,7 +30,8 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ✅ |
 | POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
-| PUT     | `/put/:nombre_usuario/password` | Actualizar usuario       | ✅ |
+| PUT     | `/put/:nombre_usuario/password` | Actualizar usuario para administrador      | ✅ |
+| PUT     | `/put/password/:nombre_usuario` | Actualizar usuario      | ✅ |
 | DELETE  | `/api/auth/delete/:nombre-usuario` | Eliminar usuario         | ❌ |
 |                           Paciente                                 |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
@@ -132,7 +133,9 @@ Resultado: todo las contraseñas estan cifradas.
 * ### GET Consultar usuario 
 Endpoint: GET /api/auth/get/:nombre_usuario
 
-Token: Authorization/Bearer Token/Token
+Iniciar sesión (copiar token)
+
+Pegar token en: Authorization/Bearer Token/Token
 
 ⚠️ IMPORTANTE: Usuario administrador logeado puede consultar usuario
 
@@ -182,7 +185,9 @@ Permite registrar el usuario y contraseña.
 
 Endpoint: POST /api/auth/register
 
-Token: Authorization/Bearer Token/Token
+Iniciar sesión (copiar token)
+
+Pegar token en: Authorization/Bearer Token/Token
 
 ⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar usuario.
 
@@ -208,12 +213,12 @@ Respuesta:
         }
     }
 
-* ### PUT Actualizar contraseña
+* ### PUT Actualizar contraseña para administrador
 Endpoint: PUT /api/auth/put/:nombre_usuario/password
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ **IMPORTANTE:** Solo usuario con rol de administrador puede registrar usuario.
+⚠️ **IMPORTANTE:** Solo usuario con rol de  puede actualizar usuario.
 
 URL: http://localhost:5000/api/auth/put/:nombre_usuario/password
 
@@ -228,6 +233,29 @@ Body/raw:
     }
 
 Respuesta: Contraseña actualizada exitosamente.
+
+* ### PUT Actualizar contraseña para usuarios
+Cualquier usuario registado sin importar el rol (paciente, médico, administador) puede cambiar su contraseña.
+
+Endpoint: PUT /api/auth/put/password/:nombre_usuario
+
+Iniciar sesión (copiar token)
+
+Pegar token en: Authorization/Bearer Token/Token
+
+URL: http://localhost:5000/api/auth/put/password/:nombre_usuario
+Se remplaza **:nombre_usuario** por el nombre de usuario
+
+URL: http://localhost:5000/api/auth/put/password/paciente8
+
+Body/raw:
+
+    {
+    "password_actual": "TuContraseñaActual",
+    "nueva_password": "NuevaContraseña@2024"
+    }
+
+Respuesta: Contraseña actualizada exitosamente. Debes volver a iniciar sesión.
 
 ---
 

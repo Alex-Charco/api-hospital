@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Usuario, RolUsuario } = require('../models');
+// Expresión regular para validar contraseñas fuertes
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-+_#^(){}[\]]).{10,}$/;
 
 // Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
 async function getUsuario(req, res) {
@@ -206,4 +208,54 @@ async function updatePassword(req, res) {
     }
 }
 
-module.exports = { getUsuario, login, registrarUsuario, updatePassword };
+// Función para que un usuarioautenticado cambie la contraseña
+async function putPassword(req, res) {
+    const { nombre_usuario } = req.params;
+    const { password_actual, nueva_password } = req.body;
+
+    try {
+        // Verificar si el usuario autenticado es el mismo que quiere cambiar la contraseña
+        const usuarioLogueado = req.usuario;
+        if (!usuarioLogueado || usuarioLogueado.nombre_usuario !== nombre_usuario) {
+            return res.status(403).json({ message: "No tienes permisos para cambiar esta contraseña" });
+        }
+
+        // Buscar el usuario por nombre de usuario
+        const usuario = await Usuario.findOne({ where: { nombre_usuario } });
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        // Verificar la contraseña actual
+        const passwordMatch = await bcrypt.compare(password_actual, usuario.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "Contraseña actual incorrecta" });
+        }
+
+        // Verifica que la contraseña sea segura
+        if (!passwordRegex.test(nueva_password)) {
+            return res.status(400).json({
+                message: "La nueva contraseña debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial."
+            });
+        }
+
+        // Cifrar la nueva contraseña con bcrypt
+        const hashedPassword = await bcrypt.hash(nueva_password, 10);
+
+        // Actualizar la contraseña en la base de datos
+        await usuario.update({ password: hashedPassword });
+
+        // Invalida todos los tokens activos cerrando sesión en otros dispositivos
+        usuario.token = null;
+        await usuario.save();
+
+        return res.json({ message: "Contraseña actualizada exitosamente. Debes volver a iniciar sesión." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error en el servidor" });
+    }
+}
+
+
+module.exports = { getUsuario, login, registrarUsuario, updatePassword, putPassword };
