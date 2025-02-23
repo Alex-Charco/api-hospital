@@ -16,7 +16,7 @@ const app = express();
 app.disable("x-powered-by");
 
 // 📌 Middlewares
-app.use(cors(corsOptions));  // Solo esta línea es necesaria
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // 📌 Rutas

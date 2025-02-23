@@ -289,16 +289,7 @@ Se remplaza **:identificacion** por el número de identificación
 
 URL: http://localhost:5000/api/info-militar/get/1234569222
 
-Respuesta:
-
-    {
-        "id_info_militar": 2,
-        "id_paciente": 1,
-        "cargo": "NINGUNO",
-        "grado": "SOLDADO",
-        "fuerza": "TERRESTRE",
-        "unidad": "15-BAE"
-    }
+Respuesta: Información militar del paciente.
 
 ## 8. Actualizar infoMilitar
 Acctualizar la información mililar del paciente mediante el número de identificación.
@@ -326,19 +317,28 @@ Body/raw:
         "unidad": "15-BAE"
     }
 
-Respuesta:
+Respuesta: Información militar actualizada exitosamente
 
-    {
-        "message": "Información militar actualizada exitosamente.",
-        "infoMilitar": {
-            "id_info_militar": 2,
-            "id_paciente": 1,
-            "cargo": "NINGUNO",
-            "grado": "CORONEL",
-            "fuerza": "TERRESTRE",
-            "unidad": "15-BAE"
-        }
-    }
+# 9. Obtener paciente
+Buscar la información del paciente mediante número de identificación.
+
+Endpoint: GET /api/paciente/get/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador y médico puede buscar paciente.
+
+URL: http://localhost:5000/api/paciente/get/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/paciente/get/1234569222
+
+...
+
+Respuesta: Se obtiene los datos del paciente
 
 ---
 ## Principales Tecnologías utilizadas
