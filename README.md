@@ -30,7 +30,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ✅ |
 | POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
-| PUT     | `/put/:nombre_usuario/password` | Actualizar usuario       | ❌ |
+| PUT     | `/put/:nombre_usuario/password` | Actualizar usuario       | ✅ |
 | DELETE  | `/api/auth/delete/:nombre-usuario` | Eliminar usuario         | ❌ |
 |                           Paciente                                 |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
