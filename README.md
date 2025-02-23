@@ -16,7 +16,27 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 
 ✔️ Configuración de pruebas automáticas (se emplea GitHub Actions, pipeline con: node.js, eslint, sonarcloud, slack )
 
-✔️ Registrar paciente
+✔️ Registrar, consultar, actualizar paciente
+
+✔️ egistrar, consultar, actualizar información militar
+
+
+## Enpoints
+## 📌 API Endpoints
+
+| Método  | Endpoint        | Descripción                 | Estado  |
+|---------|----------------|-----------------------------|---------|
+| POST     | `/api/auth/login`     | Login | ✅ |
+| POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
+| PUT     | `/api/auth/put/:nombre-usuario` | Actualiza un usuario       | ❌ |
+| DELETE  | `/api/auth/delete/:nombre-usuario` | Elimina un usuario         | ❌ |
+| GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
+| POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
+| PUT     | `/api/paciente/put/:identificacion` | Actualiza un paciente       | ✅ |
+| GET     | `/api/info-militar/get/:identificacion` | Condulta información       | ✅ |
+| POST    | `/api/info-militar/registrar`     | Registrar paciente      | ✅ |
+| PUT     | `/api/info-militar/put/:identificacion` | Actualiza un paciente       | ✅ |
+
 ---
 
 ## 1. Configurar el entorno de desarrollo 
@@ -103,7 +123,9 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     
 Resultado: todo las contraseñas estan cifradas.
 
-## 3. Login (Iniciar sesión)
+## 3. ENPOINTS
+
+### 3.1 Login (Iniciar sesión)
 Endpoint: POST /api/auth/login
 
 URL: http://localhost:5000/api/auth/login
@@ -136,7 +158,7 @@ Body/raw:
 
 ⚠️ **IMPORTANTE:** El token expira en 1 hora. Se debe renovarlo a tiempo.
 
-## 4. Registrar usuario
+### 3.2 Registrar usuario
 Permite registrar el usuario y contraseña.
 
 Endpoint: POST /api/auth/register
@@ -167,7 +189,7 @@ Respuesta:
         }
     }
 
-## 5. Registrar paciente
+### 3.3. Registrar paciente
 Registra la información del paciente.
 
 Endpoint: POST /api/paciente/registrar
