@@ -60,6 +60,13 @@ async function registrarUsuario(req, res) {
             return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
         }
 
+        // Validar si la contraseña cumple con los requisitos de seguridad
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({ 
+                message: "La contraseña no es segura. Debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial (@$!%*?&-+)." 
+            });
+        }
+
         // Cifrar la contraseña antes de guardarla
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -71,6 +78,7 @@ async function registrarUsuario(req, res) {
             fecha_creacion: new Date(),  
             estatus: 1 
         });
+        
         // Formatear la fecha de creación para un formato más legible
         const fechaFormateada = new Date(nuevoUsuario.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ');
 
