@@ -272,6 +272,34 @@ Respuesta:
         }
     }
 
+## 7. Obtener infoMilitar
+Buscar la información mililar del paciente mediante número de identificación.
+
+Endpoint: GET /api/info-militar/get/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador y médico puede consultar la información militar del paciente.
+
+URL: http://localhost:5000/api/info-militar/get/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/info-militar/get/1234569999
+
+Respuesta:
+
+    {
+        "id_info_militar": 2,
+        "id_paciente": 1,
+        "cargo": "NINGUNO",
+        "grado": "SOLDADO",
+        "fuerza": "TERRESTRE",
+        "unidad": "15-BAE"
+    }
+
 ---
 ## Principales Tecnologías utilizadas
 * JAVASCRIPT

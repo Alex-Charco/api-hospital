@@ -14,7 +14,7 @@ module.exports = {
 
             // ✅ Verificar si el paciente existe por número de identificación
             const paciente = await Paciente.findOne({ where: { identificacion } });
-            
+
             if (!paciente) {
                 return res.status(404).json({ message: "Paciente no encontrado." });
             }
@@ -48,4 +48,35 @@ module.exports = {
             return res.status(500).json({ message: "Error al crear información militar." });
         }
     },
+
+    // Obtener información militar por paciente con No. identificación (solo administradores) 
+    async getByInfoMilitar(req, res) {
+        try {
+            const { identificacion } = req.params;
+
+            // ✅ Verificar si el usuario logueado tiene el rol de ADMINISTRADOR o MÉDICO
+            const usuarioLogueado = req.usuario;
+            if (!usuarioLogueado || !['ADMINISTRADOR', 'MEDICO'].includes(usuarioLogueado.rol.nombre_rol)) {
+                return res.status(403).json({ message: "No tienes permisos para obtener información militar." });
+            }
+
+            // ✅ Buscar al paciente por identificación
+            const paciente = await Paciente.findOne({ where: { identificacion } });
+            if (!paciente) {
+                return res.status(404).json({ message: "Paciente no encontrado." });
+            }
+
+            // ✅ Buscar la información militar del paciente
+            const infoMilitar = await InfoMilitar.findOne({ where: { id_paciente: paciente.id_paciente } });
+            if (!infoMilitar) {
+                return res.status(404).json({ message: "Información militar no encontrada." });
+            }
+
+            return res.status(200).json(infoMilitar);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Error al obtener la información militar." });
+        }
+    }
+
 };
