@@ -9,7 +9,7 @@ router.post('/registrar', verificarToken, infoMilitarController.registrarInfoMil
 // Obtener información militar por paciente
 router.get('/get/:identificacion', verificarToken, infoMilitarController.getByInfoMilitar);
 // Actualizar información militar por paciente
-router.post('/post/:identificacion', verificarToken, infoMilitarController.actualizarInfoMilitar);
+router.put('/put/:identificacion', verificarToken, infoMilitarController.actualizarInfoMilitar);
 
 
 module.exports = router;

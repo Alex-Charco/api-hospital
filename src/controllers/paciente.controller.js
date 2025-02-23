@@ -148,8 +148,8 @@ module.exports = {
                 where: { identificacion },
                 include: [
                     {
-                        model: Usuario, 
-                        as: "usuario", 
+                        model: Usuario,
+                        as: "usuario",
                     },
                 ],
             });
@@ -176,4 +176,63 @@ module.exports = {
             return res.status(500).json({ message: "Error en el servidor." });
         }
     },
+
+    // Función para actualizar la información del paciente
+    async actualizarPaciente(req, res) {
+        const { identificacion } = req.params; // Identificación del paciente a actualizar
+        const { fecha_nacimiento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, genero, celular, telefono, correo, estado_civil, grupo_sanguineo, instruccion, ocupacion, empresa, discapacidad, orientacion, identidad, tipo_paciente, estatus } = req.body;
+
+        try {
+            // Verificar si el usuario logueado tiene el rol de ADMINISTRADOR
+            const usuarioLogueado = req.usuario;
+            if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+                return res.status(403).json({ message: "No tienes permisos para actualizar la información del paciente." });
+            }
+
+            // Buscar al paciente por su identificación
+            const paciente = await Paciente.findOne({ where: { identificacion } });
+            if (!paciente) {
+                return res.status(404).json({ message: "Paciente no encontrado." });
+            }
+
+            // Actualizar los datos del paciente
+            const pacienteActualizado = await paciente.update({
+                fecha_nacimiento,
+                primer_nombre,
+                segundo_nombre,
+                primer_apellido,
+                segundo_apellido,
+                genero,
+                celular,
+                telefono,
+                correo,
+                estado_civil,
+                grupo_sanguineo,
+                instruccion,
+                ocupacion,
+                empresa,
+                discapacidad,
+                orientacion,
+                identidad,
+                tipo_paciente,
+                estatus
+            });
+
+            // Formatear la fecha de nacimiento antes de devolverla
+            const pacienteFormateado = {
+                ...pacienteActualizado.toJSON(),
+                fecha_nacimiento: new Date(pacienteActualizado.fecha_nacimiento).toISOString().split('T')[0] // Formato YYYY-MM-DD
+            };
+
+            // Devolver los datos actualizados del paciente
+            return res.status(200).json({
+                message: "Información del paciente actualizada exitosamente",
+                paciente: pacienteFormateado
+            });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Error en el servidor al actualizar la información del paciente." });
+        }
+    }
 };

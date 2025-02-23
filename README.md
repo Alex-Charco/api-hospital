@@ -292,9 +292,9 @@ URL: http://localhost:5000/api/info-militar/get/1234569222
 Respuesta: Información militar del paciente.
 
 ## 8. Actualizar infoMilitar
-Acctualizar la información mililar del paciente mediante el número de identificación.
+Actualizar la información mililar del paciente mediante el número de identificación.
 
-Endpoint: POST /api/info-militar/post/:identificacion
+Endpoint: PUT /api/info-militar/put/:identificacion
 
 Token: Authorization/Bearer Token/Token
 
@@ -302,11 +302,11 @@ Token: Authorization/Bearer Token/Token
 
 El administrador puede actualizar la información militar del paciente.
 
-URL: http://localhost:5000/api/info-militar/post/:identificacion
+URL: http://localhost:5000/api/info-militar/put/:identificacion
 
 Se remplaza **:identificacion** por el número de identificación
 
-URL: http://localhost:5000/api/info-militar/post/1234569222
+URL: http://localhost:5000/api/info-militar/put/1234569222
 
 Body/raw:
 
@@ -336,9 +336,49 @@ Se remplaza **:identificacion** por el número de identificación
 
 URL: http://localhost:5000/api/paciente/get/1234569222
 
-...
-
 Respuesta: Se obtiene los datos del paciente
+
+# 10. Actualizar paciente
+
+Actualiza la información del paciente mediante número de identificación.
+
+Endpoint: PUT /api/paciente/put/:identificacion
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE:
+
+El administrador puede actualizar la información del paciente.
+
+URL: http://localhost:5000/api/paciente/put/:identificacion
+
+Se remplaza **:identificacion** por el número de identificación
+
+URL: http://localhost:5000/api/paciente/put/1234569222
+
+    {
+        "fecha_nacimiento": "1995-07-25",
+        "primer_nombre": "Andrea",
+        "segundo_nombre": "Anai",
+        "primer_apellido": "Castro",
+        "segundo_apellido": "Gonzales",
+        "genero": "FEMENINO",
+        "celular": "0987654888",
+        "telefono": "022344446",
+        "correo": "andreacastro@example.com",
+        "estado_civil": "SOLTERO/A",
+        "grupo_sanguineo": "O RH+",
+        "instruccion": "SUPERIOR",
+        "ocupacion": "MILITAR",
+        "empresa": "",
+        "discapacidad": 0,
+        "orientacion": "HETEROSEXUAL",
+        "identidad": "CISGÉNERO",
+        "tipo_paciente": "MILITAR",
+        "estatus": 1
+    }
+    
+Respuesta: Información del paciente actualizada.
 
 ---
 ## Principales Tecnologías utilizadas
