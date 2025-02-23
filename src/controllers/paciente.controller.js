@@ -1,8 +1,7 @@
 const { Paciente, Usuario, RolUsuario } = require("../models"); // Ajusta la ruta si es necesario
 
-module.exports = {
     // Función para registrar un paciente
-    async registrarPaciente(req, res) {
+    async function registrarPaciente(req, res) {
         const {
             nombre_usuario,
             identificacion,
@@ -125,10 +124,10 @@ module.exports = {
             console.error(error);
             return res.status(500).json({ message: "Error en el servidor" });
         }
-    },
+    }
 
     // Función para obtener un paciente por identificación
-    async obtenerPaciente(req, res) {
+    async function getPaciente(req, res) {
         const { identificacion } = req.params;
 
         try {
@@ -175,10 +174,10 @@ module.exports = {
             console.error(error);
             return res.status(500).json({ message: "Error en el servidor." });
         }
-    },
+    }
 
     // Función para actualizar la información del paciente
-    async actualizarPaciente(req, res) {
+    async function actualizarPaciente(req, res) {
         const { identificacion } = req.params; // Identificación del paciente a actualizar
         const { fecha_nacimiento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, genero, celular, telefono, correo, estado_civil, grupo_sanguineo, instruccion, ocupacion, empresa, discapacidad, orientacion, identidad, tipo_paciente, estatus } = req.body;
 
@@ -235,4 +234,4 @@ module.exports = {
             return res.status(500).json({ message: "Error en el servidor al actualizar la información del paciente." });
         }
     }
-};
+    module.exports = {registrarPaciente, getPaciente, actualizarPaciente };

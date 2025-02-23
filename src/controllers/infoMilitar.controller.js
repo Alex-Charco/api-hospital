@@ -1,8 +1,8 @@
 const { InfoMilitar, Paciente } = require('../models');
 
-module.exports = {
+
     // Crear nuevo registro de información militar (solo administradores)
-    async registrarInfoMilitar(req, res) {
+    async function registrarInfoMilitar(req, res) {
         const { identificacion, cargo, grado, fuerza, unidad } = req.body;
 
         try {
@@ -47,10 +47,10 @@ module.exports = {
             console.error(error);
             return res.status(500).json({ message: "Error al crear información militar." });
         }
-    },
+    }
 
     // Obtener información militar por paciente con No. identificación (administradores,y médicos) 
-    async getByInfoMilitar(req, res) {
+    async function getByInfoMilitar(req, res) {
         try {
             const { identificacion } = req.params;
 
@@ -77,10 +77,10 @@ module.exports = {
             console.error(error);
             return res.status(500).json({ message: "Error al obtener la información militar." });
         }
-    },
+    }
 
     // ✅ Actualizar información militar (solo administradores)
-    async actualizarInfoMilitar(req, res) {
+    async function actualizarInfoMilitar(req, res) {
         const { identificacion } = req.params;
         const { cargo, grado, fuerza, unidad } = req.body;
 
@@ -115,4 +115,4 @@ module.exports = {
             return res.status(500).json({ message: "Error al actualizar la información militar." });
         }
     }
-};
+    module.exports = { registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar };

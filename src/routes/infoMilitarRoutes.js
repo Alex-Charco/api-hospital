@@ -1,15 +1,15 @@
 // routes/InfoMilitarRoutes.js
 const express = require('express');
 const router = express.Router();
-const infoMilitarController = require('../controllers/infoMilitar.controller');
+const {registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar } = require('../controllers/infoMilitar.controller');
 const { verificarToken } = require('../middlewares/auth.middleware');
 
 // Crear nueva información militar
-router.post('/registrar', verificarToken, infoMilitarController.registrarInfoMilitar);
+router.post('/registrar', verificarToken, registrarInfoMilitar);
 // Obtener información militar por paciente
-router.get('/get/:identificacion', verificarToken, infoMilitarController.getByInfoMilitar);
+router.get('/get/:identificacion', verificarToken, getByInfoMilitar);
 // Actualizar información militar por paciente
-router.put('/put/:identificacion', verificarToken, infoMilitarController.actualizarInfoMilitar);
+router.put('/put/:identificacion', verificarToken, actualizarInfoMilitar);
 
 
 module.exports = router;
