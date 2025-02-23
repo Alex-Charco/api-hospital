@@ -27,7 +27,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | Método  | Endpoint        | Descripción                 | Estado  |
 |---------|----------------|-----------------------------|---------|
 |                           Usuario                                 |
-| GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ❌ |
+| GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ✅ |
 | POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
 | PUT     | `/api/auth/put/:nombre-usuario` | Actualizar usuario       | ❌ |
@@ -130,6 +130,19 @@ Resultado: todo las contraseñas estan cifradas.
 ## 3. Enpoints
 
 * ### GET Consultar usuario 
+Endpoint: GET /api/auth/get/:nombre_usuario
+
+Token: Authorization/Bearer Token/Token
+
+⚠️ IMPORTANTE: Usuario administrador logeado puede consultar usuario
+
+URL: http://localhost:5000/api/auth/get/:nombre_usuario
+
+Se remplaza **:nombre_usuario** por el nombre de usuario
+
+URL: http://localhost:5000/api/auth/get/pacient
+
+Respuesta: Usuario encontrado exitosamente y los datos.
 
 * ### POST Iniciar sesión usuario (Login)
 Endpoint: POST /api/auth/login
@@ -204,9 +217,7 @@ Endpoint: GET /api/paciente/get/:identificacion
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ IMPORTANTE:
-
-El administrador y médico puede buscar paciente.
+⚠️ IMPORTANTE: El administrador y médico puede buscar paciente.
 
 URL: http://localhost:5000/api/paciente/get/:identificacion
 
@@ -291,9 +302,7 @@ Endpoint: PUT /api/paciente/put/:identificacion
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ IMPORTANTE:
-
-El administrador puede actualizar la información del paciente.
+⚠️ IMPORTANTE: El administrador puede actualizar la información del paciente.
 
 URL: http://localhost:5000/api/paciente/put/:identificacion
 
@@ -334,9 +343,7 @@ Endpoint: GET /api/info-militar/get/:identificacion
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ IMPORTANTE:
-
-El administrador y médico puede consultar la información militar del paciente.
+⚠️ IMPORTANTE: El administrador y médico puede consultar la información militar del paciente.
 
 URL: http://localhost:5000/api/info-militar/get/:identificacion
 
@@ -353,9 +360,7 @@ Endpoint: POST /api/info-militar/registrar
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ IMPORTANTE:
-
-Solo el administrador puede registrar la información militar del paciente.
+⚠️ IMPORTANTE: Solo el administrador puede registrar la información militar del paciente.
 Se ingresa el no. identificación para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_paciente.
 
 URL: http://localhost:5000/api/paciente/registrar
@@ -391,9 +396,7 @@ Endpoint: PUT /api/info-militar/put/:identificacion
 
 Token: Authorization/Bearer Token/Token
 
-⚠️ IMPORTANTE:
-
-El administrador puede actualizar la información militar del paciente.
+⚠️ IMPORTANTE: El administrador puede actualizar la información militar del paciente.
 
 URL: http://localhost:5000/api/info-militar/put/:identificacion
 
@@ -410,7 +413,7 @@ Body/raw:
         "unidad": "15-BAE"
     }
 
-Respuesta: Información militar actualizada exitosamente
+Respuesta: Información militar actualizada exitosamente y los datos actualizados
 
 ---
 ## Principales Tecnologías utilizadas

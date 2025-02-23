@@ -2,6 +2,42 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Usuario, RolUsuario } = require('../models');
 
+// Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
+async function getUsuario(req, res) {
+    const { nombre_usuario } = req.params;
+
+    try {
+        const usuarioLogueado = req.usuario;
+        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+        }
+
+        const usuario = await Usuario.findOne({
+            where: { nombre_usuario },
+            include: [{
+                model: RolUsuario,
+                as: 'rol',
+                attributes: ['id_rol', 'nombre_rol', 'permiso', 'estatus']
+            }]
+        });
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        return res.json({
+            message: "Usuario encontrado exitosamente",
+            id_usuario: usuario.id_usuario,
+            nombre_usuario: usuario.nombre_usuario,
+            fecha_creacion: usuario.fecha_creacion,
+            rol: usuario.rol
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error en el servidor" });
+    }
+}
+
 // Función para registrar un nuevo usuario
 async function registrarUsuario(req, res) {
     const { nombre_usuario, password, id_rol } = req.body;
@@ -138,4 +174,4 @@ async function login(req, res) {
     }
 }
 
-module.exports = { login, registrarUsuario };
+module.exports = { getUsuario, login, registrarUsuario };
