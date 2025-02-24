@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Usuario, RolUsuario } = require('../models');
+const { verificarAsignaciones } = require('../services/user.service');
+
 // Expresión regular para validar contraseñas fuertes
 const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-+_#^(){}[\]]).{10,}$/;
 
@@ -265,5 +267,52 @@ async function putPassword(req, res) {
     }
 }
 
+// Función para eliminar un usuario
+async function deleteUsuario(req, res) {
+    const { nombre_usuario } = req.params; // ID del usuario a eliminar
 
-module.exports = { getUsuario, login, registrarUsuario, updatePassword, putPassword };
+    try {
+        // Verificar si el usuario autenticado es ADMINISTRADOR
+        const usuarioLogueado = req.usuario;
+        console.log("Usuario autenticado:", usuarioLogueado); // Depuración
+        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
+            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+        }
+
+        // Verificar si el usuario a eliminar existe
+        const usuario = await Usuario.findOne({ 
+            where: { nombre_usuario },
+            include: {
+                model: RolUsuario,
+                as: 'rol',
+                attributes: ['nombre_rol']
+            }        
+        });
+        
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        // Verificar si el usuario a eliminar también es ADMINISTRADOR
+        if (usuario.rol.nombre_rol === 'ADMINISTRADOR') {
+            return res.status(400).json({ message: "No puedes eliminar a otro administrador" });
+        }
+
+        // Verificar si el usuario está asignado en otras tablas con su id_usuario
+        const tieneAsignaciones = await verificarAsignaciones(usuario.id_usuario);
+        if (tieneAsignaciones) {
+            return res.status(400).json({ message: "No se puede eliminar el usuario porque está asignado a una entidad" });
+        }
+
+        // Eliminar el usuario
+        await usuario.destroy();
+
+        return res.status(200).json({ message: "Usuario eliminado exitosamente" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error en el servidor" });
+    }
+}
+
+module.exports = { getUsuario, login, registrarUsuario, updatePassword, putPassword, deleteUsuario };

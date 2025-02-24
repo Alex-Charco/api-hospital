@@ -32,7 +32,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
 | PUT     | `/put/:nombre_usuario/password` | Actualizar usuario para administrador      | ✅ |
 | PUT     | `/put/password/:nombre_usuario` | Actualizar usuario      | ✅ |
-| DELETE  | `/api/auth/delete/:nombre-usuario` | Eliminar usuario         | ❌ |
+| DELETE  | `/api/auth/delete/:nombre_usuario` | Eliminar usuario         | ✅ |
 |                           Paciente                                 |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
@@ -258,6 +258,29 @@ Body/raw:
     }
 
 Respuesta: Contraseña actualizada exitosamente. Debes volver a iniciar sesión.
+
+* ### DELETE Eliminar usuario
+⚠️ IMPORTANTE: Eliminar un usuario cumpliendo con las siguientes condiciones:
+
+1. ✅ Solo los ADMINISTRADORES pueden eliminar usuarios.
+2. ✅ El usuario debe existir en la base de datos.
+3. ✅ No se puede eliminar a otro administrador.
+4. ✅ El usuario no debe estar asignado a ninguna entidad que impida su eliminación.
+5. ✅ Manejo de errores adecuado.
+
+Endpoint: DELETE /api/auth/delete/:nombre_usuario
+
+Iniciar sesión (copiar token)
+
+Pegar token en: Authorization/Bearer Token/Token
+
+URL: http://localhost:5000/api/auth/delete/:nombre_usuario
+
+Se remplaza **:nombre_usuario** por el nombre de usuario
+
+URL: http://localhost:5000/api/auth/delete/pacient
+
+Respuesta: Usuario eliminado exitosamente.
 
 ---
 

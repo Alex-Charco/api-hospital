@@ -4,6 +4,9 @@ const Usuario = require("./usuarioModel");
 const RolUsuario = require("./rolUsuarioModel");
 const Paciente = require("./pacienteModel");
 const InfoMilitar = require("./infoMilitarModel")
+const Medico = require("./medicoModel")
+const Especialidad = require("./especialidadModel")
+const Administrador = require("./administradorModel");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -26,6 +29,7 @@ Usuario.hasOne(Paciente, {
     onUpdate: "CASCADE"
 });
 
+
 Paciente.belongsTo(Usuario, {
     foreignKey: "id_usuario",
     as: "usuario",
@@ -33,6 +37,47 @@ Paciente.belongsTo(Usuario, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre Usuario y Médico
+Usuario.hasOne(Medico, {
+    foreignKey: "id_usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Medico.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre Médico y Especialidad
+Medico.belongsTo(Especialidad, {
+    foreignKey: 'id_especialidad',
+    as: 'especialidad'
+});
+
+Especialidad.hasMany(Medico, {
+    foreignKey: 'id_especialidad',
+    onDelete: 'RESTRICT', 
+    onUpdate: 'CASCADE'
+});
+
+// Relación entre Usuario y Administrador
+Usuario.hasOne(Administrador, {
+    foreignKey: "id_usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Administrador.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre Paciente e InfoMilitar
 Paciente.hasOne(InfoMilitar, {
     foreignKey: "id_paciente",
     onDelete: "CASCADE",
@@ -46,19 +91,6 @@ InfoMilitar.belongsTo(Paciente, {
     onUpdate: "CASCADE"
 });
 
-// Función para sincronizar modelos
-async function syncModels() {
-    try {
-        console.log('Sincronizando modelos con la base de datos...');
-        await sequelize.sync({ alter: true });
-        console.log('Sincronización completada.');
-    } catch (error) {
-        console.error('Error al sincronizar los modelos:', error);
-    }
-}
-
-syncModels();
-
 // Exportar modelos y conexión
 module.exports = {
     sequelize,
@@ -66,4 +98,7 @@ module.exports = {
     RolUsuario,
     Paciente,
     InfoMilitar,
+    Medico,
+    Especialidad,
+    Administrador
 };
