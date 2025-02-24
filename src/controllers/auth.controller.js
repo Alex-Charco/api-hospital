@@ -1,10 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { Usuario, RolUsuario } = require('../models');
-const { verificarAsignaciones } = require('../services/user.service');
-
-// Expresión regular para validar contraseñas fuertes
-const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-+_#^(){}[\]]).{10,}$/;
+const { verificarUsuarioExistente, verificarPassword, verificarAsignaciones } = require('../services/user.service');
+const { validarPassword } = require('../services/validation.service');
 
 // Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
 async function getUsuario(req, res) {
@@ -43,16 +41,14 @@ async function registrarUsuario(req, res) {
 
     try {
         // Verificar si el nombre de usuario ya existe
-        const usuarioExistente = await Usuario.findOne({
-            where: { nombre_usuario }
-        });
+        const usuarioExistente = await verificarUsuarioExistente(nombre_usuario);
 
         if (usuarioExistente) {
             return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
         }
 
         // Validar si la contraseña cumple con los requisitos de seguridad
-        if (!passwordRegex.test(password)) {
+        if (!validarPassword(password)) {
             return res.status(400).json({ 
                 message: "La contraseña no es segura. Debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial (@$!%*?&-+)." 
             });
@@ -103,21 +99,16 @@ async function login(req, res) {
         });
 
         if (!user) {
-            console.log("❌ Usuario no encontrado:", nombre_usuario);
             return res.status(401).json({ message: "Usuario no encontrado" });
         }
 
         // Verificar si el usuario tiene una contraseña
         if (!user.password) {
-            console.error("❌ Error: El usuario no tiene contraseña en la BD.");
             return res.status(401).json({ message: "Contraseña no disponible en la base de datos" });
         }
 
-        console.log("🔐 Contraseña ingresada:", password);
-        console.log("🔐 Contraseña en BD:", user.password);
-
         // Verificar la contraseña usando bcryptjs
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await verificarPassword(password, user.password);
 
         if (!passwordMatch) {
             return res.status(401).json({ message: "Contraseña incorrecta" });
@@ -125,13 +116,11 @@ async function login(req, res) {
 
         // Verificar si el usuario está activo
         if (user.estatus !== 1) {
-            console.error("❌ Error: El usuario inactivo.");
-            return res.status(403).json({ message: "User is inactive" });
+            return res.status(403).json({ message: "Usuario está inactivo" });
         }
 
         // Verificar si el usuario tiene un rol asociado
         if (!user.rol) {
-            console.error("❌ Error: El usuario no tiene un rol asignado.");
             return res.status(500).json({ message: "Error: El usuario no tiene un rol asignado" });
         }
 
@@ -208,20 +197,20 @@ async function putPassword(req, res) {
 
     try {
         // Buscar el usuario por nombre de usuario
-        const usuario = await Usuario.findOne({ where: { nombre_usuario } });
+        const usuario = await verificarUsuarioExistente(nombre_usuario);
 
         if (!usuario) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
         // Verificar la contraseña actual
-        const passwordMatch = await bcrypt.compare(password_actual, usuario.password);
+        const passwordMatch = await verificarPassword(password_actual, usuario.password);
         if (!passwordMatch) {
             return res.status(401).json({ message: "Contraseña actual incorrecta" });
         }
 
         // Verifica que la contraseña sea segura
-        if (!passwordRegex.test(nueva_password)) {
+        if (!validarPassword(nueva_password)) {
             return res.status(400).json({
                 message: "La nueva contraseña debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial."
             });
