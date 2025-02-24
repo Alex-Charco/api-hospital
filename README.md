@@ -37,10 +37,14 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
 | PUT     | `/api/paciente/put/:identificacion` | Actualizar paciente       | ✅ |
-| Info militar                                                         |
+|                           Info militar                                                         |
 | GET     | `/api/info-militar/get/:identificacion` | Consultar info militar       | ✅ |
 | POST    | `/api/info-militar/registrar`     | Registrar info militar      | ✅ |
 | PUT     | `/api/info-militar/put/:identificacion` | Actualiza info militar       | ✅ |
+|                           Familiar                                                         |
+| GET     | `/api/familiar/get/:identificacion` | Consultar familiar       | ❌ |
+| POST    | `/api/familiar/registrar`     | Registrar familiar      | ❌ |
+| PUT     | `/api/familiar/put/:identificacion` | Actualiza familiar       | ❌ |
 
 ---
 
