@@ -11,11 +11,6 @@ async function getUsuario(req, res) {
     const { nombre_usuario } = req.params;
 
     try {
-        const usuarioLogueado = req.usuario;
-        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
-        }
-
         const usuario = await Usuario.findOne({
             where: { nombre_usuario },
             include: [{
@@ -47,12 +42,6 @@ async function registrarUsuario(req, res) {
     const { nombre_usuario, password, id_rol } = req.body;
 
     try {
-        // Verificar si el usuario actual tiene el rol de Administrador
-        const usuarioLogueado = req.usuario; 
-        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
-        }
-
         // Verificar si el nombre de usuario ya existe
         const usuarioExistente = await Usuario.findOne({
             where: { nombre_usuario }
@@ -192,12 +181,6 @@ async function updatePassword(req, res) {
     const { nueva_password } = req.body; 
 
     try {
-        // Verificar si el usuario actual tiene el rol de ADMINISTRADOR
-        const usuarioLogueado = req.usuario;
-        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
-        }
-
         // Buscar el usuario por nombre
         const usuario = await Usuario.findOne({ where: { nombre_usuario } });
 
@@ -224,12 +207,6 @@ async function putPassword(req, res) {
     const { password_actual, nueva_password } = req.body;
 
     try {
-        // Verificar si el usuario autenticado es el mismo que quiere cambiar la contraseña
-        const usuarioLogueado = req.usuario;
-        if (!usuarioLogueado || usuarioLogueado.nombre_usuario !== nombre_usuario) {
-            return res.status(403).json({ message: "No tienes permisos para cambiar esta contraseña" });
-        }
-
         // Buscar el usuario por nombre de usuario
         const usuario = await Usuario.findOne({ where: { nombre_usuario } });
 
@@ -272,13 +249,6 @@ async function deleteUsuario(req, res) {
     const { nombre_usuario } = req.params; // ID del usuario a eliminar
 
     try {
-        // Verificar si el usuario autenticado es ADMINISTRADOR
-        const usuarioLogueado = req.usuario;
-        console.log("Usuario autenticado:", usuarioLogueado); // Depuración
-        if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-            return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
-        }
-
         // Verificar si el usuario a eliminar existe
         const usuario = await Usuario.findOne({ 
             where: { nombre_usuario },
