@@ -1,4 +1,3 @@
-// services/validation.service.js
 const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-+_#^(){}[\]]).{10,}$/;
 
 function validarPassword(password) {

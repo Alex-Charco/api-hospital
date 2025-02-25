@@ -1,6 +1,16 @@
-// services/user.service.js
-const { Usuario, Paciente, Medico, Administrador } = require('../models');
+const { Usuario, RolUsuario, Paciente, Medico, Administrador } = require('../models');
 const bcrypt = require('bcryptjs');
+
+async function buscarUsuario(nombre_usuario) {
+    return await Usuario.findOne({
+        where: { nombre_usuario },
+        include: [{
+            model: RolUsuario,
+            as: 'rol',
+            attributes: ['id_rol', 'nombre_rol', 'permiso', 'estatus']
+        }]
+    });
+}
 
 // Función para verificar si el usuario ya existe
 async function verificarUsuarioExistente(nombre_usuario) {
@@ -21,8 +31,14 @@ async function verificarAsignaciones(id_usuario) {
     return !!(paciente || medico || administrador);
 }
 
+async function cifrarPassword(password) {
+    return await bcrypt.hash(password, 10);
+}
+
 module.exports = {
+    buscarUsuario,
     verificarUsuarioExistente,
     verificarPassword,
-    verificarAsignaciones
+    verificarAsignaciones,
+    cifrarPassword
 };

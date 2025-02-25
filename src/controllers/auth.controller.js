@@ -1,29 +1,19 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { Usuario, RolUsuario } = require('../models');
-const { verificarUsuarioExistente, verificarPassword, verificarAsignaciones } = require('../services/user.service');
+const { Usuario } = require('../models');
+const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsignaciones, cifrarPassword } = require('../services/user.service');
 const { validarPassword } = require('../services/validation.service');
+const errorMessages = require('../utils/errorMessages');
+const { generarToken } = require('../services/auth.service');
+const { formatFecha } = require('../utils/dateUtils');
+const successMessages = require('../utils/successMessages');
 
 // Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
 async function getUsuario(req, res) {
-    const { nombre_usuario } = req.params;
-
     try {
-        const usuario = await Usuario.findOne({
-            where: { nombre_usuario },
-            include: [{
-                model: RolUsuario,
-                as: 'rol',
-                attributes: ['id_rol', 'nombre_rol', 'permiso', 'estatus']
-            }]
-        });
-
-        if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
+        const usuario = await buscarUsuario(req.params.nombre_usuario);
+        if (!usuario) return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
 
         return res.json({
-            message: "Usuario encontrado exitosamente",
+            message: successMessages.usuarioEncontrado,
             id_usuario: usuario.id_usuario,
             nombre_usuario: usuario.nombre_usuario,
             fecha_creacion: usuario.fecha_creacion,
@@ -31,7 +21,7 @@ async function getUsuario(req, res) {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
@@ -43,34 +33,29 @@ async function registrarUsuario(req, res) {
         // Verificar si el nombre de usuario ya existe
         const usuarioExistente = await verificarUsuarioExistente(nombre_usuario);
 
-        if (usuarioExistente) {
-            return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
-        }
+        if (usuarioExistente) return res.status(400).json({ message: errorMessages.usuarioYaExiste });
 
         // Validar si la contraseña cumple con los requisitos de seguridad
         if (!validarPassword(password)) {
             return res.status(400).json({ 
-                message: "La contraseña no es segura. Debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial (@$!%*?&-+)." 
+                message: errorMessages.passwordInsegura 
             });
         }
-
-        // Cifrar la contraseña antes de guardarla
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Crear el nuevo usuario
         const nuevoUsuario = await Usuario.create({
             nombre_usuario,
-            password: hashedPassword,
+            password: await cifrarPassword(password),
             id_rol, 
             fecha_creacion: new Date(),  
             estatus: 1 
         });
         
-        // Formatear la fecha de creación para un formato más legible
-        const fechaFormateada = new Date(nuevoUsuario.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ');
+        // Usar la función formatFecha para formatear la fecha de creación
+        const fechaFormateada = formatFecha(nuevoUsuario.fecha_creacion);
 
         return res.status(201).json({
-            message: "Usuario registrado exitosamente",
+            message: successMessages.usuarioRegistrado,
             usuario: {
                 id_usuario: nuevoUsuario.id_usuario,
                 nombre_usuario: nuevoUsuario.nombre_usuario,
@@ -80,197 +65,150 @@ async function registrarUsuario(req, res) {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
 // Función de login para iniciar sesión
 async function login(req, res) {
-    const { nombre_usuario, password } = req.body;
-
     try {
-        const user = await Usuario.findOne({
-            where: { nombre_usuario },
-            include: [{
-                model: RolUsuario,
-                as: 'rol', 
-                attributes: ['id_rol', 'nombre_rol', 'permiso', 'estatus']
-            }]
-        });
+        const { nombre_usuario, password } = req.body;
+        const usuario = await buscarUsuario(nombre_usuario, true);
 
-        if (!user) {
-            return res.status(401).json({ message: "Usuario no encontrado" });
-        }
-
-        // Verificar si el usuario tiene una contraseña
-        if (!user.password) {
-            return res.status(401).json({ message: "Contraseña no disponible en la base de datos" });
-        }
-
-        // Verificar la contraseña usando bcryptjs
-        const passwordMatch = await verificarPassword(password, user.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Contraseña incorrecta" });
+        if (!usuario || !usuario.password || !(await verificarPassword(password, usuario.password))) {
+            return res.status(401).json({ message: errorMessages.credencialesInvalidas });
         }
 
         // Verificar si el usuario está activo
-        if (user.estatus !== 1) {
-            return res.status(403).json({ message: "Usuario está inactivo" });
-        }
+        if (usuario.estatus !== 1) return res.status(403).json({ message: errorMessages.usuarioInactivo });
+
 
         // Verificar si el usuario tiene un rol asociado
-        if (!user.rol) {
-            return res.status(500).json({ message: "Error: El usuario no tiene un rol asignado" });
-        }
+        if (!usuario.rol) return res.status(500).json({ message: errorMessages.rolNoAsignado });
 
-        // Formatear la fecha de creación para un formato más legible
-        const fechaFormateada = new Date(user.fecha_creacion).toISOString().slice(0, 19).replace('T', ' ');
 
-        const permisos = user.rol.permiso;
+        const permisos = usuario.rol.permiso;
 
         const payload = {
-            id_usuario: user.id_usuario,
-            nombre_usuario: user.nombre_usuario,
+            id_usuario: usuario.id_usuario,
+            nombre_usuario: usuario.nombre_usuario,
             rol: {
-                id_rol: user.rol.id_rol,
-                nombre_rol: user.rol.nombre_rol,
+                id_rol: usuario.rol.id_rol,
+                nombre_rol: usuario.rol.nombre_rol,
                 permiso: permisos
             }
         };
 
-        // Generar token con expiración de 1 hora
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
         return res.json({
-            message: "Inicio de sesión exitoso",
-            token: token,
+            message: successMessages.inicioSesionExitoso,
+            token: generarToken(payload),
             user: {
-                id_usuario: user.id_usuario,
-                nombre_usuario: user.nombre_usuario,
-                fecha_creacion: fechaFormateada,
+                id_usuario: usuario.id_usuario,
+                nombre_usuario: usuario.nombre_usuario,
+                fecha_creacion: formatFecha(usuario.fecha_creacion),
                 rol: {
-                    id_rol: user.rol.id_rol,
-                    nombre_rol: user.rol.nombre_rol,
+                    id_rol: usuario.rol.id_rol,
+                    nombre_rol: usuario.rol.nombre_rol,
                     permiso: permisos,
-                    estatus: user.rol.estatus
+                    estatus: usuario.rol.estatus
                 }
             }
         });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
 // Función para actualizar la contraseña de un usuario (solo ADMINISTRADOR)
 async function updatePassword(req, res) {
-    const { nombre_usuario } = req.params; 
-    const { nueva_password } = req.body; 
-
     try {
         // Buscar el usuario por nombre
-        const usuario = await Usuario.findOne({ where: { nombre_usuario } });
+        const usuario = await buscarUsuario(req.params.nombre_usuario);
 
         if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
+            return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
         }
 
-        // Cifrar la nueva contraseña
-        const hashedPassword = await bcrypt.hash(nueva_password, 10);
+        await usuario.update({ password: await cifrarPassword(req.body.nueva_password) });
 
-        // Actualizar la contraseña
-        await usuario.update({ password: hashedPassword });
+        await usuario.save();
 
-        return res.json({ message: "Contraseña actualizada exitosamente" });
+        // Responder con un mensaje que indique que se requiere un nuevo inicio de sesión
+        return res.status(200).json({ 
+            message: successMessages.passwordActualizada,
+            logout: true // Indica al frontend que cierre la sesión
+        });
+        
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
 // Función para que un usuarioautenticado cambie la contraseña
 async function putPassword(req, res) {
-    const { nombre_usuario } = req.params;
-    const { password_actual, nueva_password } = req.body;
-
     try {
         // Buscar el usuario por nombre de usuario
-        const usuario = await verificarUsuarioExistente(nombre_usuario);
+        const usuario = await buscarUsuario(req.params.nombre_usuario);
+        if (!usuario) return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
 
-        if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
 
         // Verificar la contraseña actual
-        const passwordMatch = await verificarPassword(password_actual, usuario.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Contraseña actual incorrecta" });
+        if (!(await verificarPassword(req.body.password_actual, usuario.password))) {
+            return res.status(401).json({ message: errorMessages.passwordActualIncorrecta });
         }
 
         // Verifica que la contraseña sea segura
-        if (!validarPassword(nueva_password)) {
-            return res.status(400).json({
-                message: "La nueva contraseña debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial."
-            });
+        if (!validarPassword(req.body.nueva_password)) {
+            return res.status(400).json({ message: errorMessages.passwordInsegura });
         }
 
-        // Cifrar la nueva contraseña con bcrypt
-        const hashedPassword = await bcrypt.hash(nueva_password, 10);
-
         // Actualizar la contraseña en la base de datos
-        await usuario.update({ password: hashedPassword });
+        await usuario.update({ password: await cifrarPassword(req.body.nueva_password) });
 
-        // Invalida todos los tokens activos cerrando sesión en otros dispositivos
-        usuario.token = null;
         await usuario.save();
 
-        return res.json({ message: "Contraseña actualizada exitosamente. Debes volver a iniciar sesión." });
+        // Responder con un mensaje que indique que se requiere un nuevo inicio de sesión
+        return res.status(200).json({ 
+            message: successMessages.passwordActualizada,
+            logout: true // Indica al frontend que cierre la sesión
+        });
+
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
 // Función para eliminar un usuario
 async function deleteUsuario(req, res) {
-    const { nombre_usuario } = req.params; // ID del usuario a eliminar
-
     try {
         // Verificar si el usuario a eliminar existe
-        const usuario = await Usuario.findOne({ 
-            where: { nombre_usuario },
-            include: {
-                model: RolUsuario,
-                as: 'rol',
-                attributes: ['nombre_rol']
-            }        
-        });
-        
-        if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
+        const usuario = await buscarUsuario(req.params.nombre_usuario);
+        if (!usuario) return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
+
 
         // Verificar si el usuario a eliminar también es ADMINISTRADOR
-        if (usuario.rol.nombre_rol === 'ADMINISTRADOR') {
-            return res.status(400).json({ message: "No puedes eliminar a otro administrador" });
+        if (usuario.rol?.nombre_rol === 'ADMINISTRADOR') {
+            return res.status(400).json({ message: errorMessages.noEliminarAdmin });
         }
 
         // Verificar si el usuario está asignado en otras tablas con su id_usuario
         const tieneAsignaciones = await verificarAsignaciones(usuario.id_usuario);
         if (tieneAsignaciones) {
-            return res.status(400).json({ message: "No se puede eliminar el usuario porque está asignado a una entidad" });
+            return res.status(400).json({ message: errorMessages.usuarioAsignado });
         }
 
         // Eliminar el usuario
         await usuario.destroy();
 
-        return res.status(200).json({ message: "Usuario eliminado exitosamente" });
+        return res.status(200).json({ message: successMessages.usuarioEliminado });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error en el servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 

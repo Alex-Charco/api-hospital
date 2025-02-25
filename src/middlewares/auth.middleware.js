@@ -3,31 +3,49 @@ const RolUsuario = require("../models/rolUsuarioModel");
 
 // Middleware para verificar el JWT y añadir los datos del usuario a la request
 const verificarToken = async (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return res.status(401).json({ message: "No autorizado" });
-    }
-
     try {
+        // Obtener el token del header y eliminar el prefijo "Bearer "
+        const token = req.header("Authorization")?.replace("Bearer ", "").trim();
+
+        if (!token) {
+            return res.status(401).json({ message: "No autorizado. Token no proporcionado." });
+        }
+
+        // Verificar el token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Validar que el token contenga el rol
+        if (!decoded.rol || !decoded.rol.id_rol) {
+            return res.status(403).json({ message: "Rol no definido en el token." });
+        }
+
+        // Buscar el rol en la base de datos y verificar si está activo
         const roleData = await RolUsuario.findOne({
             where: { id_rol: decoded.rol.id_rol, estatus: 1 },
         });
 
         if (!roleData) {
-            return res.status(403).json({ message: "Rol no válido o desactivado" });
+            return res.status(403).json({ message: "Rol no válido o desactivado." });
         }
 
+        // Agregar datos del usuario a la request
         req.usuario = {
-            id_usuario: decoded.id_usuario, // 🔹 Asegurar que `id_usuario` esté en `req.usuario`
+            id_usuario: decoded.id_usuario,
             nombre_usuario: decoded.nombre_usuario,
-            rol: { ...decoded.rol, permiso: roleData.permiso }
+            rol: { ...decoded.rol, permiso: roleData.permiso },
         };
 
         next();
     } catch (error) {
-        console.error(error);
-        return res.status(401).json({ message: "Token inválido" });
+        if (error.name === "TokenExpiredError") {
+            console.warn(`⚠️ Token expirado el: ${error.expiredAt}`);
+            return res.status(401).json({
+                message: "El token ha expirado. Por favor, inicia sesión nuevamente.",
+                tokenExpired: true,
+            });
+        }
+        console.error("❌ Error en la verificación del token:", error.message);
+        return res.status(401).json({ message: "Token inválido." });
     }
 };
 
