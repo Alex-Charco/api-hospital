@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const RolUsuario = require("../models/rolUsuarioModel");
+const errorMessages = require("../utils/errorMessages");
 
 // Middleware para verificar el JWT y añadir los datos del usuario a la request
 const verificarToken = async (req, res, next) => {
@@ -8,7 +9,7 @@ const verificarToken = async (req, res, next) => {
         const token = req.header("Authorization")?.replace("Bearer ", "").trim();
 
         if (!token) {
-            return res.status(401).json({ message: "No autorizado. Token no proporcionado." });
+            return res.status(401).json({ message: errorMessages.tokenNoProporcionado });
         }
 
         // Verificar el token
@@ -16,7 +17,7 @@ const verificarToken = async (req, res, next) => {
 
         // Validar que el token contenga el rol
         if (!decoded.rol || !decoded.rol.id_rol) {
-            return res.status(403).json({ message: "Rol no definido en el token." });
+            return res.status(403).json({ message: errorMessages.rolNoDefinido });
         }
 
         // Buscar el rol en la base de datos y verificar si está activo
@@ -25,7 +26,7 @@ const verificarToken = async (req, res, next) => {
         });
 
         if (!roleData) {
-            return res.status(403).json({ message: "Rol no válido o desactivado." });
+            return res.status(403).json({ message: errorMessages.rolNoValido });
         }
 
         // Agregar datos del usuario a la request
@@ -40,12 +41,12 @@ const verificarToken = async (req, res, next) => {
         if (error.name === "TokenExpiredError") {
             console.warn(`⚠️ Token expirado el: ${error.expiredAt}`);
             return res.status(401).json({
-                message: "El token ha expirado. Por favor, inicia sesión nuevamente.",
+                message: errorMessages.tokenExpirado,
                 tokenExpired: true,
             });
         }
         console.error("❌ Error en la verificación del token:", error.message);
-        return res.status(401).json({ message: "Token inválido." });
+        return res.status(401).json({ message: errorMessages.tokenInvalido });
     }
 };
 
@@ -58,13 +59,13 @@ const authorizeRole = (requiredPermissions) => {
             let permisos = typeof rol.permiso === "object" ? rol.permiso : JSON.parse(rol.permiso);
 
             if (!requiredPermissions.every(perm => permisos[perm])) {
-                return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+                return res.status(403).json({ message: errorMessages.permisosInsuficientes });
             }
 
             next();
         } catch (error) {
             console.error("Error al procesar permisos:", error);
-            return res.status(500).json({ message: "Error interno del servidor" });
+            return res.status(500).json({ message: errorMessages.errorServidor });
         }
     };
 };
@@ -72,7 +73,7 @@ const authorizeRole = (requiredPermissions) => {
 // Middleware para autorizar acceso a usuarios específicos
 const authorizeUserAccess = (req, res, next) => {
     if (req.usuario.nombre_usuario !== req.params.nombre_usuario) {
-        return res.status(403).json({ message: "No tienes permiso para acceder a este usuario" });
+        return res.status(403).json({ message: errorMessages.accesoNoPermitido });
     }
     next();
 };
