@@ -1,19 +1,20 @@
 const { Paciente, Usuario } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
+const errorMessages = require("./errorMessages");
 
 async function validarUsuarioParaPaciente(nombre_usuario) {
     const usuario = await verificarUsuarioExistente(nombre_usuario);
 
     if (!usuario) {
-        throw new Error("El usuario ingresado no existe.");
+        throw new Error(errorMessages.usuarioNoExistente);
     }
     if (usuario.id_rol !== 1) {
-        throw new Error("El usuario no tiene el rol de PACIENTE.");
+        throw new Error(errorMessages.usuarioNoEsPaciente);
     }
 
     const pacienteExistente = await Paciente.findOne({ where: { id_usuario: usuario.id_usuario } });
     if (pacienteExistente) {
-        throw new Error("Este usuario ya está registrado como paciente.");
+        throw new Error(errorMessages.usuarioRegistradoPaciente);
     }
 
     return usuario;
@@ -22,7 +23,7 @@ async function validarUsuarioParaPaciente(nombre_usuario) {
 async function validarIdentificacionPaciente(identificacion) {
     const paciente = await Paciente.findOne({ where: { identificacion } });
     if (paciente) {
-        throw new Error("Ya existe un paciente con esta identificación.");
+        throw new Error(errorMessages.pacienteYaRegistrado);
     }
 }
 

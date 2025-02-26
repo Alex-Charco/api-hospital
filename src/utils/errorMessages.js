@@ -10,6 +10,8 @@ const errorMessages = {
     passwordNoDisponible: "Contraseña no disponible en la base de datos",
     noEliminarAdmin: "No puedes eliminar a otro administrador",
     usuarioAsignado: "No se puede eliminar el usuario porque está asignado a una entidad",
+    
+
 
     // Mensajes generales
     errorServidor: "Error en el servidor",
@@ -26,8 +28,16 @@ const errorMessages = {
     // Mensajes para paciente
     pacienteNoEncontrado: "Paciente no encontrado.",
     faltanDatos: "Faltan datos obligatorios.",
-    formatoFechaIncorrecto: "Formato de fecha incorrecto."
+    formatoFechaIncorrecto: "Formato de fecha incorrecto.",
+    pacienteRegistrado: "Paciente registrado exitosamente.",
+    pacienteEncontrado: "Paciente encontrado",
+    informacionPaciente: "Información del paciente actualizada exitosamente",
 
+    // Mensajes para paciente service
+    usuarioNoExistente: "El usuario ingresado no existe.",
+    usuarioNoEsPaciente: "El usuario no tiene el rol de PACIENTE.",
+    usuarioRegistradoPaciente: "Este usuario ya está registrado como paciente.",
+    pacinteYaRegistrado: "Ya existe un paciente con esta identificación.",
 };
 
 module.exports = errorMessages;
