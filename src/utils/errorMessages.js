@@ -5,9 +5,9 @@ const errorMessages = {
     usuarioSinRol: "Error: El usuario no tiene un rol asignado",
     usuarioYaExiste: "El nombre de usuario ya está en uso",
     passwordInsegura: process.env.PASSWORD_INSEGURA_MSG,
-    passwordIncorrecta: "Contraseña incorrecta",
-    passwordActualIncorrecta: "Contraseña actual incorrecta",
-    passwordNoDisponible: "Contraseña no disponible en la base de datos",
+    passwordIncorrecta:  process.env.PASSWORD_INCORRECTA_MSG,
+    passwordActualIncorrecta: process.env.PASSWORD_ACTUAL_INCORRECTA_MSG,
+    passwordNoDisponible: process.env.PASSWORD_NO_DISPONIBLE,
     noEliminarAdmin: "No puedes eliminar a otro administrador",
     usuarioAsignado: "No se puede eliminar el usuario porque está asignado a una entidad",
     
