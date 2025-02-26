@@ -4,7 +4,7 @@ const errorMessages = {
     usuarioInactivo: "Usuario está inactivo",
     usuarioSinRol: "Error: El usuario no tiene un rol asignado",
     usuarioYaExiste: "El nombre de usuario ya está en uso",
-    passwordInsegura: "La contraseña no es segura. Debe tener al menos 10 caracteres, una mayúscula, un número y un carácter especial (@$!%*?&-+).",
+    passwordInsegura: process.env.PASSWORD_INSEGURA_MSG,
     passwordIncorrecta: "Contraseña incorrecta",
     passwordActualIncorrecta: "Contraseña actual incorrecta",
     passwordNoDisponible: "Contraseña no disponible en la base de datos",

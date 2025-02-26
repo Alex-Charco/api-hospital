@@ -131,6 +131,11 @@ async function updatePassword(req, res) {
             return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
         }
 
+        // Verifica que la contraseña sea segura
+        if (!validarPassword(req.body.nueva_password)) {
+            return res.status(400).json({ message: errorMessages.passwordInsegura });
+        }
+
         await usuario.update({ password: await cifrarPassword(req.body.nueva_password) });
 
         await usuario.save();

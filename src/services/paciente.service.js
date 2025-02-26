@@ -27,15 +27,30 @@ async function validarIdentificacionPaciente(identificacion) {
 }
 
 async function crearPaciente(datosPaciente) {
-    return await Paciente.create(datosPaciente);
+    try {
+        return await Paciente.create(datosPaciente);
+    } catch (error) {
+        throw new Error("Error al crear el paciente: " + error.message);
+    }
 }
 
 async function obtenerPacientePorIdentificacion(identificacion) {
-    return await Paciente.findOne({ where: { identificacion }, include: [{ model: Usuario, as: "usuario" }] });
+    try {
+        return await Paciente.findOne({ 
+            where: { identificacion }, 
+            include: [{ model: Usuario, as: "usuario" }] 
+        });
+    } catch (error) {
+        throw new Error("Error al obtener el paciente: " + error.message);
+    }
 }
 
 async function actualizarDatosPaciente(paciente, nuevosDatos) {
-    return await paciente.update(nuevosDatos);
+    try {
+        return await paciente.update(nuevosDatos);
+    } catch (error) {
+        throw new Error("Error al actualizar los datos del paciente: " + error.message);
+    }
 }
 
 module.exports = {
