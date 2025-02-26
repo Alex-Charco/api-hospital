@@ -75,9 +75,9 @@ async function login(req, res) {
         const { nombre_usuario, password } = req.body;
         const usuario = await buscarUsuario(nombre_usuario, true);
 
-        if (!usuario || !usuario.password || !(await verificarPassword(password, usuario.password))) {
+        if (!usuario?.password || !(await verificarPassword(password, usuario.password))) {
             return res.status(401).json({ message: errorMessages.credencialesInvalidas });
-        }
+        }        
 
         // Verificar si el usuario está activo
         if (usuario.estatus !== 1) return res.status(403).json({ message: errorMessages.usuarioInactivo });
