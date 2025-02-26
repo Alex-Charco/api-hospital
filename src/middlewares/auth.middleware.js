@@ -58,7 +58,8 @@ const authorizeRole = (requiredPermissions) => {
 
             let permisos = typeof rol.permiso === "object" ? rol.permiso : JSON.parse(rol.permiso);
 
-            if (!requiredPermissions.every(perm => permisos[perm])) {
+            // Verifica si el usuario tiene al menos uno de los permisos requeridos
+            if (!requiredPermissions.some(perm => permisos[perm])) {
                 return res.status(403).json({ message: errorMessages.permisosInsuficientes });
             }
 

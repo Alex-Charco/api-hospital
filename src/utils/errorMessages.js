@@ -21,7 +21,13 @@ const errorMessages = {
     tokenExpirado: "El token ha expirado. Por favor, inicia sesión nuevamente.",
     tokenInvalido: "Token inválido.",
     permisosInsuficientes: "No tienes permisos para realizar esta acción",
-    accesoNoPermitido: "No tienes permiso para acceder a este usuario"
+    accesoNoPermitido: "No tienes permiso para acceder a este usuario",
+
+    // Mensajes para paciente
+    pacienteNoEncontrado: "Paciente no encontrado.",
+    faltanDatos: "Faltan datos obligatorios.",
+    formatoFechaIncorrecto: "Formato de fecha incorrecto."
+
 };
 
 module.exports = errorMessages;
