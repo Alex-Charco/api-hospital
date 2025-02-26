@@ -121,37 +121,6 @@ async function login(req, res) {
     }
 }
 
-// Función para actualizar la contraseña de un usuario (solo ADMINISTRADOR)
-async function updatePassword(req, res) {
-    try {
-        // Buscar el usuario por nombre
-        const usuario = await buscarUsuario(req.params.nombre_usuario);
-
-        if (!usuario) {
-            return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
-        }
-
-        // Verifica que la contraseña sea segura
-        if (!validarPassword(req.body.nueva_password)) {
-            return res.status(400).json({ message: errorMessages.passwordInsegura });
-        }
-
-        await usuario.update({ password: await cifrarPassword(req.body.nueva_password) });
-
-        await usuario.save();
-
-        // Responder con un mensaje que indique que se requiere un nuevo inicio de sesión
-        return res.status(200).json({ 
-            message: successMessages.passwordActualizada,
-            logout: true // Indica al frontend que cierre la sesión
-        });
-        
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: errorMessages.errorServidor });
-    }
-}
-
 // Función para que un usuarioautenticado cambie la contraseña
 async function putPassword(req, res) {
     try {
@@ -194,12 +163,6 @@ async function deleteUsuario(req, res) {
         const usuario = await buscarUsuario(req.params.nombre_usuario);
         if (!usuario) return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
 
-
-        // Verificar si el usuario a eliminar también es ADMINISTRADOR
-        if (usuario.rol?.nombre_rol === 'ADMINISTRADOR') {
-            return res.status(400).json({ message: errorMessages.noEliminarAdmin });
-        }
-
         // Verificar si el usuario está asignado en otras tablas con su id_usuario
         const tieneAsignaciones = await verificarAsignaciones(usuario.id_usuario);
         if (tieneAsignaciones) {
@@ -217,4 +180,4 @@ async function deleteUsuario(req, res) {
     }
 }
 
-module.exports = { getUsuario, login, registrarUsuario, updatePassword, putPassword, deleteUsuario };
+module.exports = { getUsuario, login, registrarUsuario, putPassword, deleteUsuario };

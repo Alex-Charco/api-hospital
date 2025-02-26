@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const RolUsuario = require("../models/rolUsuarioModel");
 const errorMessages = require("../utils/errorMessages");
+const { buscarUsuario } = require("../services/user.service");
 
 // Middleware para verificar el JWT y añadir los datos del usuario a la request
 const verificarToken = async (req, res, next) => {
@@ -79,4 +80,28 @@ const authorizeUserAccess = (req, res, next) => {
     next();
 };
 
-module.exports = { verificarToken, authorizeRole, authorizeUserAccess };
+const verificarAdminEliminar = async (req, res, next) => {
+    try {
+        // Buscar el usuario que se quiere eliminar
+        const usuarioAEliminar = await buscarUsuario(req.params.nombre_usuario);
+        if (!usuarioAEliminar) {
+            return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
+        }
+
+        // Verificar si el usuario autenticado es ADMINISTRADOR y está intentando eliminar otro ADMINISTRADOR
+        if (
+            req.usuario.rol.nombre_rol === "ADMINISTRADOR" &&
+            usuarioAEliminar.rol?.nombre_rol === "ADMINISTRADOR"
+        ) {
+            return res.status(403).json({ message: errorMessages.noEliminarAdmin });
+        }
+
+        next(); // Continuar con la eliminación si pasa la validación
+    } catch (error) {
+        console.error("Error en verificarAdminEliminar:", error);
+        return res.status(500).json({ message: errorMessages.errorServidor });
+    }
+};
+
+
+module.exports = { verificarToken, authorizeRole, authorizeUserAccess, verificarAdminEliminar };
