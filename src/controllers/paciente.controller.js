@@ -40,7 +40,7 @@ async function registrarPaciente(req, res) {
 
         // Devolver todos los datos registrados del paciente
         return res.status(201).json({
-            message: successMessages.pacienteRegistrado,
+            message: successMessages.registroExitoso,
             paciente: pacienteFormateado,
         });
     } catch (error) {
@@ -99,7 +99,7 @@ async function actualizarPaciente(req, res) {
 
         // Devolver los datos actualizados del paciente
         return res.status(200).json({
-            message: successMessages.informacionPaciente,
+            message: successMessages.informacionActualizada,
             paciente: pacienteFormateado
         });
 

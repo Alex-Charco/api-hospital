@@ -55,7 +55,7 @@ async function registrarUsuario(req, res) {
         const fechaFormateada = formatFecha(nuevoUsuario.fecha_creacion);
 
         return res.status(201).json({
-            message: successMessages.usuarioRegistrado,
+            message: successMessages.registroExitoso,
             usuario: {
                 id_usuario: nuevoUsuario.id_usuario,
                 nombre_usuario: nuevoUsuario.nombre_usuario,

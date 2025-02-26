@@ -1,118 +1,59 @@
-const { InfoMilitar, Paciente } = require('../models');
+const infoMilitarService = require('../services/infoMilitar.service');
+const errorMessages = require('../utils/errorMessages');
+const successMessages = require('../utils/successMessages');
 
+// Crear nuevo registro de información militar (solo administradores)
+async function registrarInfoMilitar(req, res) {
+    const { identificacion, cargo, grado, fuerza, unidad } = req.body;
 
-    // Crear nuevo registro de información militar (solo administradores)
-    async function registrarInfoMilitar(req, res) {
-        const { identificacion, cargo, grado, fuerza, unidad } = req.body;
+    try {
+        const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+        await infoMilitarService.validarPacienteMilitar(paciente);
+        await infoMilitarService.validarInfoMilitarNoRegistrada(paciente.id_paciente);
 
-        try {
-            // ✅ Verificar si el usuario logueado tiene el rol de ADMINISTRADOR
-            const usuarioLogueado = req.usuario;
-            if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-                return res.status(403).json({ message: "No tienes permisos para registrar información militar." });
-            }
+        const infoMilitar = await infoMilitarService.crearInfoMilitar(paciente.id_paciente, { cargo, grado, fuerza, unidad });
 
-            // ✅ Verificar si el paciente existe por número de identificación
-            const paciente = await Paciente.findOne({ where: { identificacion } });
-
-            if (!paciente) {
-                return res.status(404).json({ message: "Paciente no encontrado." });
-            }
-
-            // ✅ Verificar si el paciente es de tipo "militar"
-            if (paciente.tipo_paciente !== 'MILITAR') {
-                return res.status(400).json({ message: "Solo los pacientes MILITARES pueden registrar información militar." });
-            }
-
-            // ✅ Verificar si ya existe información militar para este paciente
-            const existeInfoMilitar = await InfoMilitar.findOne({ where: { id_paciente: paciente.id_paciente } });
-            if (existeInfoMilitar) {
-                return res.status(409).json({ message: "El paciente ya tiene información militar registrada." });
-            }
-
-            // ✅ Crear nueva información militar
-            const infoMilitar = await InfoMilitar.create({
-                id_paciente: paciente.id_paciente,
-                cargo,
-                grado,
-                fuerza,
-                unidad,
-            });
-
-            return res.status(201).json({
-                message: "Información militar registrada exitosamente.",
-                infoMilitar
-            });
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Error al crear información militar." });
-        }
+        return res.status(201).json({
+            message: successMessages.registroExitoso,
+            infoMilitar
+        });
+    } catch (error) {
+        console.error("❌ Error en registrarInfoMilitar:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
+}
 
-    // Obtener información militar por paciente con No. identificación (administradores,y médicos) 
-    async function getByInfoMilitar(req, res) {
-        try {
-            const { identificacion } = req.params;
-
-            // ✅ Verificar si el usuario logueado tiene el rol de ADMINISTRADOR o MÉDICO
-            const usuarioLogueado = req.usuario;
-            if (!usuarioLogueado || !['ADMINISTRADOR', 'MEDICO'].includes(usuarioLogueado.rol.nombre_rol)) {
-                return res.status(403).json({ message: "No tienes permisos para obtener información militar." });
-            }
-
-            // ✅ Buscar al paciente por identificación
-            const paciente = await Paciente.findOne({ where: { identificacion } });
-            if (!paciente) {
-                return res.status(404).json({ message: "Paciente no encontrado." });
-            }
-
-            // ✅ Buscar la información militar del paciente
-            const infoMilitar = await InfoMilitar.findOne({ where: { id_paciente: paciente.id_paciente } });
-            if (!infoMilitar) {
-                return res.status(404).json({ message: "Información militar no encontrada." });
-            }
-
-            return res.status(200).json(infoMilitar);
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Error al obtener la información militar." });
-        }
-    }
-
-    // ✅ Actualizar información militar (solo administradores)
-    async function actualizarInfoMilitar(req, res) {
+// Obtener información militar por paciente con No. identificación (administradores,y médicos) 
+async function getByInfoMilitar(req, res) {
+    try {
         const { identificacion } = req.params;
-        const { cargo, grado, fuerza, unidad } = req.body;
+        const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+        const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
 
-        try {
-            // ✅ Verificar si el usuario logueado tiene el rol de ADMINISTRADOR
-            const usuarioLogueado = req.usuario;
-            if (!usuarioLogueado || usuarioLogueado.rol.nombre_rol !== 'ADMINISTRADOR') {
-                return res.status(403).json({ message: "No tienes permisos para actualizar información militar." });
-            }
-
-            // ✅ Buscar al paciente por identificación
-            const paciente = await Paciente.findOne({ where: { identificacion } });
-            if (!paciente) {
-                return res.status(404).json({ message: "Paciente no encontrado." });
-            }
-
-            // ✅ Buscar la información militar del paciente
-            const infoMilitar = await InfoMilitar.findOne({ where: { id_paciente: paciente.id_paciente } });
-            if (!infoMilitar) {
-                return res.status(404).json({ message: "Información militar no encontrada." });
-            }
-
-            // ✅ Actualizar los datos de información militar
-            await infoMilitar.update({ cargo, grado, fuerza, unidad });
-
-            return res.status(200).json({
-                message: "Información militar actualizada exitosamente.",
-                infoMilitar
-            });
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Error al actualizar la información militar." });
-        }
+        return res.status(200).json(infoMilitar);
+    } catch (error) {
+        console.error("❌ Error en getByInfoMilitar:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
-    module.exports = { registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar };
+}
+
+// ✅ Actualizar información militar (solo administradores)
+async function actualizarInfoMilitar(req, res) {
+    const { identificacion } = req.params;
+    const nuevosDatos = req.body;
+
+    try {
+        const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+        const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
+        const infoMilitarActualizado = await infoMilitarService.actualizarInfoMilitar(infoMilitar, nuevosDatos);
+
+        return res.status(200).json({
+            message: successMessages.informacionActualizada,
+            infoMilitar: infoMilitarActualizado
+        });
+    } catch (error) {
+        console.error("❌ Error en actualizarInfoMilitar:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+module.exports = { registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar };

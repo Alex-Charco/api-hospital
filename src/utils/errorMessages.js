@@ -29,15 +29,19 @@ const errorMessages = {
     pacienteNoEncontrado: "Paciente no encontrado.",
     faltanDatos: "Faltan datos obligatorios.",
     formatoFechaIncorrecto: "Formato de fecha incorrecto.",
-    pacienteRegistrado: "Paciente registrado exitosamente.",
     pacienteEncontrado: "Paciente encontrado",
-    informacionPaciente: "Información del paciente actualizada exitosamente",
 
     // Mensajes para paciente service
     usuarioNoExistente: "El usuario ingresado no existe.",
     usuarioNoEsPaciente: "El usuario no tiene el rol de PACIENTE.",
     usuarioRegistradoPaciente: "Este usuario ya está registrado como paciente.",
     pacinteYaRegistrado: "Ya existe un paciente con esta identificación.",
+
+    // Mensajes de infoMilitar
+    pacienteMilitar: "Solo los pacientes MILITARES pueden registrar información militar.",
+    infoMilitarRegistrada: "El paciente ya tiene información militar registrada.",
+    infoMilitarNoEncontrada: "Información militar no encontrada.",
+
 };
 
 module.exports = errorMessages;
