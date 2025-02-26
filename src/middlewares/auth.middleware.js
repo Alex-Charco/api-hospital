@@ -16,7 +16,7 @@ const verificarToken = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Validar que el token contenga el rol
-        if (!decoded.rol || !decoded.rol.id_rol) {
+        if (!decoded.rol?.id_rol) {
             return res.status(403).json({ message: errorMessages.rolNoDefinido });
         }
 
