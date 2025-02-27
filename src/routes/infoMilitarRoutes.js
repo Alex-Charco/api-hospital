@@ -1,4 +1,3 @@
-// routes/InfoMilitarRoutes.js
 const express = require('express');
 const router = express.Router();
 const {registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar } = require('../controllers/infoMilitar.controller');

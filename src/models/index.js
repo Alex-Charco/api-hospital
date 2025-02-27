@@ -8,6 +8,7 @@ const InfoMilitar = require("./infoMilitarModel")
 const Medico = require("./medicoModel")
 const Especialidad = require("./especialidadModel")
 const Administrador = require("./administradorModel");
+const Familiar = require("./familiarModel");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -92,6 +93,21 @@ InfoMilitar.belongsTo(Paciente, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre Paciente y Familiar
+Paciente.hasMany(Familiar, {
+    foreignKey: "id_paciente",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Familiar.belongsTo(Paciente, {
+    foreignKey: "id_paciente",
+    as: "paciente",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+
 // Exportar modelos y conexión
 module.exports = {
     sequelize,
@@ -102,5 +118,6 @@ module.exports = {
     InfoMilitar,
     Medico,
     Especialidad,
-    Administrador
+    Administrador,
+    Familiar
 };

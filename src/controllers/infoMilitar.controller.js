@@ -8,6 +8,12 @@ async function registrarInfoMilitar(req, res) {
 
     try {
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: "Paciente no encontrado." });
+        }
+
         await infoMilitarService.validarPacienteMilitar(paciente);
         await infoMilitarService.validarInfoMilitarNoRegistrada(paciente.id_paciente);
 
@@ -28,6 +34,12 @@ async function getByInfoMilitar(req, res) {
     try {
         const { identificacion } = req.params;
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: "Paciente no encontrado." });
+        }
+
         const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
 
         return res.status(200).json(infoMilitar);
@@ -44,6 +56,12 @@ async function actualizarInfoMilitar(req, res) {
 
     try {
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: "Paciente no encontrado." });
+        }
+        
         const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
         const infoMilitarActualizado = await infoMilitarService.actualizarInfoMilitar(infoMilitar, nuevosDatos);
 

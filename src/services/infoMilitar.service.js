@@ -2,12 +2,21 @@ const { InfoMilitar, Paciente } = require('../models');
 const errorMessages = require("../utils/errorMessages");
 
 async function validarPacienteExistente(identificacion) {
-    const paciente = await Paciente.findOne({ where: { identificacion } });
-    if (!paciente) {
-        throw new Error(errorMessages.pacienteNoEncontrado);
+    try {
+        const paciente = await Paciente.findOne({ where: { identificacion } });
+        
+        // Si no encuentra el paciente, devuelve null en lugar de lanzar un error
+        if (!paciente) {
+            return null;
+        }
+
+        return paciente; // Devuelve el paciente si lo encuentra
+    } catch (error) {
+        console.error("Error en validarPacienteExistente:", error.message);
+        throw new Error("Error al validar el paciente");
     }
-    return paciente;
 }
+
 
 async function validarPacienteMilitar(paciente) {
     console.log("📌 Datos del paciente en validarPacienteMilitar:", paciente);

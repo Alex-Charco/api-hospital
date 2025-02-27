@@ -42,6 +42,11 @@ const errorMessages = {
     infoMilitarRegistrada: "El paciente ya tiene información militar registrada.",
     infoMilitarNoEncontrada: "Información militar no encontrada.",
 
+    // Mensajes de familiar
+    familiarRegistrado:  "El paciente ya tiene familia registrado.",
+    familiarNoEncontrado: "No se encontraron familiares para este paciente.",
+    errorCrearFamiliar: "Error al crear el familiar: ",
+    errorActualizarFamiliar: "Error al actualizar los datos del familiar: ",
 };
 
 module.exports = errorMessages;
