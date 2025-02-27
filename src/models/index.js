@@ -2,6 +2,7 @@ const sequelize = require("../config/db");
 
 const Usuario = require("./usuarioModel");
 const RolUsuario = require("./rolUsuarioModel");
+const Persona = require("./personaModel");
 const Paciente = require("./pacienteModel");
 const InfoMilitar = require("./infoMilitarModel")
 const Medico = require("./medicoModel")
@@ -96,6 +97,7 @@ module.exports = {
     sequelize,
     Usuario,
     RolUsuario,
+    Persona,
     Paciente,
     InfoMilitar,
     Medico,

@@ -10,6 +10,7 @@ async function validarPacienteExistente(identificacion) {
 }
 
 async function validarPacienteMilitar(paciente) {
+    console.log("📌 Datos del paciente en validarPacienteMilitar:", paciente);
     if (paciente.tipo_paciente !== 'MILITAR') {
         throw new Error(errorMessages.pacienteMilitar);
     }
