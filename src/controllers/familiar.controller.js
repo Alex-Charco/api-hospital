@@ -1,5 +1,6 @@
 const familiarService = require('../services/familiar.service');
 const infoMilitarService = require('../services/infoMilitar.service');
+const { formatFechaNacimiento } = require('../utils/dateUtils');
 const errorMessages = require('../utils/errorMessages');
 const successMessages = require('../utils/successMessages');
 
@@ -20,9 +21,15 @@ async function registrarFamiliar(req, res) {
             nombre, apellido, telefono, direccion, relacion, ...otrosDatos
         });
 
+        // Formatear la fecha antes de devolver la respuesta
+        const familiarFormateado = {
+            ...familiar.toJSON(),
+            fecha_nacimiento: formatFechaNacimiento(familiar.fecha_nacimiento)
+        };
+
         return res.status(201).json({
             message: successMessages.registroExitoso,
-            familiar
+            familiar: familiarFormateado
         });
     } catch (error) {
         console.error("❌ Error en registrarFamiliar:", error.message);
@@ -80,9 +87,14 @@ async function actualizarFamiliar(req, res) {
         // Actualizar la información del familiar
         const familiarActualizado = await familiarService.actualizarFamiliar(familiar, nuevosDatos);
 
+        const familiarFormateado = {
+            ...familiarActualizado.toJSON(),
+            fecha_nacimiento: formatFechaNacimiento(familiarActualizado.fecha_nacimiento)
+        };
+
         return res.status(200).json({
             message: successMessages.informacionActualizada,
-            familiar: familiarActualizado
+            familiar: familiarFormateado
         });
     } catch (error) {
         console.error("❌ Error en actualizarFamiliar:", error.message);
