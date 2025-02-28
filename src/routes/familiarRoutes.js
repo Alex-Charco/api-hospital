@@ -13,7 +13,7 @@ router.post('/registrar/:identificacionPaciente', verificarToken, authorizeRole(
 // Obtener familiares por paciente (usando identificacion, no id_paciente)
 router.get('/get/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios", "ver_informacion"]), getByFamiliar);
 
-// Actualizar un familiar (también debe usar identificacion en lugar de id_paciente)
+// Actualizar un familiar (utiliza 2 parametros: identificacion del paciente y familiar)
 router.put('/put/:identificacionPaciente/:identificacionFamiliar', verificarToken, authorizeRole(["gestionar_usuarios"]), actualizarFamiliar);
 
 module.exports = router;
