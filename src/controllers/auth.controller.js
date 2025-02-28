@@ -1,10 +1,10 @@
 const { Usuario } = require('../models');
 const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsignaciones, cifrarPassword } = require('../services/user.service');
 const { validarPassword } = require('../services/validation.service');
-const errorMessages = require('../utils/errorMessages');
+const errorMessages = require('../utils/error_messages');
 const { generarToken } = require('../services/auth.service');
-const { formatFecha } = require('../utils/dateUtils');
-const successMessages = require('../utils/successMessages');
+const { formatFecha } = require('../utils/date_utils');
+const successMessages = require('../utils/success_messages');
 
 // Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
 async function getUsuario(req, res) {

@@ -1,5 +1,5 @@
 const { Residencia } = require('../models');
-const errorMessages = require("../utils/errorMessages");
+const errorMessages = require("../utils/error_messages");
 
 // Validar que no exista una residencia para el paciente
 async function validarResidenciaRegistrada(id_paciente) {

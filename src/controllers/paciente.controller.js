@@ -1,7 +1,7 @@
 const pacienteService = require("../services/paciente.service");
-const { formatFechaNacimiento } = require('../utils/dateUtils');
-const errorMessages = require('../utils/errorMessages');
-const successMessages = require('../utils/successMessages');
+const { formatFechaNacimiento } = require('../utils/date_utils');
+const errorMessages = require('../utils/error_messages');
+const successMessages = require('../utils/success_messages');
 
 // Función para registrar un paciente
 async function registrarPaciente(req, res) {

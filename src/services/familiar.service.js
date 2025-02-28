@@ -1,5 +1,5 @@
 const { Familiar } = require('../models');
-const errorMessages = require("../utils/errorMessages");
+const errorMessages = require("../utils/error_messages");
 
 async function validarFamiliarRegistrado(id_paciente, relacion) {
     const familiar = await Familiar.findOne({ where: { id_paciente, relacion } });

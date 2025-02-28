@@ -3,9 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
-const pacienteRoutes = require('./routes/pacienteRoutes');
-const infoMilitarRoutes = require('./routes/infoMilitarRoutes');
-const familiarRoutes = require('./routes/familiarRoutes');
+const pacienteRoutes = require('./routes/paciente.routes');
+const infoMilitarRoutes = require('./routes/info_militar.routes');
+const familiarRoutes = require('./routes/familiar.routes');
 const residenciaRoutes = require("./routes/residencia.routes");
 
 const corsOptions = {

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const RolUsuario = require("../models/rolUsuarioModel");
-const errorMessages = require("../utils/errorMessages");
+const RolUsuario = require("../models/rol_usuario.model");
+const errorMessages = require("../utils/error_messages");
 const { buscarUsuario } = require("../services/user.service");
 
 // Middleware para verificar el JWT y añadir los datos del usuario a la request

@@ -1,8 +1,8 @@
 const residenciaService = require('../services/residencia.service');
-const infoMilitarService = require('../services/infoMilitar.service');
-const { formatFecha } = require('../utils/dateUtils');
-const errorMessages = require('../utils/errorMessages');
-const successMessages = require('../utils/successMessages');
+const infoMilitarService = require('../services/info_militar.service');
+const { formatFecha } = require('../utils/date_utils');
+const errorMessages = require('../utils/error_messages');
+const successMessages = require('../utils/success_messages');
 
 // Crear nueva residencia (solo administradores)
 async function registrarResidencia(req, res) {
@@ -12,6 +12,11 @@ async function registrarResidencia(req, res) {
     try {
         // Validar que el paciente existe
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: errorMessages.errorValidarPaciente });
+        }
 
         // Validar que no haya una residencia ya registrada para el paciente
         await residenciaService.validarResidenciaRegistrada(paciente.id_paciente);
@@ -43,7 +48,7 @@ async function getByResidencia(req, res) {
         const { identificacion } = req.params;
 
         if (!identificacion) {
-            return res.status(400).json({ message: "La identificación es requerida." });
+            return res.status(400).json({ message: errorMessages.identificacionRequerida });
         }
 
         // Buscar al paciente por la identificación
@@ -51,7 +56,7 @@ async function getByResidencia(req, res) {
 
         // Verificar si el paciente no fue encontrado
         if (!paciente) {
-            return res.status(404).json({ message: "Paciente no encontrado." });
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
 
         // Si encontramos el paciente, obtenemos la residencia
@@ -59,7 +64,7 @@ async function getByResidencia(req, res) {
 
         // Verificar si hay residencia registrada
         if (!residencia) {
-            return res.status(404).json({ message: "Residencia no encontrada." });
+            return res.status(404).json({ message: errorMessages.residenciaNoEncontrada });
         }
 
         // Usar la función formatFecha para formatear la fecha de creación

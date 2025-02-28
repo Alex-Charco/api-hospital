@@ -15,6 +15,7 @@ const errorMessages = {
 
     // Mensajes generales
     errorServidor: "Error en el servidor",
+    identificacionRequerida: "La identificación es requerida.",
 
     // Mensajes para el middleware de autenticación
     tokenNoProporcionado: "No autorizado. Token no proporcionado.",
@@ -55,6 +56,11 @@ const errorMessages = {
     errorActualizarFamiliar: "Error al actualizar los datos del familiar: ",
     noInfoIdentificacion: "No se encontró información para la identificación proporcionada.",
 
+    // Mensajes de residencia
+    residenciaNoEncontrada: "No se encontró la residencia del paciente.",
+    residenciaYaRegistrada: "El paciente ya tiene una residencia registrada.",
+    errorCrearResidencia: "No se pudo crear la residencia. ",
+    errorActualizarResidencia: "No se pudo actualizar la residencia. "
 };
 
 module.exports = errorMessages;

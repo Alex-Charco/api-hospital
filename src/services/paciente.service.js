@@ -1,6 +1,6 @@
 const { Paciente, Usuario } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
-const errorMessages = require("../utils/errorMessages");
+const errorMessages = require("../utils/error_messages");
 
 async function validarUsuarioParaPaciente(nombre_usuario) {
     try {

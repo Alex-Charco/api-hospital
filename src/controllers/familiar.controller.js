@@ -1,8 +1,8 @@
 const familiarService = require('../services/familiar.service');
-const infoMilitarService = require('../services/infoMilitar.service');
-const { formatFechaNacimiento } = require('../utils/dateUtils');
-const errorMessages = require('../utils/errorMessages');
-const successMessages = require('../utils/successMessages');
+const infoMilitarService = require('../services/info_militar.service');
+const { formatFechaNacimiento } = require('../utils/date_utils');
+const errorMessages = require('../utils/error_messages');
+const successMessages = require('../utils/success_messages');
 
 // Crear nuevo registro de familiar (solo administradores)
 async function registrarFamiliar(req, res) {
@@ -43,7 +43,7 @@ async function getByFamiliar(req, res) {
         const { identificacion } = req.params;
 
         if (!identificacion) {
-            return res.status(400).json({ message: "La identificación es requerida." });
+            return res.status(400).json({ message: errorMessages.identificacionRequerida });
         }
 
         // Buscar al paciente por la identificación
@@ -83,6 +83,11 @@ async function actualizarFamiliar(req, res) {
     try {
         // Buscar paciente por identificación
         const paciente = await infoMilitarService.validarPacienteExistente(identificacionPaciente);
+        
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
+        }
         
         // Buscar familiar por identificación y por el id_paciente
         const familiar = await familiarService.obtenerFamiliarPorIdentificacion(identificacionFamiliar, paciente.id_paciente);

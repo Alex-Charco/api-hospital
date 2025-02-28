@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const personaAttributes = require('./personaAttributesModel');
+const personaAttributes = require('./persona_attributes');
 
 const PersonaExterna = sequelize.define('PersonaExterna', {
     id_persona_externa: {

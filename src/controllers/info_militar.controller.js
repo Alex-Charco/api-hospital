@@ -11,7 +11,7 @@ async function registrarInfoMilitar(req, res) {
 
         // Verificar si el paciente no fue encontrado
         if (!paciente) {
-            return res.status(404).json({ message: "Paciente no encontrado." });
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
 
         await infoMilitarService.validarPacienteMilitar(paciente);
@@ -37,7 +37,7 @@ async function getByInfoMilitar(req, res) {
 
         // Verificar si el paciente no fue encontrado
         if (!paciente) {
-            return res.status(404).json({ message: "Paciente no encontrado." });
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
 
         const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
@@ -59,7 +59,7 @@ async function actualizarInfoMilitar(req, res) {
 
         // Verificar si el paciente no fue encontrado
         if (!paciente) {
-            return res.status(404).json({ message: "Paciente no encontrado." });
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
         
         const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
