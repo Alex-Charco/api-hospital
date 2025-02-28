@@ -33,12 +33,17 @@ const errorMessages = {
 
     // Mensajes para paciente service
     usuarioNoExistente: "El usuario ingresado no existe.",
-    usuarioNoEsPaciente: "El usuario no tiene el rol de PACIENTE.",
+    usuarioNoEsPaciente: "El usuario no tiene el rol de paciente.",
     usuarioRegistradoPaciente: "Este usuario ya está registrado como paciente.",
     pacinteYaRegistrado: "Ya existe un paciente con esta identificación.",
+    errorValidarUsuario: "Error al validar el usuario para paciente",
+    errorValidarIdentificacion: "Error al validar la identificación del paciente",
+    errorCrearPaciente: "Error al crear el paciente",
+    errorObtenerPaciente: "Error al obtener el paciente",
+    errorActualizarPaciente: "Error al actualizar los datos del paciente",
 
     // Mensajes de infoMilitar
-    pacienteMilitar: "Solo los pacientes MILITARES pueden registrar información militar.",
+    pacienteMilitar: "Solo los pacientes militares pueden registrar información militar.",
     infoMilitarRegistrada: "El paciente ya tiene información militar registrada.",
     infoMilitarNoEncontrada: "Información militar no encontrada.",
     errorValidarPaciente: "Error al validar el paciente",

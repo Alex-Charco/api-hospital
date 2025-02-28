@@ -44,7 +44,8 @@ async function registrarPaciente(req, res) {
             paciente: pacienteFormateado,
         });
     } catch (error) {
-        console.error(error);
+        // Cambiar console.error() por una forma más controlada
+        console.warn(`Error en el registro del paciente: ${error.message}`);
         return res.status(error.statusCode || 500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
@@ -71,7 +72,7 @@ async function getPaciente(req, res) {
             paciente: pacienteFormateado,
         });
     } catch (error) {
-        console.error(error);
+        console.warn(`Error al obtener el paciente: ${error.message}`);
         return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
@@ -104,7 +105,7 @@ async function actualizarPaciente(req, res) {
         });
 
     } catch (error) {
-        console.error(error);
+        console.warn(`Error al actualizar la información del paciente: ${error.message}`);
         return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }

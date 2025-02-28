@@ -70,8 +70,6 @@ async function getByFamiliar(req, res) {
     }
 }
 
-
-
 // Actualizar información de un familiar (solo administradores)
 async function actualizarFamiliar(req, res) {
     const { identificacionPaciente, identificacionFamiliar } = req.params;
