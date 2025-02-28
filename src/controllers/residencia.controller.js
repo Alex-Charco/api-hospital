@@ -1,6 +1,6 @@
 const residenciaService = require('../services/residencia.service');
 const infoMilitarService = require('../services/info_militar.service');
-const { formatFecha } = require('../utils/date_utils');
+const { formatFechaCompleta } = require('../utils/date_utils');
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
 
@@ -26,10 +26,10 @@ async function registrarResidencia(req, res) {
             direccion, ciudad, pais, ...otrosDatos
         });
 
-        // Usar la función formatFecha para formatear la fecha de creación
+        // Usar la función formatFechaCompleta para formatear la fecha de creación
         const residenciaFormateado = {
             ...residencia.toJSON(),
-            fecha_registro: formatFecha(residencia.fecha_registro)
+            fecha_registro: formatFechaCompleta(residencia.fecha_registro)
         };
 
         return res.status(201).json({
@@ -67,8 +67,8 @@ async function getByResidencia(req, res) {
             return res.status(404).json({ message: errorMessages.residenciaNoEncontrada });
         }
 
-        // Usar la función formatFecha para formatear la fecha de creación
-        const fechaFormateada = formatFecha(residencia.fecha_registro);
+        // Usar la función formatFechaCompleta para formatear la fecha de creación
+        const fechaFormateada = formatFechaCompleta(residencia.fecha_registro);
 
         return res.status(200).json({
             id_residencia: residencia.id_residencia,
@@ -105,7 +105,7 @@ async function actualizarResidencia(req, res) {
 
         const residenciaFormateado = {
             ...residenciaActualizada.toJSON(),
-            fecha_registro: formatFecha(residenciaActualizada.fecha_registro)
+            fecha_registro: formatFechaCompleta(residenciaActualizada.fecha_registro)
         };
 
         return res.status(200).json({

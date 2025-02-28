@@ -1,5 +1,5 @@
 const pacienteService = require("../services/paciente.service");
-const { formatFechaNacimiento } = require('../utils/date_utils');
+const { formatFecha} = require('../utils/date_utils');
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
 
@@ -35,7 +35,7 @@ async function registrarPaciente(req, res) {
         // Formatear la fecha antes de devolver la respuesta
         const pacienteFormateado = {
             ...nuevoPaciente.toJSON(),
-            fecha_nacimiento: formatFechaNacimiento(nuevoPaciente.fecha_nacimiento)
+            fecha_nacimiento: formatFecha(nuevoPaciente.fecha_nacimiento)
         };
 
         // Devolver todos los datos registrados del paciente
@@ -63,7 +63,7 @@ async function getPaciente(req, res) {
         // Formatear la fecha de nacimiento antes de devolverla
         const pacienteFormateado = {
             ...paciente.toJSON(),
-            fecha_nacimiento: formatFechaNacimiento(paciente.fecha_nacimiento)
+            fecha_nacimiento: formatFecha(paciente.fecha_nacimiento)
         };
 
         // Devolver los datos del paciente
@@ -95,7 +95,7 @@ async function actualizarPaciente(req, res) {
         // Formatear la fecha de nacimiento antes de devolverla
         const pacienteFormateado = {
             ...pacienteActualizado.toJSON(),
-            fecha_nacimiento: formatFechaNacimiento(pacienteActualizado.fecha_nacimiento)
+            fecha_nacimiento: formatFecha(pacienteActualizado.fecha_nacimiento)
         };
 
         // Devolver los datos actualizados del paciente

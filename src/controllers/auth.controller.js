@@ -3,7 +3,7 @@ const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsi
 const { validarPassword } = require('../services/validation.service');
 const errorMessages = require('../utils/error_messages');
 const { generarToken } = require('../services/auth.service');
-const { formatFecha } = require('../utils/date_utils');
+const { formatFechaCompleta } = require('../utils/date_utils');
 const successMessages = require('../utils/success_messages');
 
 // Función para buscar un usuario por nombre (solo para ADMINISTRADOR)
@@ -51,8 +51,8 @@ async function registrarUsuario(req, res) {
             estatus: 1 
         });
         
-        // Usar la función formatFecha para formatear la fecha de creación
-        const fechaFormateada = formatFecha(nuevoUsuario.fecha_creacion);
+        // Usar la función formatFechaCompleta para formatear la fecha de creación
+        const fechaFormateada = formatFechaCompleta(nuevoUsuario.fecha_creacion);
 
         return res.status(201).json({
             message: successMessages.registroExitoso,
@@ -105,7 +105,7 @@ async function login(req, res) {
             user: {
                 id_usuario: usuario.id_usuario,
                 nombre_usuario: usuario.nombre_usuario,
-                fecha_creacion: formatFecha(usuario.fecha_creacion),
+                fecha_creacion: formatFechaCompleta(usuario.fecha_creacion),
                 rol: {
                     id_rol: usuario.rol.id_rol,
                     nombre_rol: usuario.rol.nombre_rol,

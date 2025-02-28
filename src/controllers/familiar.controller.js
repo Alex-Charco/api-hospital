@@ -1,6 +1,6 @@
 const familiarService = require('../services/familiar.service');
 const infoMilitarService = require('../services/info_militar.service');
-const { formatFechaNacimiento } = require('../utils/date_utils');
+const { formatFecha } = require('../utils/date_utils');
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
 
@@ -24,7 +24,7 @@ async function registrarFamiliar(req, res) {
         // Formatear la fecha antes de devolver la respuesta
         const familiarFormateado = {
             ...familiar.toJSON(),
-            fecha_nacimiento: formatFechaNacimiento(familiar.fecha_nacimiento)
+            fecha_nacimiento: formatFecha(familiar.fecha_nacimiento)
         };
 
         return res.status(201).json({
@@ -51,7 +51,7 @@ async function getByFamiliar(req, res) {
 
         // Verificar si el paciente no fue encontrado
         if (!paciente) {
-            return res.status(404).json({ message: "Paciente no encontrado." });
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
 
         // Si encontramos el paciente, obtenemos todos los familiares
@@ -65,7 +65,7 @@ async function getByFamiliar(req, res) {
         const familiar = await familiarService.obtenerFamiliarPorIdentificacion(identificacion);
 
         if (!familiar) {
-            return res.status(404).json({ message: "No se encontró información para la identificación proporcionada." });
+            return res.status(404).json({ message: errorMessages.noInfoIdentificacion });
         }
 
         return res.status(200).json(familiar);
@@ -97,7 +97,7 @@ async function actualizarFamiliar(req, res) {
 
         const familiarFormateado = {
             ...familiarActualizado.toJSON(),
-            fecha_nacimiento: formatFechaNacimiento(familiarActualizado.fecha_nacimiento)
+            fecha_nacimiento: formatFecha(familiarActualizado.fecha_nacimiento)
         };
 
         return res.status(200).json({

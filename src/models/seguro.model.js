@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const Paciente = require('./paciente.model');
 
-const Residencia = sequelize.define('Residencia', {
-    id_residencia: {
+const Seguro = sequelize.define('Seguro', {
+    id_seguro: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
@@ -16,42 +16,37 @@ const Residencia = sequelize.define('Residencia', {
             key: 'id_paciente'
         }
     },
-    lugar_nacimiento: {
-        type: DataTypes.STRING(100),
+    tipo: {
+        type: DataTypes.ENUM('SEGURO', 'ISSFA'),
         allowNull: false
     },
-    pais: {
-        type: DataTypes.STRING(20),
+    beneficiario: {
+        type: DataTypes.ENUM('MILITAR ACTIVO', 'MILITAR PASIVO'),
         allowNull: false
     },
-    nacionalidad: {
-        type: DataTypes.STRING(30),
+    codigo: {
+        type: DataTypes.STRING(50),
         allowNull: false
     },
-    provincia: {
-        type: DataTypes.STRING(100),
+    cobertura: {
+        type: DataTypes.DECIMAL(5,2),
         allowNull: false
     },
-    canton: {
-        type: DataTypes.STRING(100),
+    porcentaje: {
+        type: DataTypes.DECIMAL(5,2),
         allowNull: false
     },
-    parroquia: {
-        type: DataTypes.STRING(100),
-        allowNull: false
-    },
-    direccion: {
-        type: DataTypes.STRING(250),
-        allowNull: true
-    },
-    fecha_registro: {
+    fecha_inicio: {
         type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+        allowNull: false
+    },
+    fecha_fin: {
+        type: DataTypes.DATE,
+        allowNull: false
     }
 }, {
-    tableName: 'residencia',
+    tableName: 'seguro',
     timestamps: false
 });
 
-module.exports = Residencia;
+module.exports = Seguro;

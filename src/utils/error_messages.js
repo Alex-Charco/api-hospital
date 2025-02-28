@@ -60,7 +60,13 @@ const errorMessages = {
     residenciaNoEncontrada: "No se encontró la residencia del paciente.",
     residenciaYaRegistrada: "El paciente ya tiene una residencia registrada.",
     errorCrearResidencia: "No se pudo crear la residencia. ",
-    errorActualizarResidencia: "No se pudo actualizar la residencia. "
+    errorActualizarResidencia: "No se pudo actualizar la residencia. ",
+
+    // Mensaje de seguro
+    seguroNoEncontrado: "No se encontró un seguro registrado para este paciente.",
+    seguroYaRegistrado: "El paciente ya tiene un seguro registrado.",
+    errorCrearSeguro: "Error al registrar el seguro: ",
+    errorActualizarSeguro: "Error al actualizar el seguro: ",
 };
 
 module.exports = errorMessages;

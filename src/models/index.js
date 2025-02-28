@@ -3,13 +3,14 @@ const sequelize = require("../config/db");
 const Usuario = require("./usuario.model");
 const RolUsuario = require("./rol_usuario.model");
 const Persona = require("./persona.model");
-const Paciente = require("./paciente.nodel");
+const Paciente = require("./paciente.model");
 const InfoMilitar = require("./info_militar.model")
 const Medico = require("./medico.model")
 const Especialidad = require("./especialidad.model")
 const Administrador = require("./administrador.model");
 const Familiar = require("./familiar.model");
 const Residencia = require("./residencia.model");
+const Seguro = require("./seguro.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -122,6 +123,20 @@ Residencia.belongsTo(Paciente, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre Paciente y Seguro (Un Paciente tiene un Seguro)
+Paciente.hasOne(Seguro, {
+    foreignKey: 'id_paciente',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Seguro.belongsTo(Paciente, {
+    foreignKey: 'id_paciente',
+    as: 'paciente',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
 // Exportar modelos y conexión
 module.exports = {
     sequelize,
@@ -134,5 +149,6 @@ module.exports = {
     Especialidad,
     Administrador,
     Familiar,
-    Residencia
+    Residencia,
+    Seguro
 };
