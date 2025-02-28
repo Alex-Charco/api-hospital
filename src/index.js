@@ -6,6 +6,8 @@ const authRoutes = require("./routes/auth.routes");
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const infoMilitarRoutes = require('./routes/infoMilitarRoutes');
 const familiarRoutes = require('./routes/familiarRoutes');
+const residenciaRoutes = require("./routes/residencia.routes");
+
 const corsOptions = {
     origin: 'http://localhost:5000'
 };
@@ -24,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/paciente', pacienteRoutes);
 app.use('/api/info-militar', infoMilitarRoutes);
 app.use('/api/familiar', familiarRoutes);
+app.use('/api/residencia', residenciaRoutes);
 
 // 📌 Sincronizar Base de Datos con Sequelize
 const PORT = process.env.PORT || 5000;

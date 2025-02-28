@@ -9,6 +9,7 @@ const Medico = require("./medicoModel")
 const Especialidad = require("./especialidadModel")
 const Administrador = require("./administradorModel");
 const Familiar = require("./familiarModel");
+const Residencia = require("./residencia.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -107,6 +108,19 @@ Familiar.belongsTo(Paciente, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre Paciente y Residencia
+Paciente.hasOne(Residencia, {
+    foreignKey: "id_paciente",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Residencia.belongsTo(Paciente, {
+    foreignKey: "id_paciente",
+    as: "paciente",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
 
 // Exportar modelos y conexión
 module.exports = {
@@ -119,5 +133,6 @@ module.exports = {
     Medico,
     Especialidad,
     Administrador,
-    Familiar
+    Familiar,
+    Residencia
 };

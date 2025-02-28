@@ -49,6 +49,11 @@ async function getByFamiliar(req, res) {
         // Buscar al paciente por la identificación
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
 
+        // Verificar si el paciente no fue encontrado
+        if (!paciente) {
+            return res.status(404).json({ message: "Paciente no encontrado." });
+        }
+
         // Si encontramos el paciente, obtenemos todos los familiares
         if (paciente) {
             const familiares = await familiarService.obtenerFamiliarCondicional({ id_paciente: paciente.id_paciente });
@@ -66,7 +71,7 @@ async function getByFamiliar(req, res) {
         return res.status(200).json(familiar);
     } catch (error) {
         console.error("❌ Error en getByFamiliar:", error.message);
-        return res.status(500).json({ message: error.message || errorMessages.errorServidor, error: error.stack  });
+        return res.status(500).json({ message: error.message ||  errorMessages.errorServidor });
     }
 }
 
