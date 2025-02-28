@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar } = require('../controllers/infoMilitar.controller');
+const {registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar } = require('../controllers/info_militar.controller');
 const { verificarToken, authorizeRole } = require('../middlewares/auth.middleware');
 
 // Crear nueva información militar

@@ -1,5 +1,5 @@
 const { InfoMilitar, Paciente } = require('../models');
-const errorMessages = require("../utils/errorMessages");
+const errorMessages = require("../utils/error_messages");
 
 async function validarPacienteExistente(identificacion) {
     try {

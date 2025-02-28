@@ -1,6 +1,6 @@
 const { Model } = require('sequelize');
 const sequelize = require('../config/db');
-const personaAttributes = require('./personaAttributes');
+const personaAttributes = require('./persona_attributes');
 
 class Persona extends Model {}
 

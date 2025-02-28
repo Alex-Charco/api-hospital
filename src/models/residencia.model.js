@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Paciente = require('./pacienteModel');
+const Paciente = require('./paciente.nodel');
 
 const Residencia = sequelize.define('Residencia', {
     id_residencia: {

@@ -1,6 +1,6 @@
-const infoMilitarService = require('../services/infoMilitar.service');
-const errorMessages = require('../utils/errorMessages');
-const successMessages = require('../utils/successMessages');
+const infoMilitarService = require('../services/info_militar.service');
+const errorMessages = require('../utils/error_messages');
+const successMessages = require('../utils/success_messages');
 
 // Crear nuevo registro de información militar (solo administradores)
 async function registrarInfoMilitar(req, res) {

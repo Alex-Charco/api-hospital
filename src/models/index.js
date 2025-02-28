@@ -1,14 +1,14 @@
 const sequelize = require("../config/db");
 
-const Usuario = require("./usuarioModel");
-const RolUsuario = require("./rolUsuarioModel");
-const Persona = require("./personaModel");
-const Paciente = require("./pacienteModel");
-const InfoMilitar = require("./infoMilitarModel")
-const Medico = require("./medicoModel")
-const Especialidad = require("./especialidadModel")
-const Administrador = require("./administradorModel");
-const Familiar = require("./familiarModel");
+const Usuario = require("./usuario.model");
+const RolUsuario = require("./rol_usuario.model");
+const Persona = require("./persona.model");
+const Paciente = require("./paciente.nodel");
+const InfoMilitar = require("./info_militar.model")
+const Medico = require("./medico.model")
+const Especialidad = require("./especialidad.model")
+const Administrador = require("./administrador.model");
+const Familiar = require("./familiar.model");
 const Residencia = require("./residencia.model");
 
 // Definir relaciones con claves foráneas
