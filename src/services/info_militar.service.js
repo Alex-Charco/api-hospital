@@ -10,7 +10,7 @@ async function validarPacienteExistente(identificacion) {
             return null;
         }
 
-        return paciente; // Devuelve el paciente si lo encuentra
+        return paciente; 
     } catch (error) {
         console.warn("Error en validarPacienteExistente:", error.message);
         throw new Error(errorMessages.errorValidarPaciente);

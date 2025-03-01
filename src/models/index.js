@@ -11,6 +11,8 @@ const Administrador = require("./administrador.model");
 const Familiar = require("./familiar.model");
 const Residencia = require("./residencia.model");
 const Seguro = require("./seguro.model");
+const Horario = require("./horario.model");
+const Turno = require("./turno.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -137,6 +139,36 @@ Seguro.belongsTo(Paciente, {
     onUpdate: 'CASCADE'
 });
 
+// Relación entre médico y horario
+Medico.hasMany(Horario, {
+    foreignKey: 'id_medico',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Horario.belongsTo(Medico, {
+    foreignKey: 'id_medico',
+    as: 'medico',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+// Relación entre Turno y Horario (un horario puede tener muchos turnos)
+Horario.hasMany(Turno, {
+    foreignKey: 'id_horario',
+    as: 'turnos', 
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Turno.belongsTo(Horario, {
+    foreignKey: 'id_horario',
+    as: 'horario',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+
 // Exportar modelos y conexión
 module.exports = {
     sequelize,
@@ -150,5 +182,7 @@ module.exports = {
     Administrador,
     Familiar,
     Residencia,
-    Seguro
+    Seguro,
+    Horario,
+    Turno
 };

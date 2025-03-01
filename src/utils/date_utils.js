@@ -8,4 +8,10 @@ function formatFecha(fecha) {
     return new Date(fecha).toISOString().split("T")[0]; 
 }
 
-module.exports = { formatFechaCompleta, formatFecha };
+// Función para formatear la hora
+function formatHora(hora) {
+    // Asegurarse de que la hora es válida y esté en formato correcto (ej: HH:mm:ss)
+    return hora ? hora.toTimeString().split(' ')[0] : '';
+}
+
+module.exports = { formatFechaCompleta, formatFecha, formatHora };

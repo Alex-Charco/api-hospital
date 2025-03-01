@@ -67,6 +67,13 @@ const errorMessages = {
     seguroYaRegistrado: "El paciente ya tiene un seguro registrado.",
     errorCrearSeguro: "Error al registrar el seguro: ",
     errorActualizarSeguro: "Error al actualizar el seguro: ",
+
+    // Mensajes de horario
+    medicoNoEncontrado: "Médico no encontrado.",
+    horarioYaRegistrado: "El médico ya tiene un horario registrado.",
+    horarioNoEncontrado: "No se encontró el horario del médico.",
+    errorCrearHorario: "Error al crear el horario: ",
+    errorActualizarHorario: "Error al actualizar el horario: ",
 };
 
 module.exports = errorMessages;
