@@ -1,50 +1,77 @@
 <h1 align="center"><strong>API REST HOSPITAL</strong></h1>
 
-**Descripción**
+## Descripción
 
 API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize como ORM para MySQL, JWT para autenticación, bcrypt.js para el manejo de contraseñas y CORS para control de acceso. Además, incluye dotenv para la gestión de variables de entorno y body-parser para el procesamiento de solicitudes. Nodemon está configurado para la recarga automática en desarrollo.
 
-## Tareas completadas
+## ✅ Acciones Realizadas  
 
-✔️ Configurar el entorno de desarrollo
+- ✔️ **Configuración del entorno de desarrollo**  
+- ✔️ **Cifrado de contraseña**  
+- ✔️ **Autenticación con JSON Web Token (JWT) y bcryptjs**  
+- ✔️ **Configuración de pruebas automáticas**  
+  - 🔹 Se emplea **GitHub Actions** con un pipeline que incluye:  
+    - 🟢 **Node.js**  
+    - 🔍 **ESLint**  
+    - 📊 **SonarCloud**  
+    - 📢 **Notificación en Slack**  
 
-✔️ Cifrado de password
-
-✔️ Autenticación con jsonwebtoken (JWT) y bcryptjs
-
-✔️ Login (inicio de sesión) y registrar usuario
-
-✔️ Configuración de pruebas automáticas (se emplea GitHub Actions, pipeline con: node.js, eslint, sonarcloud, slack )
-
-✔️ Registrar, consultar, actualizar paciente
-
-✔️ Registrar, consultar, actualizar información militar
+## 🚧 En desarrollo  
+- 🚀 **Endpoints** _(En proceso...)_
 
 
-## Enpoints
-## 📌 API Endpoints
+## 🚀 Endpoints  
+
+### 📌 Lista de Endpoints  
+
+| 📂 **Módulo**            | 🛠️ **Acciones Disponibles**                        | ✅ **Estado**  |
+|--------------------------|----------------------------------------------------|---------------|
+| **🧑 Usuario**          | Login (inicio de sesión) y registrar usuario       | ✔️ Completado |
+| **🩺 Paciente**         | Registrar, consultar, actualizar paciente          | ✔️ Completado |
+| **🎖️ Información Militar** | Registrar, consultar, actualizar información militar | ✔️ Completado |
+| **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
+| **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
+| **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
+| **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ❌ Pendiente  |
+
+### 📌 API Endpoints
 
 | Método  | Endpoint        | Descripción                 | Estado  |
 |---------|----------------|-----------------------------|---------|
-|                           Usuario                                 |
+|                           **Usuario**                                 |
 | GET     | `/api/auth/get/:nombre-usuario` | Consultar usuario       | ✅ |
 | POST     | `/api/auth/login`     | Iniciar sesión usuario | ✅ |
 | POST    | `/api/auth/register`     | Registrar usuario      | ✅ |
 | PUT     | `/put/:nombre_usuario/password` | Actualizar usuario para administrador      | ✅ |
 | PUT     | `/put/password/:nombre_usuario` | Actualizar usuario      | ✅ |
 | DELETE  | `/api/auth/delete/:nombre_usuario` | Eliminar usuario         | ✅ |
-|                           Paciente                                 |
+|                           **Paciente**                                |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
 | PUT     | `/api/paciente/put/:identificacion` | Actualizar paciente       | ✅ |
-|                           Info militar                                                         |
+|                           **Info militar**                                                         |
 | GET     | `/api/info-militar/get/:identificacion` | Consultar info militar       | ✅ |
 | POST    | `/api/info-militar/registrar`     | Registrar info militar      | ✅ |
 | PUT     | `/api/info-militar/put/:identificacion` | Actualiza info militar       | ✅ |
-|                           Familiar                                                         |
-| GET     | `/api/familiar/get/:identificacion` | Consultar familiar       | ❌ |
-| POST    | `/api/familiar/registrar`     | Registrar familiar      | ❌ |
-| PUT     | `/api/familiar/put/:identificacion` | Actualiza familiar       | ❌ |
+|                         **Familiar**                                                       |
+| GET     | `/api/familiar/get/:identificacion` | Consultar familiar       | ✅ |
+| POST    | `/api/familiar/registrar/:identificacionPaciente`     | Registrar familiar      | ✅ |
+| PUT     | `/api/familiar/put/:identificacionPaciente/:identificacionFamiliar` | Actualiza familiar       | ✅ |
+**Residencia**                                                       |
+| GET     | `/api/residencia/get/:identificacion` | Consultar residencia       | ✅ |
+| POST    | `/api/residencia/registrar/:identificacion`     | Registrar residencia      | ✅ |
+| PUT     | `/api/residencia/put/:identificacion` | Actualiza residencia       | ✅ |
+**Seguro**                                                        |
+| GET     | `/api/seguro/get/:identificacion` | Consultar seguro       | ✅ |
+| POST    | `/api/seguro/registrar:identificacion`     | Registrar seguro      | ✅ |
+| PUT     | `/api/seguro/put/:identificacion` | Actualiza seguro       | ✅ |
+**Horario**                                                         |
+| GET     | `/api/horario/get/:identificacion` | Consultar horario       | ✅ |
+| POST    | `/api/horario/registrar`     | Registrar horario      | ✅ |
+**Médico**                                                        |
+| GET     | `/api/medico/get/:identificacion` | Consultar medico       | ❌ |
+| POST    | `/api/medico/registrar`     | Registrar medico      | ❌ |
+| PUT     | `/api/medico/put/:identificacion` | Actualiza medico       | ❌ |
 
 ---
 
@@ -132,366 +159,965 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     
 Resultado: todo las contraseñas estan cifradas.
 
-## 3. Enpoints
+## 🚀 3. Endpoints  
 
-* ### GET Consultar usuario 
-Endpoint: GET /api/auth/get/:nombre_usuario
+### 🔹 GET - Consultar Usuario  
 
-Iniciar sesión (copiar token)
+#### 📍 Endpoint  
 
-Pegar token en: Authorization/Bearer Token/Token
+    GET /api/auth/get/:nombre_usuario
 
-⚠️ IMPORTANTE: Usuario administrador logeado puede consultar usuario
+📝 **Descripción:**
 
-URL: http://localhost:5000/api/auth/get/:nombre_usuario
+Este endpoint permite obtener la información de un usuario específico.
 
-Se remplaza **:nombre_usuario** por el nombre de usuario
 
-URL: http://localhost:5000/api/auth/get/pacient
+🔐 **Requisitos:**
 
-Respuesta: Usuario encontrado exitosamente y los datos.
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
 
-* ### POST Iniciar sesión usuario (Login)
-Endpoint: POST /api/auth/login
+🛠 **Autorización:** Solo un usuario administrador logeado puede consultar un usuario.
 
-URL: http://localhost:5000/api/auth/login
+📥 **Parámetro de URL**
 
-Body/raw:
+- :nombre_usuario → Se debe reemplazar con el nombre del usuario a consultar.
+
+🌐 Ejemplo de Uso:
+
+📌 URL Base (Local):
+
+    http://localhost:5000/api/auth/get/:nombre_usuario
+
+📥 Ejemplo de URLcon un usuario específico:
+
+    http://localhost:5000/api/auth/get/pacient
+    
+📤 Headers Requeridos:
+
+    Authorization: Bearer <TOKEN>
+
+✅ Ejemplo de Respuesta Exitosa:
+
+    {
+        "message": "Usuario encontrado exitosamente",
+        ...(datos del usuario)
+    }
+
+### 🔹 POST - Iniciar Sesión (Login)  
+
+#### 📍 Endpoint  
+
+    POST /api/auth/login
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/auth/login
+    
+📝 Descripción
+Este endpoint permite a un usuario autenticarse en el sistema proporcionando sus credenciales.
+
+📥 Body (JSON)
 
     {
         "nombre_usuario": "pacient",
         "password": "pas555"
     }
 
-            {"message":"Inicio de sesión exitoso","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoyLCJub21icmVfdXN1YXJpbyI6InBhY2llbnRlMiIsInJvbCI6",
+📤 Headers Requeridos
+
+    {
+        "Content-Type": "application/json"
+    }
+
+✅ Ejemplo de Respuesta Exitosa
+
+            {"message":"Inicio de sesión exitoso",
+            "token":"xxxxxxx",
 
             "user": {
-                "id_usuario": 2,
-                "nombre_usuario": "pacient",
-                "fecha_creacion": "2025-02-11 05:27:07",
+                ...(datos del usuario)
                 "rol": {
-                    "id_rol": 1,
-                    "nombre_rol": "PACIENTE",
+                    ... (datos del rol)
                     "permiso": {
-                        "ver_turno": true,
-                        "ver_historial": true,
-                        "reservar_turno": true
+                        ...(datos del permiso)
                     },
                     "estatus": 1
                 }
             }
         }
 
-⚠️ **IMPORTANTE:** El token expira en 1 hora. Se debe renovarlo a tiempo.
+⚠️ **IMPORTANTE:** El token expira en 1 hora. Se debe renovarlo a tiempo para evitar pérdida de sesión.
 
-* ### POST Registrar usuario
-Permite registrar el usuario y contraseña.
+### 🔹 POST - Registrar Usuario  
 
-Endpoint: POST /api/auth/register
+#### 📍 Endpoint  
 
-Iniciar sesión (copiar token)
+    POST /api/auth/register
 
-Pegar token en: Authorization/Bearer Token/Token
+🌐 URL Base (Local)
 
-⚠️ **IMPORTANTE:** 
-1. Solo usuario con rol de administrador puede registrar usuario.
-2. Debe ingresar contraseña segura.
+    http://localhost:5000/api/auth/register
+    
+📝 **Descripción**
 
-URL: http://localhost:5000/api/auth/register
+Este endpoint permite registrar un nuevo usuario en el sistema.
 
-Body/raw:
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+**🛠 Autorización:** Solo un usuario con rol de administrador puede registrar nuevos usuarios.
+
+🔒 **Seguridad:** La contraseña debe cumplir con las políticas de seguridad establecidas.
+
+📤 Headers Requeridos
 
     {
-        "nombre_usuario": "pac788",
-        "password": "45678",
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxx",
+        "password": "xxx",
         "id_rol": 1
     }
 
-Respuesta:
+✅ Ejemplo de Respuesta Exitosa
 
     {
         "message": "Usuario registrado exitosamente",
         "usuario": {
-            "id_usuario": 17,
-            "nombre_usuario": "pac788",
-            "fecha_creacion": "2025-02-20 20:35:07",
-            "id_rol": 1
+            ...(datos del usuario)
         }
     }
 
-* ### PUT Actualizar contraseña para administrador
-Endpoint: PUT /api/auth/put/:nombre_usuario/password
+### 🔹 PUT - Actualizar Contraseña para Usuarios  
 
-Token: Authorization/Bearer Token/Token
+#### 📍 Endpoint  
 
-⚠️ **IMPORTANTE:** Solo usuario con rol de  puede actualizar usuario.
+    PUT /api/auth/put/password/:nombre_usuario
 
-URL: http://localhost:5000/api/auth/put/:nombre_usuario/password
+🌐 URL Base (Local)
 
-Se remplaza **:nombre_usuario** por el nombre de usuario
+    http://localhost:5000/api/auth/put/password/:nombre_usuario
 
-URL: http://localhost:5000/api/auth/put/paciente8/password
+📝 **Descripción**
 
-Body/raw:
+Este endpoint permite que cualquier usuario registrado (sin importar su rol) pueda cambiar su contraseña.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Cualquier usuario puede cambiar su contraseña, sin importar su rol.
+
+📥 **Parámetro de URL**
+
+- :nombre_usuario → Se debe reemplazar con el nombre del usuario.
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/auth/put/password/paciente8
+
+📤 Headers Requeridos
 
     {
-        "nueva_password": "NuevaContraseñaSegura"
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
     }
 
-Respuesta: Contraseña actualizada exitosamente.
-
-* ### PUT Actualizar contraseña para usuarios
-Cualquier usuario registado sin importar el rol (paciente, médico, administador) puede cambiar su contraseña.
-
-Endpoint: PUT /api/auth/put/password/:nombre_usuario
-
-Iniciar sesión (copiar token)
-
-Pegar token en: Authorization/Bearer Token/Token
-
-URL: http://localhost:5000/api/auth/put/password/:nombre_usuario
-Se remplaza **:nombre_usuario** por el nombre de usuario
-
-URL: http://localhost:5000/api/auth/put/password/paciente8
-
-Body/raw:
+📥 Body (JSON) - Ejemplo de Solicitud
 
     {
     "password_actual": "TuContraseñaActual",
     "nueva_password": "NuevaContraseña@2024"
     }
 
-Respuesta: Contraseña actualizada exitosamente. Debes volver a iniciar sesión.
+✅ Respuesta: Contraseña actualizada exitosamente. 
 
-* ### DELETE Eliminar usuario
-⚠️ IMPORTANTE: Eliminar un usuario cumpliendo con las siguientes condiciones:
+⚠️ IMPORTANTE:
 
-1. ✅ Solo los ADMINISTRADORES pueden eliminar usuarios.
-2. ✅ El usuario debe existir en la base de datos.
-3. ✅ No se puede eliminar a otro administrador.
-4. ✅ El usuario no debe estar asignado a ninguna entidad que impida su eliminación.
-5. ✅ Manejo de errores adecuado.
+Después de actualizar la contraseña, se deberá iniciar sesión nuevamente con la nueva contraseña.
 
-Endpoint: DELETE /api/auth/delete/:nombre_usuario
+### 🔹 DELETE - Eliminar Usuario  
 
-Iniciar sesión (copiar token)
+#### 📍 Endpoint  
 
-Pegar token en: Authorization/Bearer Token/Token
+    DELETE /api/auth/delete/:nombre_usuario
 
-URL: http://localhost:5000/api/auth/delete/:nombre_usuario
+🌐 URL Base (Local)
 
-Se remplaza **:nombre_usuario** por el nombre de usuario
+    http://localhost:5000/api/auth/delete/:nombre_usuario
+    
+📝 **Descripción**
+Este endpoint permite a un administrador eliminar un usuario del sistema bajo ciertas condiciones.
 
-URL: http://localhost:5000/api/auth/delete/pacient
+🔐 **Requisitos**
 
-Respuesta: Usuario eliminado exitosamente.
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo los administradores pueden eliminar usuarios.
+
+⚠️ **Condiciones para eliminar un usuario:**
+
+1. El usuario debe existir en la base de datos.
+2. No se puede eliminar a otro administrador.
+3. El usuario no debe estar asignado a ninguna entidad que impida su eliminación.
+4. Manejo de errores adecuado si no se cumplen las condiciones.
+
+📥 **Parámetro de URL** 
+
+- :nombre_usuario → Se debe reemplazar con el nombre del usuario a consultar.
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/auth/delete/pacient
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+     }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+No se requiere un cuerpo en la solicitud.
+
+✅ Respuesta: Usuario eliminado exitosamente.
 
 ---
 
-* ### GET Consultar paciente
-Buscar la información del paciente mediante número de identificación.
+### 🔹 GET - Consultar Paciente  
 
-Endpoint: GET /api/paciente/get/:identificacion
+#### 📍 Endpoint  
 
-Token: Authorization/Bearer Token/Token
+    GET /api/paciente/get/:identificacion
 
-⚠️ IMPORTANTE: El administrador y médico puede buscar paciente.
+🌐 URL Base (Local)
 
-URL: http://localhost:5000/api/paciente/get/:identificacion
+    http://localhost:5000/api/paciente/get/:identificacion
+    
+📝 **Descripción**
+Este endpoint permite buscar la información de un paciente mediante su número de identificación.
 
-Se remplaza **:identificacion** por el número de identificación
+🔐 **Requisitos**
 
-URL: http://localhost:5000/api/paciente/get/1234569222
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
 
-Respuesta: Se obtiene los datos del paciente
+🛠 **Autorización:** Solo administradores y médicos pueden consultar los datos de los pacientes.
 
-* ### POST Registrar paciente
-Registra la información del paciente.
+📥 **Parámetros de URL**
+- :identificacion - Reemplázalo con el número de identificación del paciente que deseas consultar.
 
-Endpoint: POST /api/paciente/registrar
+📥 Ejemplo de URL
 
-Token: Authorization/Bearer Token/Token
+    http://localhost:5000/api/paciente/get/1234569222
 
-⚠️ **IMPORTANTE:** 
-1. Solo el administrador puede registrar paciente.
-2. Se ingresa el nombre de usuario que es unico para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_usuario.
-
-URL: http://localhost:5000/api/paciente/registrar
+📤 Headers Requeridos
 
     {
-        "nombre_usuario": "pac788",
-        "identificacion": "1234566555",
-        "fecha_nacimiento": "1995-07-25",
-        "primer_nombre": "Andrea",
-        "segundo_nombre": "Mariana",
-        "primer_apellido": "Castro",
-        "segundo_apellido": "Gonzales",
-        "genero": "FEMENINO",
-        "celular": "0987654888",
-        "telefono": "022344446",
-        "correo": "andreacastro@example.com",
-        "estado_civil": "SOLTERO/A",
-        "grupo_sanguineo": "O RH+",
-        "instruccion": "SUPERIOR",
-        "ocupacion": "MILITAR",
-        "empresa": "",
-        "discapacidad": 0,
-        "orientacion": "HETEROSEXUAL",
-        "identidad": "CISGÉNERO",
-        "tipo_paciente": "MILITAR",
-        "estatus": 1
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
     }
 
-Respuesta:
+
+✅ Respuesta: Se obtiene los datos del paciente
+
+### 🔹 POST - Registrar Paciente  
+
+#### 📍 Endpoint  
+
+    POST /api/paciente/registrar
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/paciente/registrar
+    
+📝 **Descripción**
+
+Este endpoint permite registrar la información de un nuevo paciente en el sistema.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo un administrador tiene permisos para registrar un paciente.
+
+✔️ El nombre de usuario debe ser único para realizar las verificaciones previas al registro.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxxx",
+        ...(datos del paciente)
+    }
+
+✅ Respuesta:
 
     {
         "message": "Paciente registrado exitosamente",
         "paciente": {
-            "id_paciente": 7,
-            "id_usuario": 17,
-            "identificacion": "1234566555",
-            "fecha_nacimiento": "1995-07-25",
-            "primer_nombre": "Andrea",
-            "segundo_nombre": "Mariana",
-            "primer_apellido": "Castro",
-            "segundo_apellido": "Gonzales",
-            "genero": "FEMENINO",
-            "celular": "0987654888",
-            "telefono": "022344446",
-            "correo": "andreacastro@example.com",
-            "estado_civil": "SOLTERO/A",
-            "grupo_sanguineo": "O RH+",
-            "instruccion": "SUPERIOR",
-            "ocupacion": "MILITAR",
-            "empresa": "",
-            "discapacidad": 0,
-            "orientacion": "HETEROSEXUAL",
-            "identidad": "CISGÉNERO",
-            "tipo_paciente": "MILITAR",
-            "estatus": 1
+            ...(datos del paciente)
         }
     }
 
-* ### PUT Actualizar paciente
+### 🔹 PUT - Actualizar Paciente  
 
-Actualiza la información del paciente mediante número de identificación.
+#### 📍 Endpoint  
 
-Endpoint: PUT /api/paciente/put/:identificacion
+    PUT /api/paciente/put/:identificacion
 
-Token: Authorization/Bearer Token/Token
+🌐 URL Base (Local)
 
-⚠️ IMPORTANTE: El administrador puede actualizar la información del paciente.
+    http://localhost:5000/api/paciente/put/:identificacion
+    
+📝 **Descripción**
 
-URL: http://localhost:5000/api/paciente/put/:identificacion
+Este endpoint permite actualizar la información de un paciente existente en el sistema mediante su número de identificación.
 
-Se remplaza **:identificacion** por el número de identificación
+🔐 **Requisitos**
 
-URL: http://localhost:5000/api/paciente/put/1234569222
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo el administrador tiene permisos para actualizar la información de un paciente.
+
+📋 El número de identificación se debe proporcionar para identificar al paciente a actualizar.
+
+📤 Headers Requeridos
 
     {
-        "fecha_nacimiento": "1995-07-25",
-        "primer_nombre": "Andrea",
-        "segundo_nombre": "Anai",
-        "primer_apellido": "Castro",
-        "segundo_apellido": "Gonzales",
-        "genero": "FEMENINO",
-        "celular": "0987654888",
-        "telefono": "022344446",
-        "correo": "andreacastro@example.com",
-        "estado_civil": "SOLTERO/A",
-        "grupo_sanguineo": "O RH+",
-        "instruccion": "SUPERIOR",
-        "ocupacion": "MILITAR",
-        "empresa": "",
-        "discapacidad": 0,
-        "orientacion": "HETEROSEXUAL",
-        "identidad": "CISGÉNERO",
-        "tipo_paciente": "MILITAR",
-        "estatus": 1
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Parámetros de URL
+- :identificacion - Reemplazar este parámetro con el número de identificación del paciente a actualizar.
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/paciente/put/1234569222
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "fecha_nacimiento": "xxxxxx",
+        ...(datos del paciente)
     }
     
-Respuesta: Información del paciente actualizada.
+✅ Respuesta: Información del paciente actualizada.
 
 ---
+### 🔹 GET - Consultar Información Militar  
 
-* ### GET Consultar información militar
-Buscar la información mililar del paciente mediante número de identificación.
+#### 📍 Endpoint  
 
-Endpoint: GET /api/info-militar/get/:identificacion
+    GET /api/info-militar/get/:identificacion
 
-Token: Authorization/Bearer Token/Token
+🌐 URL Base (Local)
 
-⚠️ IMPORTANTE: El administrador y médico puede consultar la información militar del paciente.
+    http://localhost:5000/api/info-militar/get/:identificacion
+    
+📝 **Descripción**
 
-URL: http://localhost:5000/api/info-militar/get/:identificacion
+Este endpoint permite consultar la información militar asociada a un paciente mediante su número de identificación.
 
-Se remplaza **:identificacion** por el número de identificación
+🔐 **Requisitos**
 
-URL: http://localhost:5000/api/info-militar/get/1234569222
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
 
-Respuesta: Información militar del paciente.
+🛠 **Autorización:** Solo los administradores y médicos tienen permisos para consultar la información militar del paciente.
 
-* ### POST Registrar infoMilitar
-Registra la información mililar del paciente.
+📋 El número de identificación es necesario para identificar al paciente.
 
-Endpoint: POST /api/info-militar/registrar
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE: Solo el administrador puede registrar la información militar del paciente.
-Se ingresa el no. identificación para realizar las verificaciones y finalmente si todo esta bien guarda los datos con el id_paciente.
-
-URL: http://localhost:5000/api/paciente/registrar
-
-Body/raw:
+📤 Headers Requeridos
 
     {
-        "identificacion": "1234566333",
-        "cargo": "NINGUNO",
-        "grado": "CORONEL",
-        "fuerza": "TERRESTRE",
-        "unidad": "15-BAE"
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
     }
 
-Respuesta:
+📥 Parámetros de URL
+
+- :identificacion - Reemplazar este parámetro con el número de identificación del paciente.
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/info-militar/get/1234569222
+    
+✅ Respuesta: Información militar del paciente.
+
+⚠️ IMPORTANTE:
+
+- Asegurarse de reemplazar :identificacion con el número correcto de identificación del paciente.
+
+### 🔹 POST - Registrar Información Militar  
+
+#### 📍 Endpoint  
+
+    POST /api/info-militar/registrar
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/info-militar/registrar
+    
+📝 **Descripción**
+
+Este endpoint permite registrar la información militar de un paciente, asociándola con su número de identificación.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo los administradores pueden registrar la información militar de los pacientes.
+
+📋 **Número de identificación:** Es necesario para realizar la verificación y almacenar los datos correctamente.
+
+📤 Headers Requeridos
 
     {
-        "message": "Información militar registrada exitosamente.",
-        "infoMilitar": {
-            "id_info_militar": 5,
-            "id_paciente": 7,
-            "cargo": "NINGUNO",
-            "grado": "CORONEL",
-            "fuerza": "TERRESTRE",
-            "unidad": "15-BAE"
-        }
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
     }
 
-* ### PUT Actualizar información militar
-Actualizar la información mililar del paciente mediante el número de identificación.
-
-Endpoint: PUT /api/info-militar/put/:identificacion
-
-Token: Authorization/Bearer Token/Token
-
-⚠️ IMPORTANTE: El administrador puede actualizar la información militar del paciente.
-
-URL: http://localhost:5000/api/info-militar/put/:identificacion
-
-Se remplaza **:identificacion** por el número de identificación
-
-URL: http://localhost:5000/api/info-militar/put/1234569222
-
-Body/raw:
+📥 Body de la Solicitud
 
     {
-        "cargo": "NINGUNO",
-        "grado": "CORONEL",
-        "fuerza": "TERRESTRE",
-        "unidad": "15-BAE"
+        "identificacion": "xxxxxxxxxxxxxx",
+        "cargo": "xxxxx",
+        "grado": "xxxxx",
+        "fuerza": "xxxxxx",
+        "unidad": "xxxxx"
     }
 
-Respuesta: Información militar actualizada exitosamente y los datos actualizados
+✅ Respuesta: Información militar registrada exitosamente.
+
+### 🔹 PUT - Actualizar Información Militar  
+
+#### 📍 Endpoint  
+
+    PUT /api/info-militar/put/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/info-militar/put/:identificacion
+    
+
+📝 **Descripción**
+
+Este endpoint permite actualizar la información militar de un paciente a través de su número de identificación. 
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo el administrador puede actualizar la información militar de los pacientes.
+
+📋 **Número de identificación:** Se necesita para identificar al paciente y actualizar sus datos militares.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body de la Solicitud
+
+    {
+        "cargo": "xxxxx",
+        "grado": "xxxxx",
+        "fuerza": "xxxxxx",
+        "unidad": "xxxxx"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/info-militar/put/1234569222
+    
+
+✅ Respuesta: Información militar actualizada exitosamente.
+
+---
+### 🔹 GET - Consultar Familiar  
+
+#### 📍 Endpoint  
+
+    GET /api/familiar/get/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/familiar/get/:identificacion
+    
+
+📝 **Descripción**
+
+Este endpoint permite consultar la información del familiar de un paciente utilizando su número de identificación.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo los administradores y médicos tienen permisos para consultar la información del familiar de un paciente.
+
+📋 **Número de identificación:** Se necesita para identificar al paciente y obtener los datos del familiar.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/familiar/get/1234569222
+    
+✅ Respuesta: Información del familiar del paciente.
+
+### 🔹 POST - Registrar Familiar  
+
+#### 📍 Endpoint  
+
+    POST /api/familiar/registrar/:identificacionPaciente
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/familiar/registrar/:identificacionPaciente
+    
+📝 **Descripción**
+
+Este endpoint permite registrar la información del familiar de un paciente.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo el administrador tiene permisos para registrar la información de un familiar.
+
+📋 **Número de identificación del paciente:** El identificador único del paciente se utiliza para asociar la información del familiar.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/familiar/registrar/1234569222
+    
+📝 Ejemplo de Body (Datos del familiar)
+
+    {
+        ...(datos de la familiar)
+    }
+
+✅ Respuesta: Información del familiar del paciente.
+
+### 🔹 PUT - Actualizar Familiar  
+
+#### 📍 Endpoint  
+
+    PUT /api/familiar/put/:identificacionPaciente/:identificacionFamiliar
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/familiar/put/:identificacionPaciente/:identificacionFamiliar
+    
+📝 **Descripción**
+Este endpoint permite actualizar la información del familiar de un paciente. 
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo el administrador tiene permisos para actualizar la información de un familiar.
+
+📋 **Identificación del paciente y familiar:** Se debe proporcionar tanto el número de identificación del paciente como el del familiar para realizar la actualización.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/familiar/put/1234569222/0703390000
+    
+📝 Ejemplo de Body (Datos del familiar)
+
+    {
+        ...(datos del familiar)
+    }
+
+✅ Respuesta: Información del familiar actualizada exitosamente.
+
+---
+### 🔹 GET - Consultar Residencia
+
+#### 📍 Endpoint  
+
+    GET /api/residencia/get/:identificacion
+
+🌐 URL Base (Local)
+
+http://localhost:5000/api/residencia/get/:identificacion
+
+📝 **Descripción**
+
+Este endpoint permite consultar la información de residencia del paciente mediante su número de identificación. 
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo un administrador o médico tiene permisos para consultar la información de residencia del paciente.
+
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente para realizar la consulta.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/residencia/get/1234569222
+    
+✅ Respuesta: Información de la residencia del paciente.
+
+### 🔹 POST - Registrar Residencia
+
+#### 📍 Endpoint  
+
+    POST /api/residencia/registrar/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/residencia/registrar/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite registrar la información de residencia de un paciente. 
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo un administrador tiene permisos para registrar la residencia del paciente.
+
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente para asociar la residencia correctamente.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/residencia/registrar/1234569222
+    
+📝 Ejemplo de Body (Datos de la residencia)
+
+    {
+        ...(datos de la residencia)
+    }
+
+✅ Respuesta: Información de la residencia del paciente.
+
+### 🔹 PUT - Actualizar Residencia
+
+#### 📍 Endpoint  
+
+    PUT /api/residencia/put/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/residencia/put/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite actualizar la información de residencia de un paciente.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token.
+
+🛠 **Autorización:** Solo un administrador tiene permisos para actualizar la residencia de un paciente.
+
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente cuya residencia se actualizará.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/residencia/put/1234569222
+    
+📝 Ejemplo de Body (Datos de la residencia)
+
+    {
+        "cargo": "xxxxx",
+        "grado": "xxxxx",
+        "fuerza": "xxxxxx",
+        "unidad": "xxxxx"
+    }
+
+✅ Respuesta: Información de la residencia actualizada exitosamente.
+
+---
+### 🔹 GET - Consultar Seguro
+
+#### 📍 Endpoint  
+
+    GET /api/seguro/get/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/seguro/get/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite consultar la información del seguro de un paciente mediante su número de identificación.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token de autenticación.
+
+🛠 **Autorización:** Solo los administradores y médicos pueden acceder a la información del seguro del paciente.
+
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente cuya información del seguro se desea consultar.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/seguro/get/1234569222
+    
+✅ Respuesta: Información del seguro del paciente.
+
+### 🔹 POST - Registrar Seguro
+
+#### 📍 Endpoint  
+
+    POST /api/seguro/registrar/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/seguro/registrar/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite registrar la información del seguro de un paciente mediante su número de identificación.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe iniciar sesión y copiar el token de autenticación.
+
+🛠 **Autorización:** Solo el administrador tiene permisos para registrar el seguro de un paciente.
+
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente para registrar su información de seguro.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/seguro/registrar/1234569222
+    
+💡 Ejemplo de Body (Datos del seguro)
+
+    {
+        ...(datos del seguro)
+    }
+
+✅ Respuesta: Información del seguro del paciente.
+
+## 🚀 3. Endpoints
+
+### 🔹 PUT - Actualizar Seguro
+
+#### 📍 Endpoint  
+
+    PUT /api/seguro/put/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/seguro/put/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite actualizar la información del seguro de un paciente mediante su número de identificación.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Solo el administrador puede actualizar la información del seguro.
+
+📋 **Identificación del paciente:** Se debe incluir el número de identificación del paciente en la URL.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+📥 Ejemplo de URL
+
+    http://localhost:5000/api/seguro/put/1234569222
+    
+💡 Ejemplo de Body (Datos del seguro a actualizar)
+
+    {
+        ...(datos del seguro)
+    }
+
+✅ Respuesta: Información del seguro actualizada exitosamente.
+
+---
+### 🔹 GET - Consultar Horario
+
+#### 📍 Endpoint  
+
+    GET /api/horario/get/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/horario/get/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite consultar el horario de un médico mediante su número de identificación.
+Se ofrecen tres métodos de búsqueda para mayor flexibilidad:
+
+**1️⃣** Consultar por número de identificación (Horarios desde la fecha actual en adelante).
+
+**2️⃣** Consultar por rango de fechas (Fecha de inicio y fin).
+
+**3️⃣** Consultar por un horario específico (ID del horario).
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Solo el administrador y médico pueden consultar los horarios.
+
+📋 **Identificación del médico:** Se debe incluir el número de identificación en la URL.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+### ✅ Métodos de Consulta
+**1️⃣ Consultar por Número de Identificación**
+
+Obtiene los horarios disponibles desde la fecha actual en adelante.
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/horario/get/1234569222
+    
+✅ Respuesta: Muestra los horarios desde la fecha actual a posteriores fechas.
+
+**2️⃣ Consultar por Rango de Fechas**
+
+Filtra los horarios en un período específico. El formato de fecha YYYY-MM-DD.
+
+🌐 URL Base
+
+    http://localhost:5000/api/horario/get/:identificacion?fechaInicio={ingresar-fecha}&fechaFin={ingresar-fecha}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/horario/get/1234569222?fechaInicio=2025-03-01&fechaFin=2025-03-10
+    
+
+URL: http://localhost:5000/api/horario/get/1234569222?fechaInicio=2025-03-01&fechaFin=2025-03-10
+
+✅ Respuesta: Muestra los horarios del rango de fechas ingresadas.
+
+**3️⃣ Consultar por ID de Horario**
+
+Busca un horario específico por su ID.
+
+🌐 URL Base
+
+    http://localhost:5000/api/horario/get/:identificacion?idHorario={ingresar-id}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/horario/get/1234569222?idHorario=789
+    
+
+✅ Respuesta: Muestra el horario específico que se esta buscando.
+
+### 🔹 POST - Registrar Horario
+
+#### 📍 Endpoint  
+
+    POST /api/horario/registrar/:identificacion
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/horario/registrar/:identificacion
+    
+📝 **Descripción**
+
+Este endpoint permite registrar un nuevo horario para un médico en el sistema.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Solo el administrador puede registrar horarios.
+
+📋 **Identificación del médico:** Se debe incluir el número de identificación en la URL.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/horario/registrar/1723450000
+
+
+💡 Ejemplo de Body (Datos del horario)
+
+    {
+        ...(datos del horario)
+    }
+
+✅ Respuesta: Información del horario registrada.
 
 ---
 ## Principales Tecnologías utilizadas
