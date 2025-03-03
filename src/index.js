@@ -9,6 +9,7 @@ const familiarRoutes = require('./routes/familiar.routes');
 const residenciaRoutes = require("./routes/residencia.routes");
 const seguroRoutes = require("./routes/seguro.routes");
 const horarioRoutes = require("./routes/horario.routes");
+const citaRoutes = require("./routes/cita.routes");
 
 const corsOptions = {
     origin: 'http://localhost:5000'
@@ -31,6 +32,7 @@ app.use('/api/familiar', familiarRoutes);
 app.use('/api/residencia', residenciaRoutes);
 app.use('/api/seguro', seguroRoutes);
 app.use('/api/horario', horarioRoutes);
+app.use('/api/cita', citaRoutes);
 
 // 📌 Sincronizar Base de Datos con Sequelize
 const PORT = process.env.PORT || 5000;

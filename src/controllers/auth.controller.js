@@ -12,11 +12,15 @@ async function getUsuario(req, res) {
         const usuario = await buscarUsuario(req.params.nombre_usuario);
         if (!usuario) return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
 
+        // Usar la función formatFechaCompleta para formatear la fecha de creación
+        const fechaFormateada = formatFechaCompleta(usuario.fecha_creacion);
+
+
         return res.json({
             message: successMessages.usuarioEncontrado,
             id_usuario: usuario.id_usuario,
             nombre_usuario: usuario.nombre_usuario,
-            fecha_creacion: usuario.fecha_creacion,
+            fecha_creacion: fechaFormateada,
             rol: usuario.rol
         });
     } catch (error) {
