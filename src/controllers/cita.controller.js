@@ -24,8 +24,8 @@ async function getCita(req, res) {
 
         return res.status(200).json(citas);
     } catch (error) {
-        console.error("❌ Error en getCita:", error);
-        return res.status(500).json({ message: error?.message || errorMessages.errorServidor });
+        console.error("❌ Error en getCita:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.citasNoEncontradas });
     }
 }
 

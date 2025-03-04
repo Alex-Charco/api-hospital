@@ -84,8 +84,8 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
             } : null
         }));
     } catch (error) {
-        console.error("❌ Error en obtenerCitas:", error);
-        throw new Error(errorMessages.errorObtenerCitas + (error.message || "Error desconocido"));
+        console.error("Error en obtenerCitas: ", error.message);
+        throw new Error(errorMessages.errorObtenerCitas);
     }
 }
 

@@ -77,7 +77,7 @@ const errorMessages = {
     // Mensaje de citas
     citasNoEncontradas: "No se encontraron citas.",
     fechaInvalida: "La fecha ingresada es inválida.",
-    errorObtenerCitas: "Error al obtener las citas"
+    errorObtenerCitas: "Error al obtener las citas. "
 };
 
 module.exports = errorMessages;
