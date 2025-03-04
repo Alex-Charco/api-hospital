@@ -73,6 +73,11 @@ const errorMessages = {
     horarioYaRegistrado: "El médico ya tiene un horario registrado.",
     horarioNoEncontrado: "No se encontró el horario del médico.",
     errorCrearHorario: "Error al crear el horario: ",
+
+    // Mensaje de citas
+    citasNoEncontradas: "No se encontraron citas.",
+    fechaInvalida: "La fecha ingresada es inválida.",
+    errorObtenerCitas: "Error al obtener las citas"
 };
 
 module.exports = errorMessages;
