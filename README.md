@@ -32,6 +32,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
+| **📅 Seguro**           | Consultar         | ⏳ En proceso |
 | **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ❌ Pendiente  |
 
 ### 📌 API Endpoints
@@ -68,6 +69,9 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 **Horario**                                                         |
 | GET     | `/api/horario/get/:identificacion` | Consultar horario       | ✅ |
 | POST    | `/api/horario/registrar`     | Registrar horario      | ✅ |
+**Cita**                                                         |
+| GET     | `/api/cita/get/:identificacionPaciente` | Consultar cita       | ✅ |
+| GET     | `/api/cita/get/medico/:identificacionMedico` | Consultar cita       | ✅ |
 **Médico**                                                        |
 | GET     | `/api/medico/get/:identificacion` | Consultar medico       | ❌ |
 | POST    | `/api/medico/registrar`     | Registrar medico      | ❌ |
@@ -1118,6 +1122,98 @@ Este endpoint permite registrar un nuevo horario para un médico en el sistema.
     }
 
 ✅ Respuesta: Información del horario registrada.
+
+---
+
+### 🔹 GET - Consultar Cita
+
+#### 📍 Endpoint 1 para paciente
+
+    GET /api/cita/get/:identificacionPaciente
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/cita/get/:identificacionPaciente
+    
+
+#### 📍 Endpoint 2 para paciente
+
+    GET /api/cita/get/medico/:identificacionPaciente
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/cita/get/medico/:identificacionMedico
+
+📝 **Descripción**
+
+El endpoint 1 permite consultar las citas médicas de un paciente mediante su número de identificación. El endpoint 2 permite consultar las citas médicas de un paciente, pero que tiene el médico mediante su número de identificación del médico.
+
+Se ofrecen tres métodos de búsqueda para mayor flexibilidad:
+
+**1️⃣** Consultar por número de identificación del paciente o del médico ().
+
+**2️⃣** Consultar por rango de fechas (Fecha de inicio y fin).
+
+**3️⃣** Consultar por el estado ().
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** El administrador, puede consultar cualquier cita, en cambio, médico y paciente pueden consultar sus citas.
+
+📋 **Identificación del paciente o médico:** Se debe incluir el número de identificación en la URL.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+### ✅ Métodos de Consulta
+**1️⃣ Consultar por Número de Identificación**
+
+Obtiene las citas ingresando la identificación del paciente o médico
+
+📌 URL Ejemplo paciente:
+
+    http://localhost:5000/api/cita/get/1234569222
+
+📌 URL Ejemplo medico:
+
+    http://localhost:5000/api/cita/get/medico/1234569222
+    
+✅ Respuesta: Muestra todas las citas.
+
+**2️⃣ Consultar por Rango de Fechas**
+
+Filtra las citas en un período específico. El formato de fecha YYYY-MM-DD.
+
+🌐 URL Base
+
+    http://localhost:5000/api/cita/get/:identificacionPaciente?fechaInicio={ingresar-fecha-inicio}&fechaFin={ingresar-fecha-fin}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/cita/get/1234569222?fechaInicio=2025-03-01&fechaFin=2025-03-10
+    
+
+✅ Respuesta: Muestra las citas del rango de fechas ingresadas.
+
+**3️⃣ Consultar por el estado**
+
+Busca la cita buscando por la identificacion y el estado.
+
+🌐 URL Base
+
+    http://localhost:5000/api/cita/get/:identificacion?estadoCia={ingresar-estado}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/cita/get/1234569222?estadoCita=CONFIRMADA
+    
+
+✅ Respuesta: Muestra la cita que se esta buscando por el estado.
 
 ---
 ## Principales Tecnologías utilizadas
