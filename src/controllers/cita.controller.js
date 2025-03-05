@@ -1,4 +1,5 @@
 const citaService = require('../services/cita.service');
+const { formatFechaCompleta } = require('../utils/date_utils');
 const errorMessages = require("../utils/error_messages");
 
 async function getCita(req, res) {
@@ -35,29 +36,6 @@ async function getCita(req, res) {
     }
 }
 
-// Controlador para registrar una cita
-/*const registrarCita = async (req, res) => {
-    const { id_turno, id_paciente } = req.body;
-
-    // Validar que el turno_id y paciente_id sean proporcionados
-    if (!id_turno|| !id_paciente) {
-        return res.status(400).json({ message: 'Faltan datos: turno_id y paciente_id son requeridos.' });
-    }
-
-    try {
-        // Llamar al servicio para registrar la cita
-        const cita = await citaService.crearCita(id_turno, id_paciente);
-        return res.status(201).json({
-            message: 'Cita registrada exitosamente.',
-            cita: cita
-        });
-    } catch (error) {
-        // Manejar errores
-        console.error(error);
-        return res.status(500).json({ message: error.message });
-    }
-};
-*/
 const registrarCita = async (req, res) => {
     try {
         const { id_turno, id_paciente } = req.body;
@@ -69,10 +47,16 @@ const registrarCita = async (req, res) => {
 
         // Llamar al servicio para registrar la cita
         const resultado = await citaService.crearCita(id_turno, id_paciente);
+
+        // Formatear la fecha antes de enviarla en la respuesta
+        const citaFormateada = {
+            ...resultado.cita.toJSON(),
+            fecha_creacion: formatFechaCompleta(resultado.cita.fecha_creacion)
+        };
         
         return res.status(201).json({
             message: 'Cita registrada exitosamente.',
-            cita: resultado.cita,
+            cita: citaFormateada,
             turno_actualizado: resultado.turno_actualizado,
             horario_actualizado: resultado.horario_actualizado
         });
