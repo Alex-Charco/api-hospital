@@ -16,13 +16,14 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
             whereConditions.id_paciente = paciente.id_paciente;
         }
 
-        let medico = null;
         // Buscar médico por identificación
         if (identificacionMedico) {
-            medico = await Medico.findOne({ where: { identificacion: identificacionMedico } });
+            const medico = await Medico.findOne({ where: { identificacion: identificacionMedico } });
             if (!medico) {
                 throw new Error(errorMessages.medicoNoEncontrado);
             }
+            // Agregar condición para filtrar por id_medico en la relación de Turno -> Horario -> Medico
+            whereConditions['$turno.horario.medico.id_medico$'] = medico.id_medico;
         }
 
         // Filtro por estado de la cita si se proporciona
@@ -41,7 +42,7 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
 
         const citas = await Cita.findAll({
             where: whereConditions,
-            attributes: ['id_cita', 'estado_cita', 'fecha_creacion'],
+            attributes: ['id_cita', 'id_paciente', 'estado_cita', 'fecha_creacion'],
             include: [
                 {
                     model: Turno,
@@ -52,22 +53,22 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
                             model: Horario,
                             as: 'horario',
                             attributes: ['id_horario', 'fecha_horario'],
-                            where: whereFecha,
+                            //where: whereFecha,
                             include: [
                                 {
                                     model: Medico,
                                     as: 'medico',
                                     attributes: ['id_medico', 'identificacion', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'correo'],
                                     include: [
-                                        { 
-                                            model: Especialidad, 
-                                            as: 'especialidad', 
-                                            attributes: ['id_especialidad', 'nombre', 'atencion', 'consultorio'] 
+                                        {
+                                            model: Especialidad,
+                                            as: 'especialidad',
+                                            attributes: ['id_especialidad', 'nombre', 'atencion', 'consultorio']
                                         }
                                     ],
-                                    ...(medico ? { where: { id_medico: medico.id_medico } } : {}) // 🔥 Corrección del filtro por médico
                                 }
-                            ]
+                            ],
+                            required: false
                         }
                     ]
                 },
@@ -93,9 +94,13 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
                     id_cita: cita.id_cita,
                     estado_cita: cita.estado_cita,
                     fecha_creacion: formatCompleta(cita.fecha_creacion),
-                    horario: {
-                        fecha_horario: cita.turno?.horario?.fecha_horario ? formatFecha(cita.turno.horario.fecha_horario) : null,
-                        hora_turno: cita.turno?.hora_turno || null
+                    turno: {
+                        id_turno: cita.turno?.id_turno || null,
+                        hora_turno: cita.turno?.hora_turno || null,
+                        horario: {
+                            id_horario: cita.turno?.horario?.id_horario || null,
+                            fecha_horario: cita.turno?.horario?.fecha_horario ? formatFecha(cita.turno.horario.fecha_horario) : null,
+                        }
                     }
                 },
                 paciente: {
