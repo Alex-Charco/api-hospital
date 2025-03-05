@@ -35,5 +35,53 @@ async function getCita(req, res) {
     }
 }
 
+// Controlador para registrar una cita
+/*const registrarCita = async (req, res) => {
+    const { id_turno, id_paciente } = req.body;
 
-module.exports = { getCita };
+    // Validar que el turno_id y paciente_id sean proporcionados
+    if (!id_turno|| !id_paciente) {
+        return res.status(400).json({ message: 'Faltan datos: turno_id y paciente_id son requeridos.' });
+    }
+
+    try {
+        // Llamar al servicio para registrar la cita
+        const cita = await citaService.crearCita(id_turno, id_paciente);
+        return res.status(201).json({
+            message: 'Cita registrada exitosamente.',
+            cita: cita
+        });
+    } catch (error) {
+        // Manejar errores
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+*/
+const registrarCita = async (req, res) => {
+    try {
+        const { id_turno, id_paciente } = req.body;
+
+        // Validar que id_turno e id_paciente sean proporcionados
+        if (!id_turno || !id_paciente) {
+            return res.status(400).json({ message: 'Faltan datos: turno_id y paciente_id son requeridos.' });
+        }
+
+        // Llamar al servicio para registrar la cita
+        const resultado = await citaService.crearCita(id_turno, id_paciente);
+        
+        return res.status(201).json({
+            message: 'Cita registrada exitosamente.',
+            cita: resultado.cita,
+            turno_actualizado: resultado.turno_actualizado,
+            horario_actualizado: resultado.horario_actualizado
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getCita, registrarCita };
+
