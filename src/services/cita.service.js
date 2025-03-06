@@ -129,7 +129,6 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
     }
 }
 
-
 const crearCita = async (id_turno, id_paciente) => {
     try {
         // Verificar si el turno está disponible
@@ -207,36 +206,4 @@ const crearCita = async (id_turno, id_paciente) => {
     }
 };
 
-
-
 module.exports = { obtenerCitas, crearCita };
-
-/*const crearCita = async (id_turno, id_paciente) => {
-    try {
-        // 1️⃣ Verificar si el turno está disponible
-        const turno = await Turno.findOne({ where: { id_turno } });
-        if (!turno || turno.estado !== 'DISPONIBLE') {
-            throw new Error('El turno no está disponible');
-        }
-
-        // 2️⃣ Crear la cita en la base de datos con estado "PENDIENTE"
-        const nuevaCita = await Cita.create({
-            id_paciente,
-            id_turno,
-            estado_cita: 'PENDIENTE',
-            fecha_creacion: new Date()
-        });
-
-        // 3️⃣ Actualizar el estado del turno a RESERVADO
-        await Turno.update({ estado: 'RESERVADO' }, { where: { id_turno } });
-
-        // 4️⃣ Obtener el turno actualizado y el horario correspondiente
-        const turnoActualizado = await Turno.findOne({ where: { id_turno } });
-        const horarioActualizado = await Horario.findOne({ where: { id_horario: turnoActualizado.id_horario } });
-
-        return { cita: nuevaCita, turno_actualizado: turnoActualizado, horario_actualizado: horarioActualizado };
-
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};*/
