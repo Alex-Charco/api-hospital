@@ -77,7 +77,12 @@ const errorMessages = {
     // Mensaje de citas
     citasNoEncontradas: "No se encontraron citas.",
     fechaInvalida: "La fecha ingresada es inválida.",
-    errorObtenerCitas: "Error al obtener las citas. "
+    errorObtenerCitas: "Error al obtener las citas. ",
+    faltanDatosRequeridos: 'Faltan datos: id_turno y id_paciente son requeridos.',
+    errorCrearCita: 'Error al crear la cita. No se encontró la cita.',
+    errorTurnoNoDisponible: 'Error el turno no está disponible.',
+    errorCitaAgendada: 'Error el paciente ya tiene una cita agendada para este día.', 
+    huboErrorCrearCita: "Hubo un error al crear la cita.",
 };
 
 module.exports = errorMessages;

@@ -135,7 +135,7 @@ const crearCita = async (id_turno, id_paciente) => {
         // Verificar si el turno está disponible
         const turno = await Turno.findOne({ where: { id_turno } });
         if (!turno || turno.estado !== 'DISPONIBLE') {
-            throw new Error('El turno no está disponible.');
+            throw new Error(errorMessages.errorTurnoNoDisponible);
         }
 
         // Validar que el paciente no tenga otra cita el mismo día
@@ -160,7 +160,7 @@ const crearCita = async (id_turno, id_paciente) => {
         });
 
         if (citaExistente) {
-            throw new Error('El paciente ya tiene una cita agendada para este día.');
+            throw new Error(errorMessages.errorCitaAgendada);
         }
 
         // Aquí realizamos la lógica de la transacción directamente sin usar el procedimiento almacenado
@@ -187,7 +187,7 @@ const crearCita = async (id_turno, id_paciente) => {
 
             // Verificar que la cita fue creada correctamente
             if (!cita) {
-                throw new Error('Hubo un error al crear la cita.');
+                throw new Error(errorMessages.huboErrorCrearCita);
             }
 
             return { 

@@ -8,6 +8,9 @@ const successMessages = {
     // General
     registroExitoso: "Registro realizado exitosamente",
     informacionActualizada: "Información actualizada exitosamente",
+
+    // Mensajes para cita
+    citaRegistrada: 'Cita registrada exitosamente.',
 };
 
 module.exports = successMessages;
