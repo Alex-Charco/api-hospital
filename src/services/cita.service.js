@@ -2,6 +2,7 @@ const { Cita, Turno, Horario, Medico, Especialidad, Paciente } = require('../mod
 const errorMessages = require("../utils/error_messages");
 const { formatCompleta, formatFecha } = require('../utils/date_utils');
 const { Op } = require('sequelize');
+const sequelize = require("../config/db");
 
 async function obtenerCitas({ identificacionPaciente, identificacionMedico, fechaInicio, fechaFin, estadoCita }) {
     try {
@@ -128,7 +129,89 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
     }
 }
 
+
 const crearCita = async (id_turno, id_paciente) => {
+    try {
+        // Verificar si el turno está disponible
+        const turno = await Turno.findOne({ where: { id_turno } });
+        if (!turno || turno.estado !== 'DISPONIBLE') {
+            throw new Error('El turno no está disponible.');
+        }
+
+        // Validar que el paciente no tenga otra cita el mismo día
+        const citaExistente = await Cita.findOne({
+            where: {
+                id_paciente,
+                estado_cita: 'PENDIENTE'
+            },
+            include: [{
+                model: Turno,
+                as: "turno",
+                required: true,
+                include: [{
+                    model: Horario,
+                    as: 'horario',
+                    required: true,
+                    where: {
+                        fecha_horario: sequelize.fn('CURDATE') // Verificar la fecha del horario (no del turno)
+                    }
+                }]
+            }]
+        });
+
+        if (citaExistente) {
+            throw new Error('El paciente ya tiene una cita agendada para este día.');
+        }
+
+        // Aquí realizamos la lógica de la transacción directamente sin usar el procedimiento almacenado
+
+        // Iniciar transacción manualmente
+        const t = await sequelize.transaction();
+
+        try {
+            // Bloquear el turno para evitar otros cambios en la base de datos mientras se reserva
+            await Turno.update({ estado: 'RESERVADO' }, { where: { id_turno }, transaction: t });
+
+            // Insertar la cita
+            const cita = await Cita.create(
+                { id_turno, id_paciente, estado_cita: 'PENDIENTE', fecha_creacion: new Date() },
+                { transaction: t }
+            );
+
+            // Confirmar la transacción
+            await t.commit();
+
+            // Obtener el turno y horario actualizados
+            const turnoActualizado = await Turno.findOne({ where: { id_turno } });
+            const horarioActualizado = await Horario.findOne({ where: { id_horario: turnoActualizado.id_horario } });
+
+            // Verificar que la cita fue creada correctamente
+            if (!cita) {
+                throw new Error('Hubo un error al crear la cita.');
+            }
+
+            return { 
+                cita, 
+                turno_actualizado: turnoActualizado, 
+                horario_actualizado: horarioActualizado 
+            };
+
+        } catch (error) {
+            // Si hay un error en la transacción, revertirla
+            await t.rollback();
+            throw new Error(error.message);
+        }
+
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+
+module.exports = { obtenerCitas, crearCita };
+
+/*const crearCita = async (id_turno, id_paciente) => {
     try {
         // 1️⃣ Verificar si el turno está disponible
         const turno = await Turno.findOne({ where: { id_turno } });
@@ -156,7 +239,4 @@ const crearCita = async (id_turno, id_paciente) => {
     } catch (error) {
         throw new Error(error.message);
     }
-};
-
-module.exports = { obtenerCitas, crearCita };
-
+};*/

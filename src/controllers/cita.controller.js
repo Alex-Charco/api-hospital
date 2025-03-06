@@ -36,7 +36,7 @@ async function getCita(req, res) {
     }
 }
 
-const registrarCita = async (req, res) => {
+/*const registrarCita = async (req, res) => {
     try {
         const { id_turno, id_paciente } = req.body;
 
@@ -65,7 +65,44 @@ const registrarCita = async (req, res) => {
         console.error(error);
         return res.status(500).json({ message: error.message });
     }
+};*/
+
+const registrarCita = async (req, res) => {
+    try {
+        const { id_turno, id_paciente } = req.body;
+
+        // Validar que id_turno e id_paciente sean proporcionados
+        if (!id_turno || !id_paciente) {
+            return res.status(400).json({ message: 'Faltan datos: turno_id y paciente_id son requeridos.' });
+        }
+
+        // Llamar al servicio para registrar la cita
+        const resultado = await citaService.crearCita(id_turno, id_paciente);
+
+        // Verificar si la cita existe antes de intentar convertirla en JSON
+        if (!resultado.cita) {
+            return res.status(400).json({ message: 'Error al crear la cita. No se encontró la cita.' });
+        }
+
+        // Formatear la fecha antes de enviarla en la respuesta
+        const citaFormateada = {
+            ...resultado.cita.toJSON(),
+            fecha_creacion: formatFechaCompleta(resultado.cita.fecha_creacion)
+        };
+        
+        return res.status(201).json({
+            message: 'Cita registrada exitosamente.',
+            cita: citaFormateada,
+            turno_actualizado: resultado.turno_actualizado,
+            horario_actualizado: resultado.horario_actualizado
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
 };
+
 
 module.exports = { getCita, registrarCita };
 
