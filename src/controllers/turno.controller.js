@@ -4,8 +4,13 @@ const errorMessages = require("../utils/error_messages");
 // Obtener turnos con filtros opcionales
 async function getTurnos(req, res) {
     try {
-        const { fecha, estado } = req.query; // Obtenemos los parámetros opcionales desde la URL
+        const { fecha, estado } = req.query; 
         const turnos = await turnoService.obtenerTurnos({ fecha, estado });
+
+        if (turnos.message) {
+            return res.status(404).json({ message: turnos.message, turnos: turnos.turnos });
+        }
+
         return res.status(200).json(turnos);
     } catch (error) {
         console.error("❌ Error en getTurnos:", error.message);

@@ -38,7 +38,8 @@ async function obtenerTurnos({ fecha = null, estado = "DISPONIBLE" } = {}) {
         });
 
         if (!turnos || turnos.length === 0) {
-            throw new Error(errorMessages.turnoNoDisponible);
+            //throw new Error(errorMessages.errorTurnoNoDisponible);
+            return { message: errorMessages.errorTurnoNoDisponible, turnos: [] };
         }
 
         return turnos.map(formatTurnoData);
