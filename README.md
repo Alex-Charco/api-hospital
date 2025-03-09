@@ -17,7 +17,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
     - 📢 **Notificación en Slack**  
 
 ## 🚧 En desarrollo  
-- 🚀 **Endpoints** _(En proceso...)_
+- 🚀 **Endpoints** _(⏳ En proceso...)_
 
 
 ## 🚀 Endpoints  
@@ -32,7 +32,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
-| **📅 Seguro**           | Consultar         | ⏳ En proceso |
+| **📅 Turno**           | Consultar         | ✔️ Completado |
 | **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ❌ Pendiente  |
 
 ### 📌 API Endpoints
@@ -72,6 +72,8 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 **Cita**                                                         |
 | GET     | `/api/cita/get/:identificacionPaciente` | Consultar cita       | ✅ |
 | GET     | `/api/cita/get/medico/:identificacionMedico` | Consultar cita       | ✅ |
+**Turno**                                                         |
+| GET     | `/api/turno/get` | Consultar turno       | ✅ |
 **Médico**                                                        |
 | GET     | `/api/medico/get/:identificacion` | Consultar medico       | ❌ |
 | POST    | `/api/medico/registrar`     | Registrar medico      | ❌ |
@@ -1136,7 +1138,7 @@ Este endpoint permite registrar un nuevo horario para un médico en el sistema.
     http://localhost:5000/api/cita/get/:identificacionPaciente
     
 
-#### 📍 Endpoint 2 para paciente
+#### 📍 Endpoint 2 para médico
 
     GET /api/cita/get/medico/:identificacionPaciente
 
@@ -1214,6 +1216,59 @@ Busca la cita buscando por la identificacion y el estado.
     
 
 ✅ Respuesta: Muestra la cita que se esta buscando por el estado.
+
+---
+
+### 🔹 GET - Consultar Turno
+
+#### 📍 Endpoint
+
+    GET /api/turno/get
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/turno/get
+
+📝 **Descripción**
+
+El endpoint permite consultar los turnos.
+
+Se ofrecen tres métodos de búsqueda para mayor flexibilidad, por defecto devolvera los turnos disponibles:
+
+**1️⃣ Obtener todos los turnos (sin filtros):**
+
+    http://localhost:5000/api/turno/get
+
+**2️⃣  Filtrar por una fecha específica:**
+
+    http://localhost:5000/api/turno/get?fecha={YYYY-MM-DD}
+
+**3️⃣ Filtrar por estado:**
+
+    http://localhost:5000/api/turno/get?estado={nombre-estado}
+
+**4️⃣ Filtrar entre un rango de fechas:**
+    http://localhost:3000/api/turnos?fechaInicio=2025-03-09&fechaFin=2025-03-15
+
+**5️⃣ Filtrar por fecha y estado:**
+    http://localhost:3000/api/turnos?fecha=2025-03-09&estado=RESERVADO
+
+**6️⃣ Filtrar por fecha de inicio, fecha de fin y estado:**
+GET http://localhost:3000/api/turnos?fechaInicio=2025-03-09&fechaFin=2025-03-15&estado=RESERVADO
+
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Usuario autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+✅ Respuesta: Muestra los turnos.
 
 ---
 ## Principales Tecnologías utilizadas
