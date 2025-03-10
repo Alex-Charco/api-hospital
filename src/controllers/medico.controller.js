@@ -49,28 +49,6 @@ async function registrarMedico(req, res) {
 }
 
 // Obtener un médico por identificación
-/*async function getMedico(req, res) {
-    try {
-        const medico = await medicoService.obtenerMedicoPorIdentificacion(req.params.identificacion);
-
-        if (!medico) {
-            return res.status(404).json({ message: errorMessages.medicoNoEncontrado });
-        }
-
-        const medicoFormateado = {
-            ...medico.toJSON(),
-            fecha_nacimiento: formatFecha(medico.fecha_nacimiento)
-        };
-
-        return res.status(200).json({
-            message: successMessages.medicoEncontrado,
-            medico: medicoFormateado,
-        });
-    } catch (error) {
-        console.warn(`Error al obtener el médico: ${error.message}`);
-        return res.status(500).json({ message: errorMessages.errorServidor });
-    }
-}*/
 async function obtenerMedicos(req, res) {
     try {
         const identificacion = req.params.identificacion || null;
@@ -99,9 +77,6 @@ async function obtenerMedicos(req, res) {
         return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
-
-module.exports = { obtenerMedicos };
-
 
 // Actualizar la información de un médico
 async function actualizarMedico(req, res) {

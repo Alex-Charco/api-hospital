@@ -6,9 +6,6 @@ const { verificarToken, authorizeRole } = require('../middlewares/auth.middlewar
 // Ruta para registrar un médico
 router.post('/registrar', verificarToken, authorizeRole(["gestionar_usuarios"]), registrarMedico);
 
-// Ruta para obtener un médico por identificación
-//router.get('/get/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios", "ver_medico"]), getMedico);
-
 // Rutas para administradores y médicos
 router.get('/get/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios", "ver_medico"]), obtenerMedicos);
 //Rutas para administradores

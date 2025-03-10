@@ -44,24 +44,6 @@ async function crearMedico(datosMedico) {
     }
 }
 
-/*async function obtenerMedicoPorIdentificacion(identificacion) {
-    try {
-        return await Medico.findOne({
-            where: { identificacion },
-            include: [
-                { 
-                    model: Usuario, 
-                    as: "usuario",
-                    attributes: ['id_usuario', 'id_rol', 'nombre_usuario', 'estatus'],
-                },
-                { model: Especialidad, as: "especialidad" }
-            ]
-        });
-    } catch (error) {
-        throw new Error(`${errorMessages.errorObtenerMedico}: ${error.message}`);
-    }
-}
-*/
 async function obtenerMedicos(identificacion = null) {
     try {
         const condicion = identificacion ? { where: { identificacion } } : {};
@@ -80,9 +62,6 @@ async function obtenerMedicos(identificacion = null) {
         throw new Error(`${errorMessages.errorObtenerMedicos}: ${error.message}`);
     }
 }
-
-module.exports = { obtenerMedicos };
-
 
 async function actualizarDatosMedico(medico, nuevosDatos) {
     try {
