@@ -14,6 +14,7 @@ const Seguro = require("./seguro.model");
 const Horario = require("./horario.model");
 const Turno = require("./turno.model");
 const Cita = require("./cita.model");
+const NotaEvolutiva = require("./nota_evolutiva.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -197,11 +198,25 @@ Cita.belongsTo(Turno, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre NotaEvolutiva y Cita
+Cita.hasMany(NotaEvolutiva, {
+    foreignKey: "id_cita",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+NotaEvolutiva.belongsTo(Cita, {
+    foreignKey: "id_cita",
+    as: "cita",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 // Exportar Cita en el módulo
-module.exports = {
+/*module.exports = {
     ...module.exports,
     Cita
-};
+};*/
 
 // Exportar modelos y conexión
 module.exports = {
@@ -219,5 +234,6 @@ module.exports = {
     Seguro,
     Horario,
     Turno,
-    Cita
+    Cita,
+	NotaEvolutiva
 };

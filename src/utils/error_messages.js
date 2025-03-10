@@ -87,7 +87,11 @@ const errorMessages = {
     // Mensajes para médico
     usuarioRegistradoMedico: "Este usuario ya está registrado como médicoo.",
     usuarioNoEsMedico: "Este usuario no es médico.",
-    errorActualizarMedic: "Error al actualizar al médico. "
+    errorActualizarMedic: "Error al actualizar al médico. ",
+	
+	// Mensajes de nota evolutiva
+	errorCrearDatosNota: "Error al crear la nota evoluiva. ",
+	notaNoEncontrada: "Nota evoluiva no encontrada. "
 };
 
 module.exports = errorMessages;

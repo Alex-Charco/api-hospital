@@ -12,6 +12,7 @@ const horarioRoutes = require("./routes/horario.routes");
 const citaRoutes = require("./routes/cita.routes");
 const turnoRoutes = require("./routes/turno.routes");
 const medicoRoutes = require("./routes/medico.routes");
+const notaEvolutivaRoutes = require("./routes/nota_evolutiva.routes");
 
 const corsOptions = {
     origin: 'http://localhost:5000'
@@ -37,6 +38,7 @@ app.use('/api/horario', horarioRoutes);
 app.use('/api/cita', citaRoutes);
 app.use('/api/turno', turnoRoutes);
 app.use('/api/medico', medicoRoutes);
+app.use('/api/nota-evolutiva', notaEvolutivaRoutes);
 
 // 📌 Sincronizar Base de Datos con Sequelize
 const PORT = process.env.PORT || 5000;

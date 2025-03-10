@@ -1237,7 +1237,7 @@ Busca la cita buscando por la identificacion y el estado.
 
 El endpoint permite consultar los turnos.
 
-Se ofrecen tres métodos de búsqueda para mayor flexibilidad, por defecto devolvera los turnos disponibles:
+Se ofrecen seis métodos de búsqueda para mayor flexibilidad, por defecto devolvera los turnos disponibles:
 
 **1️⃣ Obtener todos los turnos (sin filtros):**
 
@@ -1308,6 +1308,60 @@ GET http://localhost:5000/api/turno/get?fechaInicio=2025-03-09&fechaFin=2025-03-
 ✅ Respuesta: Muestra los turnos.
 
 ---
+
+
+
+
+
+
+
+
+### 🔹 GET - Consultar Médico
+
+#### 📍 Endpoint 1 para administrador y médico
+
+    GET /api/medico/get
+
+🌐 URL Base (Local) para administrador y medico
+
+    http://localhost:5000/api/medico/get/:identificacion
+
+📌 URL Ejemplo:
+    
+    http://localhost:5000/api/medico/get/1000456444
+
+#### 📍 Endpoint 2 para administrador  
+
+🌐 URL Base (Local) para administrador
+
+    http://localhost:5000/api/medico/getAll
+
+📝 **Descripción**
+
+El endpoint 1 permite consultar los médicos con la identificación. En cambio, el segudo endpoint trae todos los médicos.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para administrador y médico autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+✅ Respuesta: Muestra los turnos.
+
+
+POST
+http://localhost:5000/api/medico/registrar
+PUT
+http://localhost:5000/api/medico/put/1723456444
+
+---
+
 ## Principales Tecnologías utilizadas
 * JAVASCRIPT
 * Express.js
