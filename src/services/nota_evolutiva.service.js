@@ -15,41 +15,6 @@ async function crearNota({ id_cita, id_paciente, motivo_consulta, ...datosNotaEv
     }
 }
 
-/*async function obtenerCitaPorId(id_cita) {
-    return await Cita.findOne({ where: { id_cita } });
-}
-
-// Obtener una única nota evolutiva por ID de cita o identificación del paciente
-async function obtenerNota({ id_cita = null, identificacion = null }) {
-    let whereClause = {};
-
-    if (id_cita) {
-        whereClause.id_cita = id_cita;
-    } else if (identificacion) {
-        const paciente = await Paciente.findOne({ where: { identificacion } });
-
-        if (!paciente) {
-            throw new Error(errorMessages.pacienteNoEncontrado);
-        }
-
-        const cita = await Cita.findOne({ where: { id_paciente: paciente.id_paciente } });
-
-        if (!cita) {
-            throw new Error(errorMessages.citaNoEncontrada);
-        }
-
-        whereClause.id_cita = cita.id_cita;
-    }
-
-    const nota = await NotaEvolutiva.findOne({ where: whereClause });
-
-    if (!nota) {
-        throw new Error(errorMessages.notaNoEncontrada);
-    }
-
-    return nota;
-}*/
-
 // Obtener todas las notas evolutivas por ID de cita o identificación del paciente
 async function obtenerNotas({ id_cita = null, identificacion = null }) {
     let whereClause = {};
