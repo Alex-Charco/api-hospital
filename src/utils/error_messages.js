@@ -83,6 +83,11 @@ const errorMessages = {
     errorTurnoNoDisponible: 'Error el turno no está disponible.',
     errorCitaAgendada: 'Error el paciente ya tiene una cita agendada para este día.', 
     huboErrorCrearCita: "Hubo un error al crear la cita.",
+
+    // Mensajes para médico
+    usuarioRegistradoMedico: "Este usuario ya está registrado como médicoo.",
+    usuarioNoEsMedico: "Este usuario no es médico.",
+    errorActualizarMedic: "Error al actualizar al médico. "
 };
 
 module.exports = errorMessages;
