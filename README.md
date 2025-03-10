@@ -32,8 +32,9 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
-| **📅 Turno**           | Consultar         | ✔️ Completado |
+| **📅 Turno**           | Consultar turno        | ✔️ Completado |
 | **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
+| **⚕️ Nota evolutiva**           | Registrar, consultar, actualizar nota evolutiva           | ✔️ Completado  |
 
 ### 📌 API Endpoints
 
@@ -80,9 +81,10 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | POST    | `/api/medico/registrar`     | Registrar medico      | ✅ |
 | PUT     | `/api/medico/put/:identificacion` | Actualiza medico       | ✅ |
 **Nota evolutiva**                                                        |
-| GET     | `/api/medico/get/:identificacion` | Consultar medico       | ❌ |
-| POST    | `/api/medico/registrar`     | Registrar medico      | ❌ |
-| PUT     | `/api/medico/put/:identificacion` | Actualiza medico       | ❌ |
+| GET     | `/api/nota-evolutiva/get` | Consultar nota evolutiva       | ✅ |
+| POST    | `/api/nota-evolutiva/registrar`     | Registrar nota evolutiva      | ✅ |
+| PUT     | `/api/nota-evolutiva/put/:id_nota_evolutiva` | Actualiza nota evolutiva       | ✅ |
+
 
 ---
 
@@ -1352,13 +1354,205 @@ El endpoint 1 permite consultar los médicos con la identificación. En cambio, 
         "Authorization": "Bearer <TOKEN>"
     }
 
-✅ Respuesta: Muestra los turnos.
+✅ Respuesta: Muestra todos los médicos.
 
 
-POST
-http://localhost:5000/api/medico/registrar
-PUT
-http://localhost:5000/api/medico/put/1723456444
+### 🔹 POST - Registrar Médico
+
+#### 📍 Endpoint 
+    POST /api/medico/registrar
+
+🌐 URL Base (Local) para administrador y medico
+
+    http://localhost:5000/api/medico/registrar
+
+📝 **Descripción**
+
+El endpoint permite registrar médicos se envia nombre_usuario en el body.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para administrador y médico autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxxx",
+        ...(datos del médico)
+    }
+
+
+✅ Respuesta: Registra los médicos.
+
+### 🔹 PUT - Actualizar Médico
+
+#### 📍 Endpoint 
+    PUT /api/medico/registrar
+
+🌐 URL Base (Local) para administrador
+
+    http://localhost:5000/api/medico/put/:dentificacion
+	
+📌 URL Ejemplo:
+	
+	http://localhost:5000/api/medico/put/1723456444
+
+📝 **Descripción**
+
+El endpoint permite actualizar médicos con la identificación del paciente.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para administrador.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxxx",
+        ...(datos del médico)
+    }
+
+✅ Respuesta: Actualizar los médicos.
+
+
+
+
+
+### 🔹 GET - Consultar Nota evolutiva
+
+#### 📍 Endpoint para médico
+
+    GET /api/nota-evolutiva/get
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/nota-evolutiva/get
+
+📝 **Descripción**
+
+El endpoint permite consultar las notas evolutivas con la identificación.
+
+**1️⃣ Obtener nota evolutiva con el id_cita:**
+
+    http://localhost:5000/api/nota-evolutiva/get?id_cita
+
+**2️⃣  Filtrar por identificacion:**
+
+🌐 URL Base
+
+	http://localhost:5000/api/nota-evolutiva/get?identificacion
+
+📌 URL Ejemplo:
+    
+    http://localhost:5000/api/medico/get/1000456666
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médico autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+✅ Respuesta: Muestra todas las nota evolutivas.
+
+### 🔹 POST - Registrar Nota evolutiva
+
+#### 📍 Endpoint 
+
+    POST /api/nota-evolutiva/registrar
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/nota-evolutiva/registrar
+
+📝 **Descripción**
+
+El endpoint permite registrar médicos y se envia nombre_usuario en el body.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médicos autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxxx",
+        ...(datos del nota-evolutiva)
+    }
+
+✅ Respuesta: Registra ls notas evolutivas.
+
+### 🔹 PUT - Actualizar Nota evolutiva
+
+#### 📍 Endpoint
+
+    PUT /api/nota-evolutiva/registrar
+
+🌐 URL Base (Local) para médico
+
+    http://localhost:5000/api/nota-evolutiva/put/:id_nota_evolutiva
+	
+📌 URL Ejemplo:
+	
+	http://localhost:5000/api/nota-evolutiva/put/1
+
+📝 **Descripción**
+
+El endpoint permite actualizar las notas evolutivas con el id de la nota evolutiva.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para administrador.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+        "nombre_usuario": "xxxx",
+        ...(datos de la nota evolutiva)
+    }
+
+✅ Respuesta: Actualizar las notas evolutivas.
 
 ---
 
