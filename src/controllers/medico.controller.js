@@ -49,7 +49,7 @@ async function registrarMedico(req, res) {
 }
 
 // Obtener un médico por identificación
-async function getMedico(req, res) {
+/*async function getMedico(req, res) {
     try {
         const medico = await medicoService.obtenerMedicoPorIdentificacion(req.params.identificacion);
 
@@ -70,7 +70,38 @@ async function getMedico(req, res) {
         console.warn(`Error al obtener el médico: ${error.message}`);
         return res.status(500).json({ message: errorMessages.errorServidor });
     }
+}*/
+async function obtenerMedicos(req, res) {
+    try {
+        const identificacion = req.params.identificacion || null;
+        let medicos = await medicoService.obtenerMedicos(identificacion);
+
+        if (!medicos || medicos.length === 0) {
+            return res.status(404).json({ message: identificacion ? errorMessages.medicoNoEncontrado : errorMessages.medicosNoEncontrados });
+        }
+
+        // Convertir a array si solo se obtiene un médico
+        if (identificacion) medicos = [medicos[0]];
+
+        // Formatear salida
+        const medicosFormateados = medicos.map(medico => ({
+            ...medico.toJSON(),
+            fecha_nacimiento: formatFecha(medico.fecha_nacimiento)
+        }));
+
+        return res.status(200).json({
+            message: identificacion ? successMessages.medicoEncontrado : successMessages.medicosEncontrados,
+            medicos: identificacion ? medicosFormateados[0] : medicosFormateados,
+        });
+
+    } catch (error) {
+        console.warn(`Error al obtener médicos: ${error.message}`);
+        return res.status(500).json({ message: errorMessages.errorServidor });
+    }
 }
+
+module.exports = { obtenerMedicos };
+
 
 // Actualizar la información de un médico
 async function actualizarMedico(req, res) {
@@ -102,4 +133,4 @@ async function actualizarMedico(req, res) {
     }
 }
 
-module.exports = { registrarMedico, getMedico, actualizarMedico };
+module.exports = { registrarMedico, obtenerMedicos, actualizarMedico };
