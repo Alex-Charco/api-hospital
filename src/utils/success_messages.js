@@ -11,6 +11,9 @@ const successMessages = {
 
     // Mensajes para cita
     citaRegistrada: 'Cita registrada exitosamente.',
+
+    //Mensaje de nota
+    notaEncontrada: "La nota evolutiva a sido encontrada. ",
 };
 
 module.exports = successMessages;

@@ -76,6 +76,7 @@ const errorMessages = {
 
     // Mensaje de citas
     citasNoEncontradas: "No se encontraron citas.",
+    citaNoEncontrada: "Cita no encontrada",
     fechaInvalida: "La fecha ingresada es inválida.",
     errorObtenerCitas: "Error al obtener las citas. ",
     faltanDatosRequeridos: 'Faltan datos: id_turno y id_paciente son requeridos.',
@@ -90,8 +91,10 @@ const errorMessages = {
     errorActualizarMedic: "Error al actualizar al médico. ",
 	
 	// Mensajes de nota evolutiva
-	errorCrearDatosNota: "Error al crear la nota evoluiva. ",
-	notaNoEncontrada: "Nota evoluiva no encontrada. "
+	errorCrearNota: "Error al crear la nota evoluiva. ",
+	notaNoEncontrada: "Nota evoluiva no encontrada. ",
+    filtroRequerido: "Se requiere el id_cita o la identificación. ",
+    idNotaRequerido:"Se requiere el id de la nota evolutiva"
 };
 
 module.exports = errorMessages;
