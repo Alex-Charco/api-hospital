@@ -33,7 +33,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
 | **📅 Turno**           | Consultar         | ✔️ Completado |
-| **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ❌ Pendiente  |
+| **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
 
 ### 📌 API Endpoints
 
@@ -75,6 +75,11 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 **Turno**                                                         |
 | GET     | `/api/turno/get` | Consultar turno       | ✅ |
 **Médico**                                                        |
+| GET     | `/api/medico/get/:identificacion` | Consultar medico       | ✅ |
+| GET     | `/api/medico/getAll` | Consultar medico       | ✅ |
+| POST    | `/api/medico/registrar`     | Registrar medico      | ✅ |
+| PUT     | `/api/medico/put/:identificacion` | Actualiza medico       | ✅ |
+**Nota evolutiva**                                                        |
 | GET     | `/api/medico/get/:identificacion` | Consultar medico       | ❌ |
 | POST    | `/api/medico/registrar`     | Registrar medico      | ❌ |
 | PUT     | `/api/medico/put/:identificacion` | Actualiza medico       | ❌ |
@@ -1240,20 +1245,52 @@ Se ofrecen tres métodos de búsqueda para mayor flexibilidad, por defecto devol
 
 **2️⃣  Filtrar por una fecha específica:**
 
+🌐 URL Base
+
     http://localhost:5000/api/turno/get?fecha={YYYY-MM-DD}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/turno/get?fecha=2025-06-03
 
 **3️⃣ Filtrar por estado:**
 
+🌐 URL Base
+
     http://localhost:5000/api/turno/get?estado={nombre-estado}
 
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/turno/get?estado=RESERVADO
+
 **4️⃣ Filtrar entre un rango de fechas:**
-    http://localhost:3000/api/turnos?fechaInicio=2025-03-09&fechaFin=2025-03-15
+
+🌐 URL Base
+
+    http://localhost:5000/api/turno/get?fechaInicio={YYYY-MM-DD}&fechaFin={YYYY-MM-DD}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/turno/get?fechaInicio=2025-03-09&fechaFin=2025-03-15
 
 **5️⃣ Filtrar por fecha y estado:**
-    http://localhost:3000/api/turnos?fecha=2025-03-09&estado=RESERVADO
+
+🌐 URL Base
+
+    http://localhost:5000/api/turno/get?fecha={YYYY-MM-DD}&estado={nombre-estado}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/turno/get?fecha=2025-03-09&estado=RESERVADO
 
 **6️⃣ Filtrar por fecha de inicio, fecha de fin y estado:**
-GET http://localhost:3000/api/turnos?fechaInicio=2025-03-09&fechaFin=2025-03-15&estado=RESERVADO
+
+🌐 URL Base
+
+    http://localhost:5000/api/turno/get?fechaInicio={YYYY-MM-DD}&fechaFin={YYYY-MM-DD}&estado={nombre-estado}
+
+📌 URL Ejemplo:
+GET http://localhost:5000/api/turno/get?fechaInicio=2025-03-09&fechaFin=2025-03-15&estado=RESERVADO
 
 
 🔐 **Requisitos**
