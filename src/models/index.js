@@ -15,6 +15,15 @@ const Horario = require("./horario.model");
 const Turno = require("./turno.model");
 const Cita = require("./cita.model");
 const NotaEvolutiva = require("./nota_evolutiva.model");
+const Diagnostico = require("./diagnostico.model");
+const Procedimiento = require("./procedimiento.model");
+const Link = require("./link.model");
+const Receta = require("./receta.model");
+const Medicacion = require("./medicacion.model");
+const Medicamento = require("./medicamento.model");
+const Posologia = require("./posologia.model");
+const RecetaAutorizacion = require("./receta_autorizacion.model");
+const Asistencia = require("./asistencia.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -212,6 +221,188 @@ NotaEvolutiva.belongsTo(Cita, {
     onUpdate: "CASCADE"
 });
 
+// Relación entre Diagnostico y NotaEvolutiva
+NotaEvolutiva.hasMany(Diagnostico, {
+    foreignKey: "id_nota_evolutiva",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Diagnostico.belongsTo(NotaEvolutiva, {
+    foreignKey: "id_nota_evolutiva",
+    as: "nota_evolutiva",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre Procedimiento y Diagnóstico
+Diagnostico.hasMany(Procedimiento, {
+    foreignKey: "id_diagnostico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+Procedimiento.belongsTo(Diagnostico, {
+    foreignKey: "id_diagnostico",
+    as: "diagnostico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una NotaEvolutiva puede tener varios Links
+NotaEvolutiva.hasMany(Link, {
+    foreignKey: "id_nota_evolutiva",
+    as: "links",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Un Link pertenece a una NotaEvolutiva
+Link.belongsTo(NotaEvolutiva, {
+    foreignKey: "id_nota_evolutiva",
+    as: "notaEvolutiva",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una NotaEvolutiva puede tener varias Recetas
+NotaEvolutiva.hasMany(Receta, {
+    foreignKey: "id_nota_evolutiva",
+    as: "recetas",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Receta pertenece a una NotaEvolutiva
+Receta.belongsTo(NotaEvolutiva, {
+    foreignKey: "id_nota_evolutiva",
+    as: "notasEvolutivas",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una Receta puede tener varias Medicaciones
+Receta.hasMany(Medicacion, {
+    foreignKey: "id_receta",
+    as: "medicaciones",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Medicación pertenece a una Receta
+Medicacion.belongsTo(Receta, {
+    foreignKey: "id_receta",
+    as: "receta",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Un Medicamento puede estar en varias Medicaciones
+Medicamento.hasMany(Medicacion, {
+    foreignKey: "id_medicamento",
+    as: "medicaciones",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Medicación pertenece a un Medicamento
+Medicacion.belongsTo(Medicamento, {
+    foreignKey: "id_medicamento",
+    as: "medicamento",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una Medicación puede tener varias Posologías
+Medicacion.hasMany(Posologia, {
+    foreignKey: "id_medicacion",
+    as: "posologias",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Posología pertenece a una única Medicación
+Posologia.belongsTo(Medicacion, {
+    foreignKey: "id_medicacion",
+    as: "medicacion",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una Receta puede tener múltiples Autorizaciones
+Receta.hasMany(RecetaAutorizacion, {
+    foreignKey: "id_receta",
+    as: "autorizaciones",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Autorización pertenece a una única Receta
+RecetaAutorizacion.belongsTo(Receta, {
+    foreignKey: "id_receta",
+    as: "receta",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación con Paciente (si el autorizado es el paciente)
+Paciente.hasMany(RecetaAutorizacion, {
+    foreignKey: "id_paciente",
+    as: "autorizaciones_paciente",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+RecetaAutorizacion.belongsTo(Paciente, {
+    foreignKey: "id_paciente",
+    as: "paciente",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación con Familiar (si el autorizado es un familiar)
+Familiar.hasMany(RecetaAutorizacion, {
+    foreignKey: "id_familiar",
+    as: "autorizaciones_familiar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+RecetaAutorizacion.belongsTo(Familiar, {
+    foreignKey: "id_familiar",
+    as: "familiar",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación con Persona Externa (si el autorizado es un externo)
+PersonaExterna.hasMany(RecetaAutorizacion, {
+    foreignKey: "id_persona_externa",
+    as: "autorizaciones_externo",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+RecetaAutorizacion.belongsTo(PersonaExterna, {
+    foreignKey: "id_persona_externa",
+    as: "persona_externa",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación: Una Cita puede tener una Asistencia
+Cita.hasOne(Asistencia, {
+    foreignKey: "id_cita",
+    as: "asistencia",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación inversa: Una Asistencia pertenece a una Cita
+Asistencia.belongsTo(Cita, {
+    foreignKey: "id_cita",
+    as: "cita",
+	onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 // Exportar Cita en el módulo
 /*module.exports = {
     ...module.exports,
@@ -235,5 +426,12 @@ module.exports = {
     Horario,
     Turno,
     Cita,
-	NotaEvolutiva
+	NotaEvolutiva,
+	Diagnostico,
+	Procedimiento,
+	Link, 
+	Receta,
+	Medicacion,
+	Medicamento,
+	Posologia
 };
