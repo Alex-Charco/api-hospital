@@ -149,6 +149,37 @@ Ejecutar en la terminal:
 
 Realiza prueba manualmente, pero se configuró build.yml para que haga pruebas automaticamente.
 
+#### 1.3.4 Instalar dependencia nodemailer
+Ejecutar en la terminal:
+
+    npm install nodemailer
+	
+**Descripción:** permite enviar un correo tanto al paciente como al medico con los datos de la cita cuando se registre.
+
+**Pasos:**
+
+1. Instalar nodemailer. 	
+2.  Configurar el servicio de correo:
+Crea un archivo emailService.js para manejar el envío de correos.
+3. Integrar el envío de correo en cita.service.js.
+4. Asegurar variables de entorno, se configura en env:
+
+    EMAIL_USER=tu_email@gmail.com
+    EMAIL_PASS=tu_contraseña
+	
+4.1 Generar la contraseña desde App & Passwords de Google.
+
+	**Pasos:**
+	1. Tener activada la autenticación en dos pasos en LA cuenta de Google.
+	2. Desde la cuenta de Google, Contraseñas para Aplicaciones. 
+	3. Ingresar un nombre y generar la nueva contraseña. 
+	4. Remplazar **tu_contraseña** por la contraseña generada que es únicamente para tus aplicaciones.
+	5. Reemplazar **tu_email@gmail.com** con el email donde se generó la contraseña.
+
+5. Carga las variables con dotenv en server.js:
+
+	require('dotenv').config();
+
 ---
 
 ### 1.4 Levantar el servidor
@@ -1433,9 +1464,7 @@ El endpoint permite actualizar médicos con la identificación del paciente.
 
 ✅ Respuesta: Actualizar los médicos.
 
-
-
-
+---
 
 ### 🔹 GET - Consultar Nota evolutiva
 
@@ -1453,17 +1482,21 @@ El endpoint permite consultar las notas evolutivas con la identificación.
 
 **1️⃣ Obtener nota evolutiva con el id_cita:**
 
-    http://localhost:5000/api/nota-evolutiva/get?id_cita
+    http://localhost:5000/api/nota-evolutiva/get?id_cita={ingresar-id_cita}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/nota-evolutiva/get?id_cita=1
 
 **2️⃣  Filtrar por identificacion:**
 
 🌐 URL Base
 
-	http://localhost:5000/api/nota-evolutiva/get?identificacion
+	http://localhost:5000/api/nota-evolutiva/get?identificacion={ingresar-identificacion}
 
 📌 URL Ejemplo:
     
-    http://localhost:5000/api/medico/get/1000456666
+    http://localhost:5000/api/nota-evolutiva/get?identificacion=1000456666
 
 🔐 **Requisitos**
 
