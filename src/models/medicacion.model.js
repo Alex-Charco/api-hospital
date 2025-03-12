@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 const Receta = require("./receta.model");
 const Medicamento = require("./medicamento.model");
 

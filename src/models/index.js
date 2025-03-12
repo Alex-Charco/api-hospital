@@ -24,6 +24,7 @@ const Medicamento = require("./medicamento.model");
 const Posologia = require("./posologia.model");
 const RecetaAutorizacion = require("./receta_autorizacion.model");
 const Asistencia = require("./asistencia.model");
+const PersonaExterna = require("./persona_externa.model");
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -433,5 +434,6 @@ module.exports = {
 	Receta,
 	Medicacion,
 	Medicamento,
-	Posologia
+	Posologia,
+    PersonaExterna
 };

@@ -71,8 +71,9 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/horario/get/:identificacion` | Consultar horario       | ✅ |
 | POST    | `/api/horario/registrar`     | Registrar horario      | ✅ |
 **Cita**                                                         |
-| GET     | `/api/cita/get/:identificacionPaciente` | Consultar cita       | ✅ |
+| GET     | `/api/cita/get/paciente/:identificacionPaciente` | Consultar cita       | ✅ |
 | GET     | `/api/cita/get/medico/:identificacionMedico` | Consultar cita       | ✅ |
+| GET     | `/api/cita/get` | Consultar todas las citas pendientes       | ✅ |
 **Turno**                                                         |
 | GET     | `/api/turno/get` | Consultar turno       | ✅ |
 **Médico**                                                        |

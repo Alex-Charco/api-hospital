@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 const NotaEvolutiva = require("./nota_evolutiva.model");
 
 const Link = sequelize.define("Link", {
