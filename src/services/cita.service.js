@@ -2,6 +2,7 @@ const { Cita, Turno, Horario, Medico, Especialidad, Paciente } = require('../mod
 const errorMessages = require("../utils/error_messages");
 const { formatCompleta, formatFecha } = require('../utils/date_utils');
 const sequelize = require("../config/db");
+const { enviarCorreoConfirmacion } = require('./email.service');
 
 async function obtenerCitas({ identificacionPaciente, identificacionMedico, fechaInicio, fechaFin, estadoCita }) {
     try {
@@ -131,7 +132,7 @@ async function obtenerCitas({ identificacionPaciente, identificacionMedico, fech
     }
 }
 
-const crearCita = async (id_turno, id_paciente) => {
+/*const crearCita = async (id_turno, id_paciente) => {
     try {
         // Verificar si el turno está disponible
         const turno = await Turno.findOne({ where: { id_turno } });
@@ -199,6 +200,99 @@ const crearCita = async (id_turno, id_paciente) => {
 
         } catch (error) {
             // Si hay un error en la transacción, revertirla
+            await t.rollback();
+            throw new Error(error.message);
+        }
+
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};*/
+
+const crearCita = async (id_turno, id_paciente) => {
+    try {
+        const turno = await Turno.findOne({ where: { id_turno } });
+        if (!turno || turno.estado !== 'DISPONIBLE') {
+            throw new Error(errorMessages.errorTurnoNoDisponible);
+        }
+
+        // Validar si el paciente ya tiene una cita pendiente
+        const citaExistente = await Cita.findOne({
+            where: {
+                id_paciente,
+                estado_cita: 'PENDIENTE'
+            },
+            include: [{
+                model: Turno,
+                as: "turno",
+                required: true,
+                include: [{
+                    model: Horario,
+                    as: 'horario',
+                    required: true,
+                    where: {
+                        fecha_horario: sequelize.fn('CURDATE') // Citas del mismo día
+                    }
+                }]
+            }]
+        });
+
+        if (citaExistente) {
+            throw new Error(errorMessages.errorCitaAgendada);
+        }
+
+        const t = await sequelize.transaction();
+        try {
+            await Turno.update({ estado: 'RESERVADO' }, { where: { id_turno }, transaction: t });
+
+            const cita = await Cita.create(
+                { id_turno, id_paciente, estado_cita: 'PENDIENTE', fecha_creacion: new Date() },
+                { transaction: t }
+            );
+
+            await t.commit();
+
+            const citaCompleta = await Cita.findOne({
+                where: { id_cita: cita.id_cita },
+                include: [
+                    {
+                        model: Paciente,
+                        as: 'paciente',
+                        attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'correo']
+                    },
+                    {
+                        model: Turno,
+                        as: 'turno',
+                        attributes: ['numero_turno', 'hora_turno'],
+                        include: [{
+                            model: Horario,
+                            as: 'horario',
+                            attributes: ['fecha_horario'],
+                            include: [{
+                                model: Medico,
+                                as: 'medico',
+                                attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'correo'],
+                                include: [{
+                                    model: Especialidad,
+                                    as: 'especialidad',
+                                    attributes: ['nombre', 'atencion', 'consultorio']
+                                }]
+                            }]
+                        }]
+                    }
+                ]
+            });
+
+            if (!citaCompleta) {
+                throw new Error(errorMessages.huboErrorCrearCita);
+            }
+
+            // Enviar email con la información de la cita
+            await enviarCorreoConfirmacion(citaCompleta);
+
+            return { cita: citaCompleta };
+
+        } catch (error) {
             await t.rollback();
             throw new Error(error.message);
         }
