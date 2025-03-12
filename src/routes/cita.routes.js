@@ -8,10 +8,6 @@ router.get('/get/paciente/:identificacionPaciente', verificarToken, authorizeRol
 
 router.get('/get/medico/:identificacionMedico', verificarToken, authorizeRole(["gestionar_cita", "ver_informacion"]), getCitas);
 
-
-// Ruta unificada para obtener citas (todas o solo pendientes del día)
-//router.get('/get/:tipo/:identificacion', verificarToken, authorizeRole(["gestionar_cita", "ver_cita", "ver_informacion"]), getCitas);
-
 router.post('/registrar', verificarToken, authorizeRole(["gestionar_cita", "registrar_cita"]), registrarCita);
 
 module.exports = router;

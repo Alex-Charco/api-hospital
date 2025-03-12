@@ -1160,7 +1160,7 @@ El endpoint 1 permite consultar las citas médicas de un paciente mediante su n�
 
 Se ofrecen tres métodos de búsqueda para mayor flexibilidad:
 
-**1️⃣** Consultar por número de identificación del paciente o del médico ().
+**1️⃣** Consultar por número de identificación del paciente o del médico (devuelve las citas del dia).
 
 **2️⃣** Consultar por rango de fechas (Fecha de inicio y fin).
 
