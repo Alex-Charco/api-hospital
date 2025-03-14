@@ -1478,7 +1478,7 @@ El endpoint permite actualizar médicos con la identificación del paciente.
 
 📝 **Descripción**
 
-El endpoint permite consultar las notas evolutivas con la identificación.
+El endpoint permite consultar todas las notas evolutivas del paciente con la identificación o id de la cita.
 
 **1️⃣ Obtener nota evolutiva con el id_cita:**
 
@@ -1542,11 +1542,12 @@ El endpoint permite registrar médicos y se envia nombre_usuario en el body.
 📥 Body (JSON) - Ejemplo de Solicitud
 
     {
-        "nombre_usuario": "xxxx",
+        "id_cita": "xxxx",
+        "motivo_consulta": "xxxx",
         ...(datos del nota-evolutiva)
     }
 
-✅ Respuesta: Registra ls notas evolutivas.
+✅ Respuesta: Registra las notas evolutivas.
 
 ### 🔹 PUT - Actualizar Nota evolutiva
 
@@ -1582,7 +1583,8 @@ El endpoint permite actualizar las notas evolutivas con el id de la nota evoluti
 📥 Body (JSON) - Ejemplo de Solicitud
 
     {
-        "nombre_usuario": "xxxx",
+        "id_cita": "xxxx",
+        "motivo_consulta": "xxxx",
         ...(datos de la nota evolutiva)
     }
 

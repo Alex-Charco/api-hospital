@@ -47,6 +47,15 @@ async function obtenerNotas({ id_cita = null, identificacion = null }) {
     return notas;
 }
 
+async function obtenerCitaPorId(id_cita) {
+    try {
+        return await Cita.findOne({ where: { id_cita } });
+    } catch (error) {
+        throw new Error(errorMessages.errorObtenerCita + error.message);
+    }
+}
+
+
 // Actualizar una nota evolutiva
 async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
     const nota = await NotaEvolutiva.findByPk(id_nota_evolutiva);
@@ -61,5 +70,6 @@ async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
 module.exports = {
     crearNota,
     obtenerNotas,
+    obtenerCitaPorId,
     actualizarNota
 };
