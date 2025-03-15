@@ -1542,12 +1542,39 @@ El endpoint permite registrar médicos y se envia nombre_usuario en el body.
 📥 Body (JSON) - Ejemplo de Solicitud
 
     {
-        "id_cita": "xxxx",
-        "motivo_consulta": "xxxx",
-        ...(datos del nota-evolutiva)
-    }
+    "id_cita": xxx,
+    "motivo_consulta": "Dolor de cabeza y fiebre",
+    "enfermedad": "Gripe",
+    "tratamiento": "Paracetamol y reposo",
+    "resultado_examen": "Negativo para COVID-19",
+    "decision_consulta": "Revisar en 48 horas",
+    "reporte_decision": "Se dará seguimiento al paciente",
+    "diagnosticos": [
+        {
+            "condicion": "Infección viral",
+            "cie_10": "J11.1",
+            "descripcion": "Gripe sin neumonía"
+        },
+        {
+            "condicion": "Faringitis aguda",
+            "cie_10": "J02.9",
+            "descripcion": "Inflamación de la faringe"
+        }
+    ],
+    "procedimientos": [
+        {
+            "codigo": "A123",
+            "descripcion_proc": "Nebulización con suero fisiológico"
+        },
+        {
+            "codigo": "B456",
+            "descripcion_proc": "Aplicación de antibiótico tópico"
+        }
+    ]
+}
 
-✅ Respuesta: Registra las notas evolutivas.
+
+✅ Respuesta: Registra las notas evolutivas y devuelve exactamente todos los datos guardados.
 
 ### 🔹 PUT - Actualizar Nota evolutiva
 
