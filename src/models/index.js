@@ -231,7 +231,7 @@ NotaEvolutiva.hasMany(Diagnostico, {
 
 Diagnostico.belongsTo(NotaEvolutiva, {
     foreignKey: "id_nota_evolutiva",
-    as: "nota_evolutiva",
+    as: "Diagnosticos",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
@@ -239,6 +239,7 @@ Diagnostico.belongsTo(NotaEvolutiva, {
 // Relación entre Procedimiento y Diagnóstico
 Diagnostico.hasMany(Procedimiento, {
     foreignKey: "id_diagnostico",
+	as: "Procedimientos",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });

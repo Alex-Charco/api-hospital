@@ -5,7 +5,7 @@ const procedimientoService = require("../services/procedimiento.service");
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
 
-// Registrar una nueva nota evolutiva
+// Registrar una nueva nota evolutiva v1
 /*async function registrarNotaEvolutiva(req, res) {
     const { 
         id_cita, 
@@ -46,7 +46,7 @@ const successMessages = require('../utils/success_messages');
     }
 }*/
 
-// NO FUNCIONA PROCEDIMIENTO
+// NO FUNCIONA PROCEDIMIENTO v2
 /*async function registrarNotaEvolutiva(req, res) {
     const { id_cita, motivo_consulta, diagnosticos, procedimientos, ...datosNotaEvolutiva } = req.body;
 
@@ -116,6 +116,7 @@ const successMessages = require('../utils/success_messages');
     }
 }*/
 
+// Registrar una nueva nota evolutiva v3 ok
 async function registrarNotaEvolutiva(req, res) {
     const { id_cita, motivo_consulta, diagnosticos, procedimientos, ...datosNotaEvolutiva } = req.body;
 
@@ -184,8 +185,8 @@ async function registrarNotaEvolutiva(req, res) {
     }
 }
 
-// Obtener nota evolutiva por ID de cita o identificación del paciente
-async function obtenerNotaEvolutiva(req, res) {
+// Obtener nota evolutiva por ID de cita o identificación del paciente v1
+/*async function obtenerNotaEvolutiva(req, res) {
     try {
         const { id_cita, identificacion } = req.query;
 
@@ -205,10 +206,37 @@ async function obtenerNotaEvolutiva(req, res) {
         console.error("❌ Error en obtenerNotaEvolutiva:", error.message);
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
+}*/
+
+// Obtener nota evolutiva por ID de cita o identificación del paciente v2
+async function obtenerNotaEvolutiva(req, res) {
+    try {
+        const { id_cita, identificacion } = req.query;
+
+        if (!id_cita && !identificacion) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        // Obtener la nota evolutiva junto con diagnósticos y procedimientos
+        const nota = await notaEvolutivaService.obtenerNotasDetalladas({ id_cita, identificacion });
+
+        if (!nota || nota.length === 0) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        return res.status(200).json({ 
+            message: successMessages.notaEncontrada, 
+            nota
+        });
+
+    } catch (error) {
+        console.error("❌ Error en obtenerNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
 }
 
-// Actualizar una nota evolutiva
-async function actualizarNotaEvolutiva(req, res) {
+// Actualizar una nota evolutiva v1
+/*async function actualizarNotaEvolutiva(req, res) {
     try {
         const { id_nota_evolutiva } = req.params;
         const nuevosDatos = req.body;
@@ -226,6 +254,29 @@ async function actualizarNotaEvolutiva(req, res) {
 
     } catch (error) {
         console.error("❌ Error en actualizarNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+*/
+
+// Actualizar una nota evolutiva v2
+async function actualizarNotaEvolutiva(req, res) {
+    try {
+        const { id_nota_evolutiva } = req.params;
+        const nuevosDatos = req.body;
+
+        if (!id_nota_evolutiva) {
+            return res.status(400).json({ message: errorMessages.idNotaRequerido });
+        }
+
+        const notaActualizada = await notaEvolutivaService.actualizarNota(id_nota_evolutiva, nuevosDatos);
+
+        return res.status(200).json({
+            message: successMessages.informacionActualizada,
+            nota: notaActualizada
+        });
+    } catch (error) {
+        console.error("\u274C Error en actualizarNotaEvolutiva:", error.message);
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }

@@ -1,4 +1,4 @@
-const { NotaEvolutiva, Cita, Paciente } = require('../models');
+const { NotaEvolutiva, Cita, Paciente, Diagnostico, Procedimiento } = require('../models');
 const errorMessages = require("../utils/error_messages");
 
 // Crear una nueva nota evolutiva
@@ -24,8 +24,8 @@ async function crearNota(data, transaction) {
 }
 
 
-// Obtener todas las notas evolutivas por ID de cita o identificación del paciente
-async function obtenerNotas({ id_cita = null, identificacion = null }) {
+// Obtener todas las notas evolutivas por ID de cita o identificación del paciente v1
+/*async function obtenerNotas({ id_cita = null, identificacion = null }) {
     let whereClause = {};
 
     if (id_cita) {
@@ -54,6 +54,53 @@ async function obtenerNotas({ id_cita = null, identificacion = null }) {
     }
 
     return notas;
+}*/
+
+// Obtener todas las notas evolutivas por ID de cita o identificación del paciente v2
+async function obtenerNotasDetalladas({ id_cita = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_cita) {
+        whereClause.id_cita = id_cita;
+    } else if (identificacion) {
+        const paciente = await Paciente.findOne({ where: { identificacion } });
+
+        if (!paciente) {
+            throw new Error(errorMessages.pacienteNoEncontrado);
+        }
+
+        const citas = await Cita.findAll({ where: { id_paciente: paciente.id_paciente } });
+
+        if (!citas || citas.length === 0) {
+            throw new Error(errorMessages.citaNoEncontrada);
+        }
+
+        const idsCitas = citas.map(cita => cita.id_cita);
+        whereClause.id_cita = idsCitas;
+    }
+
+    // Buscar notas evolutivas con diagnósticos y procedimientos asociados
+    const notas = await NotaEvolutiva.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Diagnostico,
+                as: 'Diagnosticos',
+                include: [
+                    {
+                        model: Procedimiento,
+                        as: 'Procedimientos'
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!notas || notas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    return notas;
 }
 
 async function obtenerCitaPorId(id_cita) {
@@ -65,8 +112,8 @@ async function obtenerCitaPorId(id_cita) {
 }
 
 
-// Actualizar una nota evolutiva
-async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
+// Actualizar una nota evolutiva v1
+/*async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
     const nota = await NotaEvolutiva.findByPk(id_nota_evolutiva);
     
     if (!nota) {
@@ -75,10 +122,48 @@ async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
 
     return await nota.update(nuevosDatos);
 }
+*/
+
+// Actualizar una nota evolutiva v2
+async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
+    const nota = await NotaEvolutiva.findByPk(id_nota_evolutiva, {
+        include: [{
+            model: Diagnostico,
+            as: 'Diagnosticos',
+            include: [{ model: Procedimiento, as: 'Procedimientos' }]
+        }]
+    });
+
+    if (!nota) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    await nota.update(nuevosDatos);
+
+    if (nuevosDatos.Diagnosticos && Array.isArray(nuevosDatos.Diagnosticos)) {
+        for (const nuevoDiagnostico of nuevosDatos.Diagnosticos) {
+            let diagnostico = await Diagnostico.findByPk(nuevoDiagnostico.id_diagnostico);
+            if (diagnostico) {
+                await diagnostico.update(nuevoDiagnostico);
+            }
+
+            if (nuevoDiagnostico.Procedimientos && Array.isArray(nuevoDiagnostico.Procedimientos)) {
+                for (const nuevoProcedimiento of nuevoDiagnostico.Procedimientos) {
+                    let procedimiento = await Procedimiento.findByPk(nuevoProcedimiento.id_procedimiento);
+                    if (procedimiento) {
+                        await procedimiento.update(nuevoProcedimiento);
+                    }
+                }
+            }
+        }
+    }
+    
+    return nota;
+}
 
 module.exports = {
     crearNota,
-    obtenerNotas,
+    obtenerNotasDetalladas,
     obtenerCitaPorId,
     actualizarNota
 };
