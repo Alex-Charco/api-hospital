@@ -2,7 +2,7 @@ const { NotaEvolutiva, Cita, Paciente } = require('../models');
 const errorMessages = require("../utils/error_messages");
 
 // Crear una nueva nota evolutiva
-async function crearNota({ id_cita, id_paciente, motivo_consulta, ...datosNotaEvolutiva }) {
+/*async function crearNota({ id_cita, id_paciente, motivo_consulta, ...datosNotaEvolutiva }) {
     try {
         return await NotaEvolutiva.create({
             id_cita,
@@ -13,7 +13,16 @@ async function crearNota({ id_cita, id_paciente, motivo_consulta, ...datosNotaEv
     } catch (error) {
         throw new Error(errorMessages.errorCrearNota + error.message);
     }
+}*/
+
+async function crearNota(data, transaction) {
+    try {
+        return await NotaEvolutiva.create(data, { transaction });
+    } catch (error) {
+        throw new Error("Error al crear la nota evolutiva: " + error.message);
+    }
 }
+
 
 // Obtener todas las notas evolutivas por ID de cita o identificación del paciente
 async function obtenerNotas({ id_cita = null, identificacion = null }) {
