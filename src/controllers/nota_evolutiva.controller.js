@@ -2,9 +2,195 @@ const { sequelize } = require("../models");
 const notaEvolutivaService = require("../services/nota_evolutiva.service");
 const diagnosticoService = require("../services/diagnostico.service");
 const procedimientoService = require("../services/procedimiento.service");
+const linkService = require("../services/link.service"); // Importar el servicio de Link
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
 
+// Registrar una nueva nota evolutiva con diagnóstico, procedimiento y link v1
+/*async function registrarNotaEvolutiva(req, res) {
+    const { id_cita, motivo_consulta, diagnosticos, procedimientos, links, ...datosNotaEvolutiva } = req.body;
+
+    if (!id_cita || !motivo_consulta) {
+        return res.status(400).json({ message: "Faltan datos obligatorios" });
+    }
+
+    const transaction = await sequelize.transaction(); // Inicia transacción
+
+    try {
+        // 1️⃣ Obtener la cita y su id_paciente
+        const cita = await notaEvolutivaService.obtenerCitaPorId(id_cita);
+
+        if (!cita) {
+            return res.status(404).json({ message: "Cita no encontrada" });
+        }
+
+        const { id_paciente } = cita;
+        if (!id_paciente) {
+            return res.status(400).json({ message: "Paciente no encontrado" });
+        }
+
+        // 2️⃣ Crear la nota evolutiva
+        const nota = await notaEvolutivaService.crearNota({
+            id_cita,
+            id_paciente,
+            motivo_consulta,
+            ...datosNotaEvolutiva
+        }, transaction);
+
+        // 3️⃣ Insertar diagnósticos y mapear los nuevos ID generados
+        const diagnosticosGuardados = [];
+        for (const diag of diagnosticos) {
+            const nuevoDiagnostico = await diagnosticoService.crearDiagnostico({
+                id_nota_evolutiva: nota.id_nota_evolutiva,
+                ...diag
+            }, transaction);
+            diagnosticosGuardados.push(nuevoDiagnostico);
+        }
+
+        // 4️⃣ Insertar procedimientos usando los nuevos ID de diagnósticos
+        const procedimientosGuardados = [];
+        for (const proc of procedimientos) {
+            const diagnosticoAsociado = diagnosticosGuardados[procedimientos.indexOf(proc)]; // Usar índice para mapear
+            if (diagnosticoAsociado) {
+                const nuevoProcedimiento = await procedimientoService.crearProcedimiento({
+                    id_diagnostico: diagnosticoAsociado.id_diagnostico,
+                    ...proc
+                }, transaction);
+                procedimientosGuardados.push(nuevoProcedimiento);
+            }
+        }
+
+        // 5️⃣ Insertar links asociados
+        const linksGuardados = [];
+        for (const link of links) {
+            const nuevoLink = await linkService.crearLink({
+                id_nota_evolutiva: nota.id_nota_evolutiva,
+                ...link
+            }, transaction);
+            linksGuardados.push(nuevoLink);
+        }
+
+        await transaction.commit(); // Confirmamos la transacción
+
+        return res.status(201).json({
+            message: "Registro exitoso",
+            nota,
+            diagnosticosGuardados,
+            procedimientosGuardados,
+            linksGuardados
+        });
+    } catch (error) {
+        await transaction.rollback(); // Revertimos la transacción en caso de error
+        console.error("❌ Error en registrarNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || "Error interno del servidor" });
+    }
+}
+*/
+
+// Registrar una nueva nota evolutiva con diagnóstico, procedimiento y link v2
+async function registrarNotaEvolutiva(req, res) {
+    const { id_cita, motivo_consulta, diagnosticos, procedimientos, links, ...datosNotaEvolutiva } = req.body;
+
+    if (!id_cita || !motivo_consulta) {
+        return res.status(400).json({ message: "Faltan datos obligatorios" });
+    }
+
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Delegar toda la lógica a `crearNota`
+        const resultado = await notaEvolutivaService.crearNota({
+            id_cita,
+            motivo_consulta,
+            diagnosticos,
+            procedimientos,
+            links,
+            ...datosNotaEvolutiva
+        }, transaction);
+
+        await transaction.commit();
+        return res.status(201).json({ message: "Registro exitoso", ...resultado });
+
+    } catch (error) {
+        await transaction.rollback();
+        console.error("❌ Error en registrarNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || "Error interno del servidor" });
+    }
+}
+
+// Obtener nota evolutiva por ID de cita o identificación del paciente
+async function obtenerNotaEvolutiva(req, res) {
+    try {
+        const { id_cita, identificacion } = req.query;
+
+        if (!id_cita && !identificacion) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        // Obtener la nota evolutiva junto con diagnósticos, procedimientos y links
+        const nota = await notaEvolutivaService.obtenerNotasDetalladas({ id_cita, identificacion });
+
+        if (!nota || nota.length === 0) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        return res.status(200).json({ 
+            message: successMessages.notaEncontrada, 
+            nota
+        });
+
+    } catch (error) {
+        console.error("❌ Error en obtenerNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+// Actualizar una nota evolutiva con diagnóstico, procedimiento y link
+async function actualizarNotaEvolutiva(req, res) {
+    try {
+        const { id_nota_evolutiva } = req.params;
+        const nuevosDatos = req.body;
+
+        if (!id_nota_evolutiva) {
+            return res.status(400).json({ message: errorMessages.idNotaRequerido });
+        }
+
+        const notaActualizada = await notaEvolutivaService.actualizarNota(id_nota_evolutiva, nuevosDatos);
+
+        // ✅ Insertar nuevos links en paralelo
+        if (nuevosDatos.links && Array.isArray(nuevosDatos.links)) {
+            await Promise.all(nuevosDatos.links.map(async nuevoLink => {
+                await linkService.crearLink({ id_nota_evolutiva, ...nuevoLink });
+            }));
+        }
+
+        return res.status(200).json({
+            message: successMessages.informacionActualizada,
+            nota: notaActualizada
+        });
+    } catch (error) {
+        console.error("\u274C Error en actualizarNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+module.exports = {
+    registrarNotaEvolutiva,
+    obtenerNotaEvolutiva,
+    actualizarNotaEvolutiva
+};
+
+
+
+
+
+/*const { sequelize } = require("../models");
+const notaEvolutivaService = require("../services/nota_evolutiva.service");
+const diagnosticoService = require("../services/diagnostico.service");
+const procedimientoService = require("../services/procedimiento.service");
+const errorMessages = require('../utils/error_messages');
+const successMessages = require('../utils/success_messages');
+*/
 // Registrar una nueva nota evolutiva v1
 /*async function registrarNotaEvolutiva(req, res) {
     const { 
@@ -117,7 +303,7 @@ const successMessages = require('../utils/success_messages');
 }*/
 
 // Registrar una nueva nota evolutiva v3 ok
-async function registrarNotaEvolutiva(req, res) {
+/*async function registrarNotaEvolutiva(req, res) {
     const { id_cita, motivo_consulta, diagnosticos, procedimientos, ...datosNotaEvolutiva } = req.body;
 
     if (!id_cita || !motivo_consulta) {
@@ -184,7 +370,7 @@ async function registrarNotaEvolutiva(req, res) {
         return res.status(500).json({ message: error.message || "Error interno del servidor" });
     }
 }
-
+*/
 // Obtener nota evolutiva por ID de cita o identificación del paciente v1
 /*async function obtenerNotaEvolutiva(req, res) {
     try {
@@ -209,7 +395,7 @@ async function registrarNotaEvolutiva(req, res) {
 }*/
 
 // Obtener nota evolutiva por ID de cita o identificación del paciente v2
-async function obtenerNotaEvolutiva(req, res) {
+/*async function obtenerNotaEvolutiva(req, res) {
     try {
         const { id_cita, identificacion } = req.query;
 
@@ -234,6 +420,7 @@ async function obtenerNotaEvolutiva(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
+*/
 
 // Actualizar una nota evolutiva v1
 /*async function actualizarNotaEvolutiva(req, res) {
@@ -260,7 +447,7 @@ async function obtenerNotaEvolutiva(req, res) {
 */
 
 // Actualizar una nota evolutiva v2
-async function actualizarNotaEvolutiva(req, res) {
+/*async function actualizarNotaEvolutiva(req, res) {
     try {
         const { id_nota_evolutiva } = req.params;
         const nuevosDatos = req.body;
@@ -286,3 +473,4 @@ module.exports = {
     obtenerNotaEvolutiva,
     actualizarNotaEvolutiva
 };
+*/

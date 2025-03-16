@@ -1466,6 +1466,10 @@ El endpoint permite actualizar médicos con la identificación del paciente.
 
 ---
 
+### 🔹 GET, POST, PUT
+
+En todos los enpoints de Nota evolutiva incluyen: link, diagnostico, procedimiento.
+
 ### 🔹 GET - Consultar Nota evolutiva
 
 #### 📍 Endpoint para médico
@@ -1542,36 +1546,51 @@ El endpoint permite registrar médicos y se envia nombre_usuario en el body.
 📥 Body (JSON) - Ejemplo de Solicitud
 
     {
-    "id_cita": xxx,
-    "motivo_consulta": "Dolor de cabeza y fiebre",
-    "enfermedad": "Gripe",
-    "tratamiento": "Paracetamol y reposo",
-    "resultado_examen": "Negativo para COVID-19",
-    "decision_consulta": "Revisar en 48 horas",
-    "reporte_decision": "Se dará seguimiento al paciente",
-    "diagnosticos": [
-        {
-            "condicion": "Infección viral",
-            "cie_10": "J11.1",
-            "descripcion": "Gripe sin neumonía"
-        },
-        {
-            "condicion": "Faringitis aguda",
-            "cie_10": "J02.9",
-            "descripcion": "Inflamación de la faringe"
-        }
-    ],
-    "procedimientos": [
-        {
-            "codigo": "A123",
-            "descripcion_proc": "Nebulización con suero fisiológico"
-        },
-        {
-            "codigo": "B456",
-            "descripcion_proc": "Aplicación de antibiótico tópico"
-        }
-    ]
-}
+		"id_cita": xxx,
+		"motivo_consulta": "Dolor abdominal y náuseas",
+		"enfermedad": "Gastritis",
+		"tratamiento": "Omeprazol y dieta blanda",
+		"resultado_examen": "Sin hallazgos de infección",
+		"decision_consulta": "Control en una semana",
+		"reporte_decision": "Paciente continuará con el tratamiento indicado",
+		"diagnosticos": [
+			{
+				"condicion": "Gastritis aguda",
+				"cie_10": "K29.0",
+				"descripcion": "Inflamación de la mucosa gástrica"
+			},
+			{
+				"condicion": "Náuseas recurrentes",
+				"cie_10": "R11.0",
+				"descripcion": "Sensación persistente de náuseas"
+			}
+		],
+		"procedimientos": [
+			{
+				"codigo": "C789",
+				"descripcion_proc": "Endoscopia gástrica"
+			},
+			{
+				"codigo": "D012",
+				"descripcion_proc": "Biopsia de mucosa gástrica"
+			}
+		],
+		"links": [
+			{
+				"categoria": "EXAMEN",
+				"url": "http://examen-gastritis.com"
+			},
+			{
+				"categoria": "PEDIDO",
+				"url": "http://pedido-endoscopia.com"
+			},
+			{
+				"categoria": "CERTIFICADO",
+				"url": "http://certificado-diagnostico.com"
+			}
+		]
+	}
+
 
 
 ✅ Respuesta: Registra las notas evolutivas y devuelve exactamente todos los datos guardados.
@@ -1592,7 +1611,7 @@ El endpoint permite registrar médicos y se envia nombre_usuario en el body.
 
 📝 **Descripción**
 
-El endpoint permite actualizar las notas evolutivas con el id de la nota evolutiva.
+El endpoint permite actualizar las notas evolutivas con el **id de la nota evolutiva.**
 
 🔐 **Requisitos**
 
