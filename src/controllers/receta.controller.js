@@ -1,6 +1,7 @@
 const recetaService = require('../services/receta.service');
 const { sequelize } = require("../models");
 const successMessages = require('../utils/success_messages');
+const errorMessages = require('../utils/error_messages');
 
 /*async function registrarReceta(req, res) {
     try {
@@ -165,8 +166,29 @@ async function obtenerRecetas(req, res) {
     }
 }
 
-
 async function actualizarReceta(req, res) {
+    try {
+        const { id_receta } = req.params;
+        const nuevosDatos = req.body;
+
+        if (!id_receta) {
+            return res.status(400).json({ message: errorMessages.idRecetaRequerido });
+        }
+
+        const recetaActualizada = await recetaService.actualizarRecetaDetallada(id_receta, nuevosDatos);
+
+        return res.status(200).json({
+            message: successMessages.informacionActualizada,
+            receta: recetaActualizada
+        });
+    } catch (error) {
+        console.error("❌ Error en actualizarReceta:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+
+/*async function actualizarReceta(req, res) {
     try {
         const { id_receta } = req.params;
         const nuevosDatos = req.body;
@@ -178,11 +200,11 @@ async function actualizarReceta(req, res) {
         const recetaActualizada = await recetaService.actualizarRecetaDetallada(id_receta, nuevosDatos);
 
         // ✅ Insertar nuevos links en paralelo
-        /*if (nuevosDatos.links && Array.isArray(nuevosDatos.links)) {
-            await Promise.all(nuevosDatos.links.map(async nuevoLink => {
-                await linkService.crearLink({ id_nota_evolutiva, ...nuevoLink });
-            }));
-        }*/
+        //if (nuevosDatos.links && Array.isArray(nuevosDatos.links)) {
+            //await Promise.all(nuevosDatos.links.map(async nuevoLink => {
+                //await linkService.crearLink({ id_nota_evolutiva, ...nuevoLink });
+            //}));
+        //}
 
         return res.status(200).json({
             message: successMessages.informacionActualizada,
@@ -192,7 +214,7 @@ async function actualizarReceta(req, res) {
         console.error("\u274C Error en actualizarNotaEvolutiva:", error.message);
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
-}
+}*/
 
 module.exports = {
     registrarReceta,

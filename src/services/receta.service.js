@@ -503,6 +503,170 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
 
 async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
     const receta = await Receta.findByPk(id_receta, {
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    {
+                        model: Medicamento,
+                        as: 'medicamento'
+                    },
+                    {
+                        model: Posologia,
+                        as: 'posologias'
+                    }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion'
+            }
+        ]
+    });
+
+    if (!receta) {
+        throw new Error(errorMessages.recetaNoEncontrada);
+    }
+
+    // ✅ Formatear fechas antes de actualizar
+    if (nuevosDatos.fecha_prescripcion) {
+        nuevosDatos.fecha_prescripcion = formatFecha(nuevosDatos.fecha_prescripcion);
+    }
+
+    if (nuevosDatos.fecha_vigencia) {
+        nuevosDatos.fecha_vigencia = formatFecha(nuevosDatos.fecha_vigencia);
+    }
+
+    // ✅ Actualizar datos de la receta
+    await receta.update(nuevosDatos);
+
+    // ✅ Actualizar medicaciones en paralelo
+    if (nuevosDatos.medicaciones && Array.isArray(nuevosDatos.medicaciones)) {
+        await Promise.all(nuevosDatos.medicaciones.map(async nuevaMedicacion => {
+            let medicacion = await Medicacion.findByPk(nuevaMedicacion.id_medicacion);
+            if (medicacion) {
+                await medicacion.update(nuevaMedicacion);
+            }
+
+            // ✅ Actualizar medicamentos en paralelo
+            if (nuevaMedicacion.medicamentos && Array.isArray(nuevaMedicacion.medicamentos)) {
+                await Promise.all(nuevaMedicacion.medicamentos.map(async nuevoMedicamento => {
+                    let medicamento = await Medicamento.findByPk(nuevoMedicamento.id_medicamento);
+                    if (medicamento) {
+                        await medicamento.update(nuevoMedicamento);
+                    }
+                }));
+            }
+
+            // ✅ Actualizar posologías en paralelo
+            if (nuevaMedicacion.posologias && Array.isArray(nuevaMedicacion.posologias)) {
+                await Promise.all(nuevaMedicacion.posologias.map(async nuevaPosologia => {
+                    let posologia = await Posologia.findByPk(nuevaPosologia.id_posologia);
+                    if (posologia) {
+                        await posologia.update(nuevaPosologia);
+                    }
+                }));
+            }
+        }));
+    }
+
+    // ✅ Actualizar receta_autorizacion si está presente
+    if (nuevosDatos.receta_autorizacion) {
+        let recetaAutorizacion = await RecetaAutorizacion.findByPk(nuevosDatos.receta_autorizacion.id_receta_autorizacion);
+        if (recetaAutorizacion) {
+            await recetaAutorizacion.update(nuevosDatos.receta_autorizacion);
+        }
+    }
+
+    // Formatear fechas antes de devolver
+    const recetaFormateada = {
+        ...receta.toJSON(),
+        fecha_prescripcion: formatFecha(receta.fecha_prescripcion),
+        fecha_vigencia: formatFecha(receta.fecha_vigencia)
+    };
+
+    return {
+        receta: recetaFormateada
+    };
+}
+
+// Funciona pero no formatea la fecha v2
+/*async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
+    const receta = await Receta.findByPk(id_receta, {
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    {
+                        model: Medicamento,
+                        as: 'medicamento'
+                    },
+                    {
+                        model: Posologia,
+                        as: 'posologias'
+                    }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion'
+            }
+        ]
+    });
+
+    if (!receta) {
+        throw new Error(errorMessages.recetaNoEncontrada);
+    }
+
+    // ✅ Actualizar datos de la receta
+    await receta.update(nuevosDatos);
+
+    // ✅ Actualizar medicaciones en paralelo
+    if (nuevosDatos.medicaciones && Array.isArray(nuevosDatos.medicaciones)) {
+        await Promise.all(nuevosDatos.medicaciones.map(async nuevaMedicacion => {
+            let medicacion = await Medicacion.findByPk(nuevaMedicacion.id_medicacion);
+            if (medicacion) {
+                await medicacion.update(nuevaMedicacion);
+            }
+
+            // ✅ Actualizar medicamentos en paralelo
+            if (nuevaMedicacion.medicamentos && Array.isArray(nuevaMedicacion.medicamentos)) {
+                await Promise.all(nuevaMedicacion.medicamentos.map(async nuevoMedicamento => {
+                    let medicamento = await Medicamento.findByPk(nuevoMedicamento.id_medicamento);
+                    if (medicamento) {
+                        await medicamento.update(nuevoMedicamento);
+                    }
+                }));
+            }
+
+            // ✅ Actualizar posologías en paralelo
+            if (nuevaMedicacion.posologias && Array.isArray(nuevaMedicacion.posologias)) {
+                await Promise.all(nuevaMedicacion.posologias.map(async nuevaPosologia => {
+                    let posologia = await Posologia.findByPk(nuevaPosologia.id_posologia);
+                    if (posologia) {
+                        await posologia.update(nuevaPosologia);
+                    }
+                }));
+            }
+        }));
+    }
+
+    // ✅ Actualizar receta_autorizacion si está presente
+    if (nuevosDatos.receta_autorizacion) {
+        let recetaAutorizacion = await RecetaAutorizacion.findByPk(nuevosDatos.receta_autorizacion.id_receta_autorizacion);
+        if (recetaAutorizacion) {
+            await recetaAutorizacion.update(nuevosDatos.receta_autorizacion);
+        }
+    }
+
+    return receta;
+}*/
+
+// v1
+/*async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
+    const receta = await Receta.findByPk(id_receta, {
          include: [
             {
                 model: Medicacion,
@@ -533,16 +697,16 @@ async function actualizarRecetaDetallada(id_receta, nuevosDatos) {
     await receta.update(nuevosDatos);
 
     // ✅ Actualizar receta_autorizacion asociados
-    /*if (nuevosDatos.links && Array.isArray(nuevosDatos.links)) {
-        await Promise.all(nuevosDatos.links.map(async nuevoLink => {
-            let link = await Link.findByPk(nuevoLink.id_link);
-            if (link) {
-                await link.update(nuevoLink);
-            } else {
-                await Link.create({ id_nota_evolutiva, ...nuevoLink });
-            }
-        }));
-    }*/
+    //if (nuevosDatos.links && Array.isArray(nuevosDatos.links)) {
+        //await Promise.all(nuevosDatos.links.map(async nuevoLink => {
+            //let link = await Link.findByPk(nuevoLink.id_link);
+            //if (link) {
+                //await link.update(nuevoLink);
+            //} else {
+                //await Link.create({ id_nota_evolutiva, ...nuevoLink });
+            //}
+        //}));
+    //}
 
     // ✅ Actualizar diagnósticos en paralelo
     if (nuevosDatos.meicaciones && Array.isArray(nuevosDatos.medicaciones)) {
@@ -565,7 +729,7 @@ async function actualizarRecetaDetallada(id_receta, nuevosDatos) {
     }
 
     return nota;
-}
+}*/
 
 
 module.exports = { crearReceta, obtenerDatosAutorizado, obtenerRecetasDetalladas, actualizarRecetaDetallada };
