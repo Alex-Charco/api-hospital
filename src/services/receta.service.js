@@ -1,4 +1,4 @@
-const { Receta, Medicacion, Medicamento, Posologia, RecetaAutorizacion, NotaEvolutiva } = require('../models');
+const { Receta, Medicacion, Medicamento, Posologia, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia } = require('../models');
 const medicacionService = require("./medicacion.service");
 const medicamentoService = require("./medicamento.service");
 const posologiaService = require("./posologia.service");
@@ -456,7 +456,7 @@ async function obtenerNotaEvolutivaPorId(id_nota_evolutiva) {
     }
 }
 
-async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+/*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
     let whereClause = {};
 
     if (id_nota_evolutiva) {
@@ -500,6 +500,306 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
 
     return recetas;
 }
+*/
+
+//verson 2
+/*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_nota_evolutiva) {
+        whereClause.id_nota_evolutiva = id_nota_evolutiva;
+    } else if (identificacion) {
+        const notaEvolutiva = await NotaEvolutiva.findOne({ where: { identificacion } });
+        if (!notaEvolutiva) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+        whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+    }
+
+    // Buscar recetas con sus datos asociados
+    const recetas = await Receta.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    {
+                        model: Medicamento,
+                        as: 'medicamento'
+                    },
+                    {
+                        model: Posologia,
+                        as: 'posologias'
+                    }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion',
+                include: [
+                    // Aquí incluimos la lógica para obtener los datos completos de la persona autorizada
+                    {
+                        model: Paciente,  // Suponiendo que Paciente es el modelo para obtener los datos del paciente
+                        as: 'paciente',
+                        required: false
+                    },
+                    {
+                        model: Familiar,  // Si el tipo autorizado es Familiar, incluir los datos del familiar
+                        as: 'familiar',
+                        required: false
+                    },
+                    {
+                        model: PersonaExterna,  // Si el tipo autorizado es Externo, incluir los datos de persona externa
+                        as: 'persona_externa',
+                        required: false
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!recetas || recetas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    return recetas;
+}
+*/
+
+/*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_nota_evolutiva) {
+        whereClause.id_nota_evolutiva = id_nota_evolutiva;
+    } else if (identificacion) {
+        const notaEvolutiva = await NotaEvolutiva.findOne({ where: { identificacion } });
+        if (!notaEvolutiva) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+        whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+    }
+
+    // Buscar recetas con todos los datos necesarios
+    const recetas = await Receta.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    { model: Medicamento, as: 'medicamento' },
+                    { model: Posologia, as: 'posologias' }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion'
+            }
+        ]
+    });
+
+    if (!recetas || recetas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    return recetas;
+}
+*/
+
+/*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_nota_evolutiva) {
+        whereClause.id_nota_evolutiva = id_nota_evolutiva;
+    } else if (identificacion) {
+        const notaEvolutiva = await NotaEvolutiva.findOne({ where: { identificacion } });
+        if (!notaEvolutiva) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+        whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+    }
+
+    // Buscar recetas con todos los datos necesarios
+    const recetas = await Receta.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    { model: Medicamento, as: 'medicamento' },
+                    { model: Posologia, as: 'posologias' }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion',
+                include: [
+                    { 
+                        model: Paciente, 
+                        as: 'paciente',
+                        attributes: ['id_paciente', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo'],
+						include: [
+                            {
+                                model: Residencia,
+                                as: 'paciente',
+                                attributes: ['direccion'] // Aseguramos obtener la dirección de la tabla residencia
+                            }
+                        ]
+                    },
+                    { 
+                        model: Familiar, 
+                        as: 'familiar',
+                        attributes: ['id_familiar', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']  // Atributos específicos si necesitas
+                    },
+                    { 
+                        model: PersonaExterna, 
+                        as: 'persona_externa',
+                        attributes: ['id_persona_externa', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']  // Atributos específicos si necesitas
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!recetas || recetas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    // Ahora transformamos las recetas con los datos autorizados
+    const recetasConDatosAutorizados = await Promise.all(recetas.map(async (recetaItem) => {
+        const recetaAutorizacion = recetaItem.receta_autorizacion;
+
+        if (recetaAutorizacion) {
+            const datosAutorizado = await obtenerDatosAutorizado(
+                recetaAutorizacion.tipo,
+                recetaAutorizacion.id_paciente,
+                recetaAutorizacion.id_familiar,
+                recetaAutorizacion.id_persona_externa
+            );
+
+            // Obtenemos la dirección de la tabla residencia si existe solo para paciente
+            const direccionPaciente = recetaAutorizacion.paciente?.residencia?.direccion || '';
+
+            // Transformamos la estructura de receta_autorizacion
+            recetaItem.receta_autorizacion = {
+                id_receta_autorizacion: recetaAutorizacion.id_receta_autorizacion,
+                tipo: recetaAutorizacion.tipo,
+                nombre: datosAutorizado
+                    ? `${datosAutorizado.primer_nombre || ''} ${datosAutorizado.segundo_nombre || ''} ${datosAutorizado.primer_apellido || ''} ${datosAutorizado.segundo_apellido || ''}`.trim()
+                    : "",
+                celular: datosAutorizado?.celular || "",
+                telefono: datosAutorizado?.telefono || "",
+                correo: datosAutorizado?.correo || "",
+                // Solo asignamos la dirección si es un paciente
+                ...(recetaAutorizacion.paciente ? { direccion: direccionPaciente } : {})
+            };
+        }
+
+        return recetaItem; // Es importante devolver la recetaItem transformada
+    }));
+
+    return recetasConDatosAutorizados;
+}
+*/
+
+async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_nota_evolutiva) {
+        whereClause.id_nota_evolutiva = id_nota_evolutiva;
+    } else if (identificacion) {
+        const notaEvolutiva = await NotaEvolutiva.findOne({ where: { identificacion } });
+        if (!notaEvolutiva) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+        whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+    }
+
+    // Buscar recetas con todos los datos necesarios
+    const recetas = await Receta.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    { model: Medicamento, as: 'medicamento' },
+                    { model: Posologia, as: 'posologias' }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion',
+                include: [
+                    { 
+                        model: Paciente, 
+                        as: 'paciente',
+                        attributes: ['id_paciente', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo'],
+                        include: [
+                            {
+                                model: Residencia,
+                                as: 'residencia',
+                                attributes: ['direccion']
+                            }
+                        ]
+                    },
+                    { 
+                        model: Familiar, 
+                        as: 'familiar',
+                        attributes: ['id_familiar', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
+                    },
+                    { 
+                        model: PersonaExterna, 
+                        as: 'persona_externa',
+                        attributes: ['id_persona_externa', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!recetas || recetas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    // Ahora transformamos las recetas con los datos autorizados
+    const recetasConDatosAutorizados = await Promise.all(recetas.map(async (recetaItem) => {
+        const recetaAutorizacion = recetaItem.receta_autorizacion;
+
+        if (recetaAutorizacion) {
+            const datosAutorizado = await obtenerDatosAutorizado(
+                recetaAutorizacion.tipo,
+                recetaAutorizacion.id_paciente,
+                recetaAutorizacion.id_familiar,
+                recetaAutorizacion.id_persona_externa
+            );
+
+            // Obtenemos la dirección de la tabla residencia si existe solo para paciente
+            const direccionPaciente = recetaAutorizacion.paciente?.residencia?.direccion || '';
+
+            // Transformamos la estructura de receta_autorizacion
+            recetaItem.receta_autorizacion = {
+                id_receta_autorizacion: recetaAutorizacion.id_receta_autorizacion,
+                tipo: recetaAutorizacion.tipo,
+                nombre: datosAutorizado
+                    ? `${datosAutorizado.primer_nombre || ''} ${datosAutorizado.segundo_nombre || ''} ${datosAutorizado.primer_apellido || ''} ${datosAutorizado.segundo_apellido || ''}`.trim()
+                    : "",
+                celular: datosAutorizado?.celular || "",
+                telefono: datosAutorizado?.telefono || "",
+                correo: datosAutorizado?.correo || "",
+                // Solo asignamos la dirección si es un paciente
+                ...(recetaAutorizacion.paciente ? { direccion: direccionPaciente } : {})
+            };
+        }
+
+        return recetaItem; // Es importante devolver la recetaItem transformada
+    }));
+
+    return recetasConDatosAutorizados;
+}
+
 
 async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
     const receta = await Receta.findByPk(id_receta, {

@@ -126,13 +126,14 @@ Familiar.belongsTo(Paciente, {
 // Relación entre Paciente y Residencia
 Paciente.hasOne(Residencia, {
     foreignKey: "id_paciente",
+    as: 'residencia',
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
 
 Residencia.belongsTo(Paciente, {
     foreignKey: "id_paciente",
-    as: "paciente",
+    as: "residencia",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });

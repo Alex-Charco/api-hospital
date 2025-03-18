@@ -140,6 +140,141 @@ async function registrarReceta(req, res) {
 }
 
 // Obtener receta por ID de cita o identificación del paciente
+/*async function obtenerRecetas(req, res) {
+    try {
+        const { id_nota_evolutiva, identificacion } = req.query;
+
+        if (!id_nota_evolutiva && !identificacion) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        // Obtener la receta junto con medicacion, medicamento, posologia, receta_autorizada
+        const receta = await recetaService.obtenerRecetasDetalladas({ id_nota_evolutiva, identificacion });
+
+        if (!receta || receta.length === 0) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        return res.status(200).json({ 
+            message: successMessages.recetaEncontrada,
+            receta
+        });
+
+    } catch (error) {
+        console.error("❌ Error en obtenerReceta:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+*/
+
+// version 2 devuelve todos los datos de la persona autrizada
+/*async function obtenerRecetas(req, res) {
+    try {
+        const { id_nota_evolutiva, identificacion } = req.query;
+
+        if (!id_nota_evolutiva && !identificacion) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        // Obtener la receta junto con medicacion, medicamento, posologia, receta_autorizada
+        const receta = await recetaService.obtenerRecetasDetalladas({ id_nota_evolutiva, identificacion });
+
+        if (!receta || receta.length === 0) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        // Procesar los datos de la persona autorizada
+        const recetaConDatosAutorizados = receta.map(recetaItem => {
+            const recetaAutorizacion = recetaItem.receta_autorizacion;
+
+            if (recetaAutorizacion) {
+                let datosAutorizado = {};
+
+                if (recetaAutorizacion.tipo === 'PACIENTE' && recetaAutorizacion.paciente) {
+                    datosAutorizado = recetaAutorizacion.paciente;
+                } else if (recetaAutorizacion.tipo === 'FAMILIAR' && recetaAutorizacion.familiar) {
+                    datosAutorizado = recetaAutorizacion.familiar;
+                } else if (recetaAutorizacion.tipo === 'EXTERNO' && recetaAutorizacion.persona_externa) {
+                    datosAutorizado = recetaAutorizacion.persona_externa;
+                }
+
+                recetaAutorizacion.nombre = `${datosAutorizado.primer_nombre || ''} ${datosAutorizado.segundo_nombre || ''} ${datosAutorizado.primer_apellido || ''} ${datosAutorizado.segundo_apellido || ''}`.trim();
+                recetaAutorizacion.celular = datosAutorizado?.celular || '';
+                recetaAutorizacion.telefono = datosAutorizado?.telefono || '';
+                recetaAutorizacion.correo = datosAutorizado?.correo || '';
+                recetaAutorizacion.direccion = datosAutorizado?.direccion || '';
+            }
+
+            return recetaItem;
+        });
+
+        return res.status(200).json({
+            message: successMessages.recetaEncontrada,
+            receta: recetaConDatosAutorizados
+        });
+    } catch (error) {
+        console.error("❌ Error en obtenerReceta:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+*/
+
+// devuelve los datos de recetaAutorizacion y no detalles de la persona v3
+/*async function obtenerRecetas(req, res) {
+    try {
+        const { id_nota_evolutiva, identificacion } = req.query;
+
+        if (!id_nota_evolutiva && !identificacion) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        // Obtener las recetas con sus detalles
+        const recetas = await recetaService.obtenerRecetasDetalladas({ id_nota_evolutiva, identificacion });
+
+        if (!recetas || recetas.length === 0) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        // Procesar los datos de la persona autorizada
+        const recetasConDatosAutorizados = await Promise.all(recetas.map(async (recetaItem) => {
+            const recetaAutorizacion = recetaItem.receta_autorizacion;
+
+            if (recetaAutorizacion) {
+                const datosAutorizado = await recetaService.obtenerDatosAutorizado(
+                    recetaAutorizacion.tipo,
+                    recetaAutorizacion.id_paciente,
+                    recetaAutorizacion.id_familiar,
+                    recetaAutorizacion.id_persona_externa
+                );
+
+                // Transformamos la estructura de receta_autorizacion
+                recetaItem.receta_autorizacion = {
+                    id_receta_autorizacion: recetaAutorizacion.id_receta_autorizacion,
+                    tipo: recetaAutorizacion.tipo,
+                    nombre: datosAutorizado
+                        ? `${datosAutorizado.primer_nombre || ''} ${datosAutorizado.segundo_nombre || ''} ${datosAutorizado.primer_apellido || ''} ${datosAutorizado.segundo_apellido || ''}`.trim()
+                        : "",
+                    celular: datosAutorizado?.celular || "",
+                    telefono: datosAutorizado?.telefono || "",
+                    correo: datosAutorizado?.correo || "",
+                    direccion: datosAutorizado?.direccion || ""
+                };
+            }
+
+            return recetaItem;
+        }));
+
+        return res.status(200).json({
+            message: successMessages.recetaEncontrada,
+            receta: recetasConDatosAutorizados
+        });
+    } catch (error) {
+        console.error("❌ Error en obtenerRecetas:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+*/
+
 async function obtenerRecetas(req, res) {
     try {
         const { id_nota_evolutiva, identificacion } = req.query;
@@ -165,6 +300,7 @@ async function obtenerRecetas(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
+
 
 async function actualizarReceta(req, res) {
     try {
