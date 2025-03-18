@@ -63,10 +63,28 @@ async function actualizarDatosPaciente(paciente, nuevosDatos) {
     }
 }
 
+async function obtenerPacientePorId(id_paciente) {
+    try {
+        const paciente = await Paciente.findByPk(id_paciente, {
+            include: [{ model: Usuario, as: "usuario" }]
+        });
+
+        if (!paciente) {
+            throw new Error(errorMessages.pacienteNoEncontrado);
+        }
+
+        return paciente;
+    } catch (error) {
+        throw new Error(`${errorMessages.errorObtenerPaciente}: ${error.message}`);
+    }
+}
+
+
 module.exports = {
     validarUsuarioParaPaciente,
     validarIdentificacionPaciente,
     crearPaciente,
     obtenerPacientePorIdentificacion,
     actualizarDatosPaciente,
+	obtenerPacientePorId
 };

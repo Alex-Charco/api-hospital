@@ -94,7 +94,11 @@ const errorMessages = {
 	errorCrearNota: "Error al crear la nota evoluiva. ",
 	notaNoEncontrada: "Nota evoluiva no encontrada. ",
     filtroRequerido: "Se requiere el id_cita o la identificación. ",
-    idNotaRequerido:"Se requiere el id de la nota evolutiva"
+    idNotaRequerido:"Se requiere el id de la nota evolutiva",
+	errorObtenerNotaEvolutiva: "Error al obtener la nota evolutiva",
+	
+	// Mensajes de receta
+	recetaNoEncontrada: "no se encontro la receta"
 };
 
 module.exports = errorMessages;

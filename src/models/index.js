@@ -321,21 +321,20 @@ Medicacion.hasMany(Posologia, {
     as: "posologias",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
-});
+})
 
-// Relación inversa: Una Posología pertenece a una única Medicación
 Posologia.belongsTo(Medicacion, {
     foreignKey: "id_medicacion",
-    as: "medicacion",
+    as: "posologias",
 	onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
 
 // Relación: Una Receta puede tener múltiples Autorizaciones
-Receta.hasMany(RecetaAutorizacion, {
-    foreignKey: "id_receta",
-    as: "autorizaciones",
-    onDelete: "CASCADE",
+Receta.hasOne(RecetaAutorizacion, { 
+    as: 'receta_autorizacion', 
+    foreignKey: 'id_receta',
+	onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
 
@@ -436,5 +435,6 @@ module.exports = {
 	Medicacion,
 	Medicamento,
 	Posologia,
-    PersonaExterna
+    PersonaExterna,
+	RecetaAutorizacion
 };

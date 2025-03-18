@@ -16,7 +16,7 @@ const Posologia = sequelize.define("Posologia", {
         allowNull: false
     },
     dosis_tipo: {
-        type: DataTypes.ENUM("TABLETA", "CUCHARADA", "INYECCIÓN", "GOTERO", "MILILITRO"),
+        type: DataTypes.ENUM("AMPOLLA", "CAPSULA", "CUCHARADA", "GOTAS", "GOTERO", "GRAGEA", "INYECCIÓN", "MILILITRO", "PARCHES", "SOBRE", "SUPOSITORIO", "TABLETA", "UNIDAD"),
         allowNull: false
     },
     frecuencia_numero: {

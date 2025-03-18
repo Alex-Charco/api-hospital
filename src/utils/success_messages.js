@@ -14,6 +14,9 @@ const successMessages = {
 
     //Mensaje de nota
     notaEncontrada: "La nota evolutiva a sido encontrada. ",
+	
+	// Mensaje de receta
+	recetaEncontrada: "La receta a sido encontrada. "
 };
 
 module.exports = successMessages;

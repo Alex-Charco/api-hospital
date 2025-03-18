@@ -61,10 +61,25 @@ async function actualizarFamiliar(familiar, nuevosDatos) {
     }
 }
 
+async function obtenerFamiliarPorId(id_familiar) {
+    try {
+        const familiar = await Familiar.findByPk(id_familiar);
+
+        if (!familiar) {
+            throw new Error(errorMessages.familiarNoEncontrado);
+        }
+
+        return familiar;
+    } catch (error) {
+        throw new Error(`${errorMessages.errorObtenerFamiliar}: ${error.message}`);
+    }
+}
+
 module.exports = {
     validarFamiliarRegistrado,
     obtenerFamiliarCondicional,
     obtenerFamiliarPorIdentificacion,
     crearFamiliar,
-    actualizarFamiliar
+    actualizarFamiliar,
+	obtenerFamiliarPorId
 };
