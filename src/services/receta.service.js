@@ -378,7 +378,11 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                 tipo_autorizado: recetaAutorizacion.tipo_autorizado,
                 paciente: paciente ? {
                     id_paciente: paciente.id_paciente,
-                    nombre: `${paciente.primer_nombre || ''} ${paciente.segundo_nombre || ''} ${paciente.primer_apellido || ''} ${paciente.segundo_apellido || ''}`.trim(),
+                    nombre: paciente
+                    ? [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido]
+                        .filter(Boolean) // Elimina valores nulos o undefined
+                        .join(' ') // Une los nombres con un solo espacio
+                    : "",
                     celular: paciente.celular,
                     telefono: paciente.telefono,
                     correo: paciente.correo,
@@ -386,14 +390,22 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                 } : null,
                 familiar: familiar ? {
                     id_familiar: familiar.id_familiar,
-                    nombre: `${familiar.primer_nombre || ''} ${familiar.segundo_nombre || ''} ${familiar.primer_apellido || ''} ${familiar.segundo_apellido || ''}`.trim(),
+                    nombre: familiar
+                    ? [familiar.primer_nombre, familiar.segundo_nombre, familiar.primer_apellido, familiar.segundo_apellido]
+                        .filter(Boolean) // Elimina valores nulos o undefined
+                        .join(' ') // Une los nombres con un solo espacio
+                    : "",
                     celular: familiar.celular,
                     telefono: familiar.telefono,
                     correo: familiar.correo
                 } : null,
                 persona_externa: personaExterna ? {
                     id_persona_externa: personaExterna.id_persona_externa,
-                    nombre: `${personaExterna.primer_nombre || ''} ${personaExterna.segundo_nombre || ''} ${personaExterna.primer_apellido || ''} ${personaExterna.segundo_apellido || ''}`.trim(),
+                    nombre: personaExterna
+                    ? [personaExterna.primer_nombre, personaExterna.segundo_nombre, personaExterna.primer_apellido, personaExterna.segundo_apellido]
+                        .filter(Boolean) // Elimina valores nulos o undefined
+                        .join(' ') // Une los nombres con un solo espacio
+                    : "",
                     celular: personaExterna.celular,
                     telefono: personaExterna.telefono,
                     correo: personaExterna.correo
