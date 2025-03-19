@@ -1,4 +1,4 @@
-const { Receta, Medicacion, Medicamento, Posologia, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia } = require('../models');
+const { Receta, Medicacion, Medicamento, Posologia, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia, Cita } = require('../models');
 const medicacionService = require("./medicacion.service");
 const medicamentoService = require("./medicamento.service");
 const posologiaService = require("./posologia.service");
@@ -276,6 +276,135 @@ async function obtenerNotaEvolutivaPorId(id_nota_evolutiva) {
     }
 }
 
+async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+    let whereClause = {};
+
+    if (id_nota_evolutiva) {
+        whereClause.id_nota_evolutiva = id_nota_evolutiva;
+    } else if (identificacion) {
+        // Buscar al paciente por su identificación
+        const paciente = await Paciente.findOne({ where: { identificacion } });
+        if (!paciente) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+
+        // Buscar la cita asociada al paciente
+        const cita = await Cita.findOne({ where: { id_paciente: paciente.id_paciente } });
+        if (!cita) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+
+        // Buscar la nota evolutiva con el id_cita obtenido
+        const notaEvolutiva = await NotaEvolutiva.findOne({ where: { id_cita: cita.id_cita } });
+        if (!notaEvolutiva) {
+            throw new Error(errorMessages.notaNoEncontrada);
+        }
+
+        whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+    }
+
+    // Buscar recetas con todos los datos necesarios
+    const recetas = await Receta.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    { model: Medicamento, as: 'medicamento' },
+                    { model: Posologia, as: 'posologias' }
+                ]
+            },
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion',
+                include: [
+                    { 
+                        model: Paciente, 
+                        as: 'paciente',
+                        attributes: ['id_paciente', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo'],
+                        include: [
+                            {
+                                model: Residencia,
+                                as: 'residencia',
+                                attributes: ['direccion']
+                            }
+                        ]
+                    },
+                    { 
+                        model: Familiar, 
+                        as: 'familiar',
+                        attributes: ['id_familiar', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
+                    },
+                    { 
+                        model: PersonaExterna, 
+                        as: 'persona_externa',
+                        attributes: ['id_persona_externa', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!recetas || recetas.length === 0) {
+        throw new Error(errorMessages.notaNoEncontrada);
+    }
+
+    return recetas.map(receta => {
+        const recetaAutorizacion = receta.receta_autorizacion || {};
+        const paciente = recetaAutorizacion.paciente;
+        const familiar = recetaAutorizacion.familiar;
+        const personaExterna = recetaAutorizacion.persona_externa;
+
+        return {
+            id_receta: receta.id_receta,
+            id_nota_evolutiva: receta.id_nota_evolutiva,
+            fecha_prescripcion: receta.fecha_prescripcion,
+            fecha_vigencia: receta.fecha_vigencia,
+            medicaciones: receta.medicaciones.map(medicacion => ({
+                id_medicacion: medicacion.id_medicacion,
+                id_receta: medicacion.id_receta,
+                id_medicamento: medicacion.id_medicamento,
+                externo: medicacion.externo,
+                indicacion: medicacion.indicacion,
+                signo_alarma: medicacion.signo_alarma,
+                indicacion_no_farmacologica: medicacion.indicacion_no_farmacologica,
+                recomendacion_no_farmacologica: medicacion.recomendacion_no_farmacologica,
+                medicamento: medicacion.medicamento,
+                posologias: medicacion.posologias
+            })),
+            receta_autorizacion: {
+                id_receta_autorizacion: recetaAutorizacion.id_receta_autorizacion,
+                tipo_autorizado: recetaAutorizacion.tipo_autorizado,
+                paciente: paciente ? {
+                    id_paciente: paciente.id_paciente,
+                    nombre: `${paciente.primer_nombre || ''} ${paciente.segundo_nombre || ''} ${paciente.primer_apellido || ''} ${paciente.segundo_apellido || ''}`.trim(),
+                    celular: paciente.celular,
+                    telefono: paciente.telefono,
+                    correo: paciente.correo,
+                    residencia: paciente.residencia ? paciente.residencia.direccion : null
+                } : null,
+                familiar: familiar ? {
+                    id_familiar: familiar.id_familiar,
+                    nombre: `${familiar.primer_nombre || ''} ${familiar.segundo_nombre || ''} ${familiar.primer_apellido || ''} ${familiar.segundo_apellido || ''}`.trim(),
+                    celular: familiar.celular,
+                    telefono: familiar.telefono,
+                    correo: familiar.correo
+                } : null,
+                persona_externa: personaExterna ? {
+                    id_persona_externa: personaExterna.id_persona_externa,
+                    nombre: `${personaExterna.primer_nombre || ''} ${personaExterna.segundo_nombre || ''} ${personaExterna.primer_apellido || ''} ${personaExterna.segundo_apellido || ''}`.trim(),
+                    celular: personaExterna.celular,
+                    telefono: personaExterna.telefono,
+                    correo: personaExterna.correo
+                } : null
+            }
+        };
+    });
+}
+
+
+
 /*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
     let whereClause = {};
 
@@ -339,10 +468,10 @@ async function obtenerNotaEvolutivaPorId(id_nota_evolutiva) {
     return recetas;
 }*/
 
-async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+/*async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
     let whereClause = {};
 
-    if (id_nota_evolutiva) {
+    /*if (id_nota_evolutiva) {
         whereClause.id_nota_evolutiva = id_nota_evolutiva;
     } else if (identificacion) {
         const notaEvolutiva = await NotaEvolutiva.findOne({ where: { identificacion } });
@@ -350,7 +479,24 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
             throw new Error(errorMessages.notaNoEncontrada);
         }
         whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
-    }
+    }*/
+        /*if (id_nota_evolutiva) {
+            whereClause.id_nota_evolutiva = id_nota_evolutiva;
+        } else if (identificacion) {
+            // Buscar al paciente por su identificación
+            const paciente = await Paciente.findOne({ where: { identificacion } });
+            if (!paciente) {
+                throw new Error(errorMessages.notaNoEncontrada);
+            }
+    
+            // Buscar la nota evolutiva con el id_paciente obtenido
+            const notaEvolutiva = await NotaEvolutiva.findOne({ where: { id_paciente: paciente.id_paciente } });
+            if (!notaEvolutiva) {
+                throw new Error(errorMessages.notaNoEncontrada);
+            }
+    
+            whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
+        }
 
     // Buscar recetas con todos los datos necesarios
     const recetas = await Receta.findAll({
@@ -451,7 +597,7 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
             }
         };
     });
-}
+}*/
 
 async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
     const receta = await Receta.findByPk(id_receta, {

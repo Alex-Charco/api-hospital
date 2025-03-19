@@ -1528,7 +1528,7 @@ El endpoint permite consultar todas las notas evolutivas del paciente con la ide
 
 📝 **Descripción**
 
-El endpoint permite registrar médicos y se envia nombre_usuario en el body.
+El endpoint permite registrar nota_evolutiva.
 
 🔐 **Requisitos**
 
@@ -1599,8 +1599,7 @@ El endpoint permite registrar médicos y se envia nombre_usuario en el body.
 
 #### 📍 Endpoint
 
-    PUT /api/nota-evolutiva/registrar
-
+    PUT /api/nota-evolutiva/put
 🌐 URL Base (Local) para médico
 
     http://localhost:5000/api/nota-evolutiva/put/:id_nota_evolutiva
@@ -1617,7 +1616,7 @@ El endpoint permite actualizar las notas evolutivas con el **id de la nota evolu
 
 🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
 
-🛠 **Autorización:** Permitido para administrador.
+🛠 **Autorización:** Permitido para médicos.
 
 📤 Headers Requeridos
 
@@ -1635,6 +1634,211 @@ El endpoint permite actualizar las notas evolutivas con el **id de la nota evolu
     }
 
 ✅ Respuesta: Actualizar las notas evolutivas.
+
+---
+
+### 🔹 GET, POST, PUT
+
+En todos los enpoints dela receta incluyen: medicacion, medicamento, posologia, receta_autorizacion.
+
+### 🔹 GET - Consultar Receta
+
+#### 📍 Endpoint para médico
+
+    GET /api/receta/get
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/receta/get
+
+📝 **Descripción**
+
+El endpoint permite consultar todas las recetas del paciente con la identificación o id de la cita.
+
+**1️⃣ Obtener nota evolutiva con el id_cita:**
+
+    http://localhost:5000/api/receta/get?id_nota_evolutiva={ingresar-id_nota_evolutiva}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/receta/get?id_nota_evolutiva=1
+
+**2️⃣  Filtrar por identificacion:**
+
+🌐 URL Base
+
+	http://localhost:5000/api/receta/get?identificacion={ingresar-identificacion}
+
+📌 URL Ejemplo:
+    
+    http://localhost:5000/api/receta/get?identificacion=1000456666
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médico autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+✅ Respuesta: Muestra todas las recetas.
+
+### 🔹 POST - Registrar Receta
+
+#### 📍 Endpoint 
+
+    POST /api/receta/registrar
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/receta/registrar
+
+📝 **Descripción**
+
+El endpoint permite registrar recetas.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médicos autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+		"id_nota_evolutiva": 13,
+		"fecha_prescripcion": "2025-03-18",
+		"medicaciones": [
+			{
+				"externo": false,
+				"indicacion": "Tomar una tableta cada 6 horas",
+				"signo_alarma": "Dolor abdominal persistente",
+				"indicacion_no_farmacologica": "Evitar alimentos grasos",
+				"recomendacion_no_farmacologica": "Mantener una dieta balanceada",
+				"medicamento": {
+					"cum": "12366",
+					"nombre_medicamento": "Omezol",
+					"forma_farmaceutica": "Tableta",
+					"via_administracion": "Oral",
+					"concentracion": "40mg",
+					"presentacion": "Caja",
+					"tipo": "AGUDO",
+					"cantidad": 30
+				},
+				"posologias": [
+					{
+						"dosis_numero": 1,
+						"dosis_tipo": "CAPSULA",
+						"frecuencia_numero": 1,
+						"frecuencia_tipo": "DÍAS",
+						"duracion_numero": 30,
+						"duracion_tipo": "DÍAS",
+						"fecha_inicio": "2025-03-18",
+						"hora_inicio": "07:00:00",
+						"via": "ORAL"
+					}
+				]
+			}
+		],
+		"receta_autorizacion": {
+			"id_paciente": null,
+			"id_familiar": null,
+			"id_persona_externa": 1,
+			"tipo_autorizado": "EXTERNO"
+		}
+	}
+
+
+✅ Respuesta: Registra las recetas y devuelve exactamente todos los datos guardados.
+
+### 🔹 PUT - Actualizar Receta
+
+#### 📍 Endpoint
+
+    PUT /api/receta/put
+
+🌐 URL Base (Local) para médico
+
+    http://localhost:5000/api/receta/put/:id_receta
+	
+📌 URL Ejemplo:
+	
+	http://localhost:5000/api/receta/put/1
+
+📝 **Descripción**
+
+El endpoint permite actualizar las recetas con el **id de la receta.**
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médicos.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+	PUT /api/receta/put/id_receta
+	{
+		"id_nota_evolutiva": 1,
+		"fecha_prescripcion": "2025-03-19",
+		"medicaciones": [
+			{
+				"externo": false,
+				"indicacion": "Tomar una tableta cada 6 horas",
+				"signo_alarma": "Dolor abdominal severo",
+				"indicacion_no_farmacologica": "Evitar alimentos ácidos",
+				"recomendacion_no_farmacologica": "Tomar suficiente agua",
+				"medicamento": {
+					"cum": "12345",
+					"nombre_medicamento": "Omeprazol",
+					"forma_farmaceutica": "Tableta",
+					"via_administracion": "Oral",
+					"concentracion": "20mg",
+					"presentacion": "Caja",
+					"tipo": "AGUDO",
+					"cantidad": 30
+				},
+				"posologias": [
+					{
+						"dosis_numero": 1,
+						"dosis_tipo": "TABLETA",
+						"frecuencia_numero": 1,
+						"frecuencia_tipo": "HORAS",
+						"duracion_numero": 10,
+						"duracion_tipo": "DÍAS",
+						"fecha_inicio": "2025-03-19",
+						"hora_inicio": "10:00:00",
+						"via": "ORAL"
+					}
+				]
+			}
+		],
+		"receta_autorizacion": {
+			"id_familiar": null,
+			"id_persona_externa": null,
+			"tipo_autorizado": "PACIENTE"
+		}
+	}	
+
+✅ Respuesta: Actualizar las recetas.
 
 ---
 
