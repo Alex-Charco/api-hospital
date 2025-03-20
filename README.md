@@ -38,6 +38,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **🏥 Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
 | **📜 Nota evolutiva**           | Registrar, consultar, actualizar nota evolutiva           | ✔️ Completado  |
 | **💊 Receta**           | Registrar, consultar, actualizar la receta           | ✔️ Completado  |
+| **👤 Persona externa**           | Registrar, consultar, actualizar persona externa           | ✔️ Completado  |
 
 ### 📌 API Endpoints
 
@@ -92,6 +93,10 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/receta/get` | Consultar receta      | ✅ |
 | POST    | `/api/receta/registrar`     | Registrar receta      | ✅ |
 | PUT     | `/api/receta/put/:id_receta` | Actualiza receta       | ✅ |
+**Persona externa**                                                        |
+| GET     | `/api/persona-externa/get` | Consultar persona externa      | ✅ |
+| POST    | `/api/persona-externa/registrar`     | Registrar persona externa      | ✅ |
+| PUT     | `/api/persona-externa/put/:id_persona_externa` | Actualiza persona externa        | ✅ |
 
 ---
 
@@ -210,7 +215,9 @@ Se crea el archivo **"actualizarContraseñas.js"** el script para actualizar los
     
 Resultado: todo las contraseñas estan cifradas.
 
-## 🚀 3. Endpoints  
+## 🚀 3. Endpoints
+
+Definición: Admnistrador(personal administrativo)
 
 ### 🔹 GET - Consultar Usuario  
 
@@ -1809,7 +1816,6 @@ El endpoint permite actualizar las recetas con el **id de la receta.**
 
 📥 Body (JSON) - Ejemplo de Solicitud
 
-	PUT /api/receta/put/id_receta
 	{
 		"id_nota_evolutiva": 1,
 		"fecha_prescripcion": "2025-03-19",
@@ -1855,6 +1861,171 @@ El endpoint permite actualizar las recetas con el **id de la receta.**
 ✅ Respuesta: Actualizar las recetas.
 
 ---
+
+### 🔹 GET - Consultar Persona externa
+
+#### 📍 Endpoint para médico y admnistrador(personal administrativo)
+
+    GET /api/persona-externa/get
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/persona-externa/get
+
+📝 **Descripción**
+
+El endpoint permite consultar todas las personas externas.
+
+- Si no encuentra ninguna persona externa, devuelve un 404.
+.
+
+**1️⃣ Obtener persona-externa por id_persona_externa:**
+
+Primero busca por id_persona_externa si está presente.
+
+    http://localhost:5000/api/persona-externa/get?id_persona_externa={ingresar-id_persona_externa}
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/persona-externa/get?id_persona_externa=1
+
+**2️⃣  Filtrar por identificacion:**
+
+Si no se proporciona un id_persona_externa, busca por identificacion.
+
+🌐 URL Base
+
+	http://localhost:5000/api/persona-externa/get?identificacion={ingresar-identificacion}
+
+📌 URL Ejemplo:
+    
+    http://localhost:5000/api/persona-externa/get?identificacion=1234567890
+	
+**2️⃣  Filtrar por identificacion:**
+
+Permite filtrar ingresando tanto id_persona_externa + identificacion.
+
+🌐 URL Base
+
+	http://localhost:5000/api/persona-externa/get?id_persona_externa={ingresar-id_persona_externa}&identificacion={ingresar-identificacion}
+
+	http://localhost:5000/api/persona-externa/get?identificacion={ingresar-identificacion}&id_persona_externa={ingresar-id_persona_externa}
+
+📌 URL Ejemplo:
+    
+	http://localhost:5000/api/persona-externa/get?id_persona_externa=1&identificacion=1234567890
+	
+    http://localhost:5000/api/persona-externa/get?identificacion=1234567890&id_persona_externa=1
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médico y administrador autenticado.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>"
+    }
+
+✅ Respuesta: Muestra todas la persona externa.
+
+### 🔹 POST - Registrar Persona externa
+
+#### 📍 Endpoint 
+
+    POST /api/persona-externa/registrar
+
+🌐 URL Base (Local) para medico
+
+    http://localhost:5000/api/persona-externa/registrar
+
+📝 **Descripción**
+
+El endpoint permite registrar las personas externas.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médicos y administradores autenticados.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+    {
+		"identificacion": "1234567111",
+		"fecha_nacimiento": "2009-05-10",
+		"primer_nombre": "Juanito",
+		"segundo_nombre": "Manuel",
+		"primer_apellido": "Pesantez",
+		"segundo_apellido": "Gonzales",
+		"genero": "MASCULINO",
+		"celular": "3001234000",
+		"telefono": "0233234567",
+		"correo": "juanito.pesantez@example.com",
+		"estatus": 1,
+		"direccion": "Calle 123 #45-33, Bogotá"
+	}
+
+✅ Respuesta: Registra las personas externas y devuelve exactamente todos los datos guardados.
+
+### 🔹 PUT - Actualizar Persona externa
+
+#### 📍 Endpoint
+
+    PUT /api/persona-externa/put
+
+🌐 URL Base (Local) para médico y administrador
+
+    http://localhost:5000/api/persona-externa/put/:id_persona_externa
+	
+📌 URL Ejemplo:
+	
+	http://localhost:5000/api/persona-externa/put/1
+
+📝 **Descripción**
+
+El endpoint permite actualizar las personas externas con el **id de la persona externa.**
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Permitido para médicos y administradores.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📥 Body (JSON) - Ejemplo de Solicitud
+
+	{
+		"identificacion": "1234567110",
+		"fecha_nacimiento": "2009-05-12",
+		"primer_nombre": "Juanito",
+		"segundo_nombre": "",
+		"primer_apellido": "Pesantez",
+		"segundo_apellido": "",
+		"genero": "MASCULINO",
+		"celular": "3001234000",
+		"telefono": "0233234567",
+		"correo": "juanito.pesantez@example.com",
+		"estatus": 1,
+		"direccion": "Calle 123 #45-33, Bogotá"
+	}
+
+✅ Respuesta: Actualizar las personas externas.
 
 ## Principales Tecnologías utilizadas
 * JAVASCRIPT
