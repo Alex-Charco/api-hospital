@@ -32,12 +32,12 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
-| **🛡️ Horario**           | Registrar, consultar, horario           | ✔️ Completado |
-| **🛡️ Cita**           | Registrar, consultar, cita          | ✔️ Completado |
-| **📅 Turno**           | Consultar turno        | ✔️ Completado |
-| **⚕️ Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
-| **⚕️ Nota evolutiva**           | Registrar, consultar, actualizar nota evolutiva           | ✔️ Completado  |
-| **⚕️ Receta**           | Registrar, consultar, actualizar la receta           | ✔️ Completado  |
+| **⏰ Horario**           | Registrar, consultar, horario           | ✔️ Completado |
+| **📅 Cita**           | Registrar, consultar, cita          | ✔️ Completado |
+| **🔄 Turno**           | Consultar turno        | ✔️ Completado |
+| **🏥 Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
+| **📜 Nota evolutiva**           | Registrar, consultar, actualizar nota evolutiva           | ✔️ Completado  |
+| **💊 Receta**           | Registrar, consultar, actualizar la receta           | ✔️ Completado  |
 
 ### 📌 API Endpoints
 
