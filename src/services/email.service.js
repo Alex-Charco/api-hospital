@@ -15,7 +15,6 @@ function crearTransporter() {
     });
 }
 
-// Crear el contenido del correo
 // Crear el contenido del correo para paciente y médico
 function crearMensaje(cita) {
     // Mensaje común que se usará para ambos
