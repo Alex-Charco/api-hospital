@@ -155,6 +155,7 @@ Seguro.belongsTo(Paciente, {
 // Relación entre médico y horario
 Medico.hasMany(Horario, {
     foreignKey: 'id_medico',
+    as: 'horarios',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
