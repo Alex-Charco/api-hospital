@@ -13,14 +13,14 @@ async function getCitas(req, res) {
         // 🔹 Buscar paciente si se envía su identificación
         if (identificacionPaciente) {
             const paciente = await Paciente.findOne({ where: { identificacion: req.params.identificacionPaciente } });
-            if (!paciente) return res.status(404).json({ message: "Paciente no encontrado" });
+            if (!paciente) return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
             whereConditions.id_paciente = paciente.id_paciente;
         }
 
         // 🔹 Buscar médico si se envía su identificación
         if (identificacionMedico) {
             const medico = await Medico.findOne({ where: { identificacion: identificacionMedico } });
-            if (!medico) return res.status(404).json({ message: "Médico no encontrado" });
+            if (!medico) return res.status(404).json({ message: errorMessages.medicoNoEncontrado });
             whereConditions['$turno.horario.medico.id_medico$'] = medico.id_medico;
         }
 
@@ -36,7 +36,7 @@ async function getCitas(req, res) {
             citas = await citaService.obtenerCitasDelDiaActual(whereConditions);
         }
 
-        if (!citas || citas.length === 0) return res.status(404).json({ message: "No se encontraron citas" });
+        if (!citas || citas.length === 0) return res.status(404).json({ message: errorMessages.citasNoEncontradas });
 
         res.json(
             citas.map(cita => ({
@@ -82,7 +82,7 @@ async function getCitas(req, res) {
             }))
         );
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener citas: " + error.message });
+        res.status(500).json({ message: errorMessages.errorObtenerCitas + error.message });
     }
 }
 

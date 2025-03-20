@@ -9,7 +9,7 @@ async function registrarNotaEvolutiva(req, res) {
     const { id_cita, motivo_consulta, diagnosticos, procedimientos, links, ...datosNotaEvolutiva } = req.body;
 
     if (!id_cita || !motivo_consulta) {
-        return res.status(400).json({ message: "Faltan datos obligatorios" });
+        return res.status(400).json({ message: errorMessages.faltanDatos });
     }
 
     const transaction = await sequelize.transaction();
@@ -26,12 +26,12 @@ async function registrarNotaEvolutiva(req, res) {
         }, transaction);
 
         await transaction.commit();
-        return res.status(201).json({ message: "Registro exitoso", ...resultado });
+        return res.status(201).json({ message: successMessages.registroExitoso, ...resultado });
 
     } catch (error) {
         await transaction.rollback();
         console.error("❌ Error en registrarNotaEvolutiva:", error.message);
-        return res.status(500).json({ message: error.message || "Error interno del servidor" });
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
 

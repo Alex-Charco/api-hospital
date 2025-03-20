@@ -84,6 +84,7 @@ const errorMessages = {
     errorTurnoNoDisponible: 'Error el turno no está disponible.',
     errorCitaAgendada: 'Error el paciente ya tiene una cita agendada para este día.', 
     huboErrorCrearCita: "Hubo un error al crear la cita.",
+    campoObligatorio: "El campo tipo_autorizado es obligatorio en receta_autorizacion. ",
 
     // Mensajes para médico
     usuarioRegistradoMedico: "Este usuario ya está registrado como médicoo.",
@@ -98,7 +99,9 @@ const errorMessages = {
 	errorObtenerNotaEvolutiva: "Error al obtener la nota evolutiva",
 	
 	// Mensajes de receta
-	recetaNoEncontrada: "no se encontro la receta"
+	recetaNoEncontrada: "no se encontro la receta",
+    nombreaMedicamentoObligatorio:  "El nombre del medicamento es obligatorio.",
+    errorCrearReceta: "Error al crear la receta: ",
 };
 
 module.exports = errorMessages;

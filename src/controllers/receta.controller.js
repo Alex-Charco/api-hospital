@@ -8,7 +8,7 @@ async function registrarReceta(req, res) {
         const { id_nota_evolutiva, fecha_prescripcion, medicaciones, receta_autorizacion, ...datosReceta } = req.body;
 
         if (!id_nota_evolutiva || !fecha_prescripcion) {
-            return res.status(400).json({ message: "Faltan datos obligatorios" });
+            return res.status(400).json({ message: errorMessages.faltanDatos });
         }
 
         const transaction = await sequelize.transaction();
@@ -36,12 +36,12 @@ async function registrarReceta(req, res) {
         } catch (error) {
             await transaction.rollback();
             console.error("❌ Error en registrarReceta:", error);
-            return res.status(500).json({ message: error.message || "Error interno del servidor" });
+            return res.status(500).json({ message: error.message || errorMessages.errorServidor });
         }
 
     } catch (error) {
         console.error("❌ Error general en registrarReceta:", error);
-        return res.status(500).json({ message: "Error interno del servidor" });
+        return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
 
