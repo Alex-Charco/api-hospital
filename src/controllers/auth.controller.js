@@ -1,5 +1,5 @@
 const { Usuario } = require('../models');
-const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsignaciones, cifrarPassword } = require('../services/user.service');
+const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsignaciones, cifrarPassword, obtenerDatosUsuario } = require('../services/user.service');
 const { validarPassword } = require('../services/validation.service');
 const errorMessages = require('../utils/error_messages');
 const { generarToken } = require('../services/auth.service');
@@ -74,7 +74,7 @@ async function registrarUsuario(req, res) {
 }
 
 // Función de login para iniciar sesión
-async function login(req, res) {
+/*async function login(req, res) {
     try {
         const { nombre_usuario, password } = req.body;
         const usuario = await buscarUsuario(nombre_usuario, true);
@@ -116,6 +116,64 @@ async function login(req, res) {
                     permiso: permisos,
                     estatus: usuario.rol.estatus
                 }
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: errorMessages.errorServidor });
+    }
+}
+*/
+
+async function login(req, res) {
+    try {
+        const { nombre_usuario, password } = req.body;
+        const usuario = await buscarUsuario(nombre_usuario, true);
+
+        if (!usuario?.password || !(await verificarPassword(password, usuario.password))) {
+            return res.status(401).json({ message: errorMessages.credencialesInvalidas });
+        }        
+
+        // Verificar si el usuario está activo
+        if (usuario.estatus !== 1) return res.status(403).json({ message: errorMessages.usuarioInactivo });
+
+        // Verificar si el usuario tiene un rol asociado
+        if (!usuario.rol) return res.status(500).json({ message: errorMessages.rolNoAsignado });
+
+        // Buscar datos adicionales según el tipo de usuario (Paciente, Médico, Administrador)
+        const datosUsuario = await obtenerDatosUsuario(usuario.id_usuario);
+
+        const permisos = usuario.rol.permiso;
+
+        const payload = {
+            id_usuario: usuario.id_usuario,
+            nombre_usuario: usuario.nombre_usuario,
+            rol: {
+                id_rol: usuario.rol.id_rol,
+                nombre_rol: usuario.rol.nombre_rol,
+                permiso: permisos
+            }
+        };
+
+        return res.json({
+            message: successMessages.inicioSesionExitoso,
+            token: generarToken(payload),
+            user: {
+                id_usuario: usuario.id_usuario,
+                nombre_usuario: usuario.nombre_usuario,
+                fecha_creacion: formatFechaCompleta(usuario.fecha_creacion),
+                rol: {
+                    id_rol: usuario.rol.id_rol,
+                    nombre_rol: usuario.rol.nombre_rol,
+                    permiso: permisos,
+                    estatus: usuario.rol.estatus
+                },
+                // Agregar los datos de nombres y apellidos si existen
+                primer_nombre: datosUsuario?.primer_nombre || null,
+                segundo_nombre: datosUsuario?.segundo_nombre || null,
+                primer_apellido: datosUsuario?.primer_apellido || null,
+                segundo_apellido: datosUsuario?.segundo_apellido || null
             }
         });
 

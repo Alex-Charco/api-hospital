@@ -53,6 +53,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | DELETE  | `/api/auth/delete/:nombre_usuario` | Eliminar usuario         | ✅ |
 |                           **Paciente**                                |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
+| GET     | `/api/paciente/get/id_usuario/:id_usuario` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
 | PUT     | `/api/paciente/put/:identificacion` | Actualizar paciente       | ✅ |
 |                           **Info militar**                                                         |

@@ -51,7 +51,7 @@ async function registrarPaciente(req, res) {
 }
 
 // Función para obtener un paciente por identificación
-async function getPaciente(req, res) {
+/*async function getPaciente(req, res) {
     try {
         // Buscar al paciente por identificación
         const paciente = await pacienteService.obtenerPacientePorIdentificacion(req.params.identificacion);
@@ -67,6 +67,39 @@ async function getPaciente(req, res) {
         };
 
         // Devolver los datos del paciente
+        return res.status(200).json({
+            message: successMessages.pacienteEncontrado,
+            paciente: pacienteFormateado,
+        });
+    } catch (error) {
+        console.warn(`Error al obtener el paciente: ${error.message}`);
+        return res.status(500).json({ message: errorMessages.errorServidor });
+    }
+}
+*/
+
+// Función para obtener un paciente por identificación o id_usuario
+async function getPaciente(req, res) {
+    try {
+        const { identificacion, id_usuario } = req.params;
+        let paciente;
+
+        if (identificacion) {
+            paciente = await pacienteService.obtenerPacientePorIdentificacion(identificacion);
+        } else if (id_usuario) {
+            paciente = await pacienteService.obtenerPacientePorIdUsuario(id_usuario);
+        }
+
+        if (!paciente) {
+            return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
+        }
+
+        // Formatear la fecha de nacimiento antes de devolverla
+        const pacienteFormateado = {
+            ...paciente.toJSON(),
+            fecha_nacimiento: formatFecha(paciente.fecha_nacimiento)
+        };
+
         return res.status(200).json({
             message: successMessages.pacienteEncontrado,
             paciente: pacienteFormateado,

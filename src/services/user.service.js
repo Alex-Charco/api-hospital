@@ -35,10 +35,39 @@ async function cifrarPassword(password) {
     return await bcrypt.hash(password, 10);
 }
 
+async function obtenerDatosUsuario(id_usuario) {
+    try {
+        let datosUsuario = await Paciente.findOne({ 
+            where: { id_usuario }, 
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
+        });
+
+        if (!datosUsuario) {
+            datosUsuario = await Medico.findOne({ 
+                where: { id_usuario }, 
+                attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
+            });
+        }
+
+        if (!datosUsuario) {
+            datosUsuario = await Administrador.findOne({ 
+                where: { id_usuario }, 
+                attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
+            });
+        }
+
+        return datosUsuario ? datosUsuario.toJSON() : null;
+    } catch (error) {
+        console.error(`Error al obtener datos del usuario: ${error.message}`);
+        return null;
+    }
+}
+
 module.exports = {
     buscarUsuario,
     verificarUsuarioExistente,
     verificarPassword,
     verificarAsignaciones,
-    cifrarPassword
+    cifrarPassword,
+	obtenerDatosUsuario
 };

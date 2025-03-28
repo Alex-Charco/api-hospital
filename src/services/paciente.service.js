@@ -79,6 +79,16 @@ async function obtenerPacientePorId(id_paciente) {
     }
 }
 
+async function obtenerPacientePorIdUsuario(id_usuario) {
+    try {
+        return await Paciente.findOne({
+            where: { id_usuario },
+            include: [{ model: Usuario, as: "usuario" }]
+        });
+    } catch (error) {
+        throw new Error(`${errorMessages.errorObtenerPaciente}: ${error.message}`);
+    }
+}
 
 module.exports = {
     validarUsuarioParaPaciente,
@@ -86,5 +96,6 @@ module.exports = {
     crearPaciente,
     obtenerPacientePorIdentificacion,
     actualizarDatosPaciente,
-	obtenerPacientePorId
+	obtenerPacientePorId,
+	obtenerPacientePorIdUsuario
 };
