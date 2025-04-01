@@ -4,7 +4,7 @@ const Usuario = require('../models/usuario.model');
 const Medico = require('../models/medico.model');
 const Administrador = require('../models/administrador.model');
 const Paciente = require('../models/paciente.model');
-const { JWT_SECRET, SMTP_CONFIG } = require('../utils/config');
+const { JWT_SECRET } = require('../utils/config');
 const bcrypt = require('bcryptjs');
 
 async function hashPassword(password) {
@@ -66,6 +66,7 @@ module.exports = {
 
       user.password = await hashPassword(newPassword);
       await user.save();
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       throw new Error('El token es inválido o ha expirado.');
     }
