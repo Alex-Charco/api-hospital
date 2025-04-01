@@ -34,7 +34,15 @@ module.exports = {
     const token = jwt.sign({ id_usuario: user.id_usuario }, JWT_SECRET, { expiresIn: '1h' });
 
     // Enviar correo con el enlace de restablecimiento
-    const transporter = nodemailer.createTransport(SMTP_CONFIG);
+    const transporter = nodemailer.createTransport({
+	  host: "smtp.tu-servidor.com", // Cambia esto por tu servidor SMTP
+	  port: 465, // Usa 465 para SSL o 587 con STARTTLS
+	  secure: true, // true para SSL/TLS
+	  auth: {
+		user: process.env.SMTP_USER, // Usa variables de entorno
+		pass: process.env.SMTP_PASS,
+	  },
+	});
     const resetUrl = `http://localhost:3000/auth/reset-password/reset?token=${token}`;
 
     const mailOptions = {
