@@ -6,12 +6,12 @@ const successMessages = require('../utils/success_messages');
 
 // Crear nuevo registro de familiar (solo administradores)
 async function registrarFamiliar(req, res) {
-    const { identificacion } = req.params;
+    const { identificacionPaciente } = req.params;
     const { relacion, direccion, nombre, apellido, telefono, ...otrosDatos } = req.body;
 
     try {
         // Validar que el paciente existe
-        const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
+        const paciente = await infoMilitarService.validarPacienteExistente(identificacionPaciente);
         
         // Validar que no haya un familiar ya registrado (si corresponde)
         await familiarService.validarFamiliarRegistrado(paciente.id_paciente, relacion);

@@ -721,7 +721,7 @@ Este endpoint permite actualizar la información militar de un paciente a travé
 
 📝 **Descripción**
 
-Este endpoint permite consultar la información del familiar de un paciente utilizando su número de identificación.
+Este endpoint permite consultar la información del familiar de un paciente, utilizando el número de identificación del paciente.
 
 🔐 **Requisitos**
 
