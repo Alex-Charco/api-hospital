@@ -75,22 +75,21 @@ async function getByFamiliar(req, res) {
     }
 }
 
-// Actualizar información de un familiar (solo administradores)
+// ✅ Actualizar información del familiar (solo administradores)
 async function actualizarFamiliar(req, res) {
-    const { identificacionPaciente, identificacionFamiliar } = req.params;
+    const { identificacionPaciente } = req.params;
     const nuevosDatos = req.body;
 
     try {
-        // Buscar paciente por identificación
+        // Validar si el paciente existe
         const paciente = await infoMilitarService.validarPacienteExistente(identificacionPaciente);
-        
-        // Verificar si el paciente no fue encontrado
+
         if (!paciente) {
             return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
-        
-        // Buscar familiar por identificación y por el id_paciente
-        const familiar = await familiarService.obtenerFamiliarPorIdentificacion(identificacionFamiliar, paciente.id_paciente);
+
+        // Buscar el familiar asociado al paciente
+        const familiar = await familiarService.obtenerFamiliarCondicional({ id_paciente: paciente.id_paciente });
 
         // Actualizar la información del familiar
         const familiarActualizado = await familiarService.actualizarFamiliar(familiar, nuevosDatos);
@@ -109,5 +108,6 @@ async function actualizarFamiliar(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
+
 
 module.exports = { registrarFamiliar, getByFamiliar, actualizarFamiliar };

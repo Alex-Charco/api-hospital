@@ -63,7 +63,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 |                         **Familiar**                                                       |
 | GET     | `/api/familiar/get/:identificacion` | Consultar familiar       | ✅ |
 | POST    | `/api/familiar/registrar/:identificacionPaciente`     | Registrar familiar      | ✅ |
-| PUT     | `/api/familiar/put/:identificacionPaciente/:identificacionFamiliar` | Actualiza familiar       | ✅ |
+| PUT     | `/api/familiar/put/:identificacionPaciente` | Actualiza familiar       | ✅ |
 **Residencia**                                                       |
 | GET     | `/api/residencia/get/:identificacion` | Consultar residencia       | ✅ |
 | POST    | `/api/residencia/registrar/:identificacion`     | Registrar residencia      | ✅ |
@@ -787,11 +787,11 @@ Este endpoint permite registrar la información del familiar de un paciente.
 
 #### 📍 Endpoint  
 
-    PUT /api/familiar/put/:identificacionPaciente/:identificacionFamiliar
+    PUT /api/familiar/put/:identificacionPaciente
 
 🌐 URL Base (Local)
 
-    http://localhost:5000/api/familiar/put/:identificacionPaciente/:identificacionFamiliar
+    http://localhost:5000/api/familiar/put/:identificacionPaciente
     
 📝 **Descripción**
 Este endpoint permite actualizar la información del familiar de un paciente. 
@@ -802,7 +802,7 @@ Este endpoint permite actualizar la información del familiar de un paciente.
 
 🛠 **Autorización:** Solo el administrador tiene permisos para actualizar la información de un familiar.
 
-📋 **Identificación del paciente y familiar:** Se debe proporcionar tanto el número de identificación del paciente como el del familiar para realizar la actualización.
+📋 **Identificación del paciente:** Se debe proporcionar el número de identificación del paciente para realizar la actualización.
 
 📤 Headers Requeridos
 
@@ -812,7 +812,7 @@ Este endpoint permite actualizar la información del familiar de un paciente.
 
 📥 Ejemplo de URL
 
-    http://localhost:5000/api/familiar/put/1234569222/0703390000
+    http://localhost:5000/api/familiar/put/1234569222
     
 📝 Ejemplo de Body (Datos del familiar)
 
