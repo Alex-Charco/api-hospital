@@ -63,11 +63,22 @@ async function obtenerDatosUsuario(id_usuario) {
     }
 }
 
+async function actualizarEstatusUsuario(nombre_usuario, nuevoEstatus) {
+    const usuario = await buscarUsuario(nombre_usuario);
+    if (!usuario) return null;
+
+    usuario.estatus = nuevoEstatus;
+    await usuario.save();
+    return usuario;
+}
+
+
 module.exports = {
     buscarUsuario,
     verificarUsuarioExistente,
     verificarPassword,
     verificarAsignaciones,
     cifrarPassword,
-	obtenerDatosUsuario
+	obtenerDatosUsuario,
+	actualizarEstatusUsuario
 };

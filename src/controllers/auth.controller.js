@@ -1,5 +1,13 @@
 const { Usuario } = require('../models');
-const {buscarUsuario, verificarUsuarioExistente, verificarPassword, verificarAsignaciones, cifrarPassword, obtenerDatosUsuario } = require('../services/user.service');
+const {
+	buscarUsuario, 
+	verificarUsuarioExistente, 
+	verificarPassword, 
+	verificarAsignaciones, 
+	cifrarPassword, 
+	obtenerDatosUsuario,
+	actualizarEstatusUsuario 	
+	} = require('../services/user.service');
 const { validarPassword } = require('../services/validation.service');
 const errorMessages = require('../utils/error_messages');
 const { generarToken } = require('../services/auth.service');
@@ -218,6 +226,49 @@ async function putPassword(req, res) {
     }
 }
 
+// Actualizar solo el estatus del usuario
+// Actualizar solo el estatus del usuario
+async function putEstatus(req, res) {
+    try {
+        const { nombre_usuario } = req.params;
+        const { estatus } = req.body;  // Cambié "nuevo_estatus" por "estatus"
+
+        console.log("estatus recibido:", estatus);
+        console.log("typeof estatus:", typeof estatus);
+
+        // Convertimos a número, para garantizar que es un 0 o 1
+        const estatusNumerico = Number(estatus);
+
+        console.log("estatusNumerico:", estatusNumerico);
+        console.log("Es entero válido:", Number.isInteger(estatusNumerico));
+        console.log("¿Es 0 o 1?", [0, 1].includes(estatusNumerico));
+
+        // Validación estricta
+        if (!Number.isInteger(estatusNumerico) || ![0, 1].includes(estatusNumerico)) {
+            return res.status(400).json({ message: "El estatus debe ser 0 o 1 (inactivo o activo)." });
+        }
+
+        // Llamamos la función para actualizar el estatus del usuario en la base de datos
+        const usuarioActualizado = await actualizarEstatusUsuario(nombre_usuario, estatusNumerico);
+        if (!usuarioActualizado) {
+            return res.status(404).json({ message: errorMessages.usuarioNoEncontrado });
+        }
+
+        return res.status(200).json({ 
+            message: "Estatus actualizado correctamente.",
+            usuario: {
+                nombre_usuario: usuarioActualizado.nombre_usuario,
+                estatus: usuarioActualizado.estatus
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: errorMessages.errorServidor });
+    }
+}
+
+
 // Función para eliminar un usuario
 async function deleteUsuario(req, res) {
     try {
@@ -242,4 +293,4 @@ async function deleteUsuario(req, res) {
     }
 }
 
-module.exports = { getUsuario, login, registrarUsuario, putPassword, deleteUsuario };
+module.exports = { getUsuario, login, registrarUsuario, putPassword, putEstatus, deleteUsuario };

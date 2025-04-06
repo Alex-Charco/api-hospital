@@ -29,6 +29,13 @@ const verificarToken = async (req, res, next) => {
         if (!roleData) {
             return res.status(403).json({ message: errorMessages.rolNoValido });
         }
+		
+		 // Verificar si el usuario está activo
+        const usuario = await buscarUsuario(decoded.nombre_usuario);  // Usa nombre_usuario aquí
+
+		if (!usuario || usuario.estatus === 0) {
+			return res.status(403).json({ message: errorMessages.usuarioInactivo });
+		}
 
         // Agregar datos del usuario a la request
         req.usuario = {
