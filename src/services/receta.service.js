@@ -39,7 +39,7 @@ async function crearReceta(data, transaction) {
 
         // Procesar medicaciones y medicamentos asociados
         const medicacionesGuardadas = await Promise.all(medicaciones.map(async (med) => {
-            if (!med.medicamento || !med.medicamento.nombre_medicamento) {
+            if (!med.medicamento?.nombre_medicamento) {
                 console.error("❌ Error: No se recibió el objeto medicamento.");
                 throw new Error(errorMessages.nombreaMedicamentoObligatorio);
             }

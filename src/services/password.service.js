@@ -67,8 +67,10 @@ module.exports = {
       user.password = await hashPassword(newPassword);
       await user.save();
     // eslint-disable-next-line no-unused-vars
-    } catch (error) {
-      throw new Error('El token es inválido o ha expirado.');
-    }
+  } catch (error) {
+    console.error('Error al verificar el token de restablecimiento de contraseña:', error);
+    throw new Error('El token es inválido o ha expirado.');
+  }
+  
   }
 };

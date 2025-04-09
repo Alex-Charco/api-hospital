@@ -406,13 +406,6 @@ Asistencia.belongsTo(Cita, {
     onUpdate: "CASCADE"
 });
 
-// Exportar Cita en el módulo
-/*module.exports = {
-    ...module.exports,
-    Cita
-};*/
-
-// Exportar modelos y conexión
 module.exports = {
     sequelize,
     Usuario,

@@ -80,21 +80,6 @@ async function actualizarPersonaExterna(id_persona_externa, nuevosDatos) {
     }
 }
 
-
-// 🔄 Actualizar datos de persona externa
-/*async function actualizarPersonaExterna(id_persona_externa, nuevosDatos) {
-    try {
-        const persona = await PersonaExterna.findByPk(id_persona_externa);
-        if (!persona) {
-            throw new Error(errorMessages.personaExternaNoEncontrada);
-        }
-
-        return await persona.update(nuevosDatos);
-    } catch (error) {
-        throw new Error(`${errorMessages.errorActualizarPersonaExterna}: ${error.message}`);
-    }
-}*/
-
 module.exports = {
     obtenerPersonaExternaPorId,
     obtenerPersonaExternaPorIdentificacion,

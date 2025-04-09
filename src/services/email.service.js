@@ -61,9 +61,10 @@ function crearMensaje(cita) {
 // Función principal para enviar el correo
 async function enviarCorreoConfirmacion(cita) {
     // Verificación de los datos necesarios
-    if (!cita || !cita.paciente || !cita.turno || !cita.turno.horario || !cita.turno.horario.medico) {
+    if (!cita?.paciente || !cita?.turno?.horario?.medico) {
         throw new Error("Faltan datos para enviar el correo.");
     }
+    
 
     try {
         // Crear el transporte
