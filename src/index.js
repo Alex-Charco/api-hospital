@@ -17,34 +17,11 @@ const recetaRoutes = require("./routes/receta.routes");
 const recetaAutorizacionRoutes = require("./routes/receta_autorizacion.routes");
 const personaExternaRoutes = require("./routes/persona_externa.routes");
 
-/*const corsOptions = {
-    origin: 'http://localhost:3000'
-};*/
-
-/*const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,  // Permite cookies/sesiones
-    optionsSuccessStatus: 200 // Para navegadores antiguos
-};*/
-
-/*const corsOptions = {
-    origin: ["http://localhost:3000", "http://localhost:52232"],
-    credentials: true
-};
-*/
-
 const app = express();
 
 // Deshabilitar la cabecera "x-powered-by"
 app.disable("x-powered-by");
 
-// 📌 Middlewares
-//app.use(cors(corsOptions));
-// Funciona con app web
-//app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
-// No usar en producción, pero con app web no funciona
-//app.use(cors({ origin: "*", credentials: true }));
 const corsOptions = {
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);  // Permite solicitudes sin origen (ej: Postman, móviles)

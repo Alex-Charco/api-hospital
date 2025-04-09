@@ -23,7 +23,6 @@ async function getUsuario(req, res) {
         // Usar la función formatFechaCompleta para formatear la fecha de creación
         const fechaFormateada = formatFechaCompleta(usuario.fecha_creacion);
 
-
         return res.json({
             message: successMessages.usuarioEncontrado,
             id_usuario: usuario.id_usuario,
@@ -81,59 +80,6 @@ async function registrarUsuario(req, res) {
         return res.status(500).json({ message: errorMessages.errorServidor });
     }
 }
-
-// Función de login para iniciar sesión
-/*async function login(req, res) {
-    try {
-        const { nombre_usuario, password } = req.body;
-        const usuario = await buscarUsuario(nombre_usuario, true);
-
-        if (!usuario?.password || !(await verificarPassword(password, usuario.password))) {
-            return res.status(401).json({ message: errorMessages.credencialesInvalidas });
-        }        
-
-        // Verificar si el usuario está activo
-        if (usuario.estatus !== 1) return res.status(403).json({ message: errorMessages.usuarioInactivo });
-
-
-        // Verificar si el usuario tiene un rol asociado
-        if (!usuario.rol) return res.status(500).json({ message: errorMessages.rolNoAsignado });
-
-
-        const permisos = usuario.rol.permiso;
-
-        const payload = {
-            id_usuario: usuario.id_usuario,
-            nombre_usuario: usuario.nombre_usuario,
-            rol: {
-                id_rol: usuario.rol.id_rol,
-                nombre_rol: usuario.rol.nombre_rol,
-                permiso: permisos
-            }
-        };
-
-        return res.json({
-            message: successMessages.inicioSesionExitoso,
-            token: generarToken(payload),
-            user: {
-                id_usuario: usuario.id_usuario,
-                nombre_usuario: usuario.nombre_usuario,
-                fecha_creacion: formatFechaCompleta(usuario.fecha_creacion),
-                rol: {
-                    id_rol: usuario.rol.id_rol,
-                    nombre_rol: usuario.rol.nombre_rol,
-                    permiso: permisos,
-                    estatus: usuario.rol.estatus
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: errorMessages.errorServidor });
-    }
-}
-*/
 
 async function login(req, res) {
     try {

@@ -1,7 +1,6 @@
 const personaExternaService = require('../services/persona_externa.service');
 const errorMessages = require('../utils/error_messages');
 const successMessages = require('../utils/success_messages');
-//const { formatFecha } = require('../utils/date_utils'); // Importa la función de formateo
 
 // 🔍 Buscar persona externa por ID o Identificación
 async function buscarPersonaExterna(req, res) {
@@ -57,52 +56,6 @@ async function actualizarPersonaExterna(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
-
-
-
-// 🔄 Actualizar datos de una persona externa
-/*async function actualizarPersonaExterna(req, res) {
-    const { id_persona_externa } = req.params;
-    const nuevosDatos = req.body;
-
-    try {
-        const personaActualizada = await personaExternaService.actualizarPersonaExterna(id_persona_externa, nuevosDatos);
-
-        // Convertir la instancia de Sequelize en un objeto plano
-        let personaPlano = personaActualizada.toJSON();
-
-        // 📌 Formatear la fecha antes de enviarla en la respuesta
-        if (personaPlano.fecha_nacimiento) {
-            personaPlano.fecha_nacimiento = formatFecha(personaPlano.fecha_nacimiento);
-        }
-
-        return res.status(200).json({
-            message: successMessages.informacionActualizada,
-            persona: personaPlano
-        });
-    } catch (error) {
-        console.error("❌ Error en actualizarPersonaExterna:", error.message);
-        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
-    }
-}*/
-
-
-// 🔄 Actualizar datos de una persona externa
-/*async function actualizarPersonaExterna(req, res) {
-    const { id_persona_externa } = req.params;
-    const nuevosDatos = req.body;
-
-    try {
-        const personaActualizada = await personaExternaService.actualizarPersonaExterna(id_persona_externa, nuevosDatos);
-        return res.status(200).json({
-            message: successMessages.informacionActualizada,
-            persona: personaActualizada
-        });
-    } catch (error) {
-        console.error("❌ Error en actualizarPersonaExterna:", error.message);
-        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
-    }
-}*/
 
 module.exports = {
     buscarPersonaExterna,
