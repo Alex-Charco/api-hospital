@@ -28,6 +28,7 @@ async function getUsuario(req, res) {
             message: successMessages.usuarioEncontrado,
             id_usuario: usuario.id_usuario,
             nombre_usuario: usuario.nombre_usuario,
+			estatus: usuario.estatus,
             fecha_creacion: fechaFormateada,
             rol: usuario.rol
         });
