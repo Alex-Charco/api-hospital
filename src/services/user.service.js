@@ -39,6 +39,38 @@ async function obtenerDatosUsuario(id_usuario) {
     try {
         let datosUsuario = await Paciente.findOne({ 
             where: { id_usuario }, 
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            raw: true
+        });
+
+        if (datosUsuario) return { ...datosUsuario, tipo: 'paciente' };
+
+        datosUsuario = await Medico.findOne({ 
+            where: { id_usuario }, 
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            raw: true
+        });
+
+        if (datosUsuario) return { ...datosUsuario, tipo: 'medico' };
+
+        datosUsuario = await Administrador.findOne({ 
+            where: { id_usuario }, 
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            raw: true
+        });
+
+        return datosUsuario ? { ...datosUsuario, tipo: 'administrador' } : null;
+    } catch (error) {
+        console.error(`Error al obtener datos del usuario: ${error.message}`);
+        return null;
+    }
+}
+
+
+/*async function obtenerDatosUsuario(id_usuario) {
+    try {
+        let datosUsuario = await Paciente.findOne({ 
+            where: { id_usuario }, 
             attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
         });
 
@@ -61,7 +93,7 @@ async function obtenerDatosUsuario(id_usuario) {
         console.error(`Error al obtener datos del usuario: ${error.message}`);
         return null;
     }
-}
+}*/
 
 async function actualizarEstatusUsuario(nombre_usuario, nuevoEstatus) {
     const usuario = await buscarUsuario(nombre_usuario);

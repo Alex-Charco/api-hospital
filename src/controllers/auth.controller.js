@@ -91,13 +91,22 @@ async function login(req, res) {
         }        
 
         // Verificar si el usuario está activo
-        if (usuario.estatus !== 1) return res.status(403).json({ message: errorMessages.usuarioInactivo });
+		if (usuario.estatus !== 1) {
+			return res.status(403).json({ message: errorMessages.usuarioInactivo });
+		}
 
-        // Verificar si el usuario tiene un rol asociado
-        if (!usuario.rol) return res.status(500).json({ message: errorMessages.rolNoAsignado });
+		// Verificar si el usuario tiene un rol asociado
+		if (!usuario.rol) {
+			return res.status(500).json({ message: errorMessages.rolNoAsignado });
+		}
 
-        // Buscar datos adicionales según el tipo de usuario (Paciente, Médico, Administrador)
-        const datosUsuario = await obtenerDatosUsuario(usuario.id_usuario);
+		// Obtener datos del rol (incluye estatus y tipo)
+		const datosUsuario = await obtenerDatosUsuario(usuario.id_usuario);
+
+		// Verificar si el estatus del rol también está activo
+		if (datosUsuario?.estatus !== 1) {
+			return res.status(403).json({ message: `La cuenta del ${datosUsuario.tipo} está inactiva.` });
+		}
 
         const permisos = usuario.rol.permiso;
 
@@ -173,7 +182,6 @@ async function putPassword(req, res) {
     }
 }
 
-// Actualizar solo el estatus del usuario
 // Actualizar solo el estatus del usuario
 async function putEstatus(req, res) {
     try {

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const Usuario = require('../models/usuario.model');
 const Medico = require('../models/medico.model');
@@ -35,14 +35,15 @@ module.exports = {
 
     // Enviar correo con el enlace de restablecimiento
     const transporter = nodemailer.createTransport({
-	  host: "smtp.tu-servidor.com", // Cambia esto por tu servidor SMTP
-	  port: 465, // Usa 465 para SSL o 587 con STARTTLS
-	  secure: true, // true para SSL/TLS
-	  auth: {
-		user: process.env.SMTP_USER, // Usa variables de entorno
-		pass: process.env.SMTP_PASS,
-	  },
-	});
+      host: "smtp.gmail.com",
+      port: 465, // Usa 465 para SSL o 587 con STARTTLS
+      secure: true, // true para SSL/TLS
+      auth: {
+        user: process.env.EMAIL_USER, // Usa variables de entorno
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
     const resetUrl = `http://localhost:3000/auth/reset-password/reset?token=${token}`;
 
     const mailOptions = {
@@ -67,10 +68,9 @@ module.exports = {
       user.password = await hashPassword(newPassword);
       await user.save();
 
-  } catch (error) {
-    console.error('Error al verificar el token de restablecimiento de contraseña:', error);
-    throw new Error('El token es inválido o ha expirado.');
-  }
-  
+    } catch (error) {
+      console.error('Error al verificar el token de restablecimiento de contraseña:', error);
+      throw new Error('El token es inválido o ha expirado.');
+    }
   }
 };
