@@ -1,4 +1,4 @@
-const { Paciente, Usuario } = require("../models");
+const { Paciente, Usuario, RolUsuario, Familiar, InfoMilitar, Residencia, Seguro } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
 
@@ -48,7 +48,31 @@ async function obtenerPacientePorIdentificacion(identificacion) {
     try {
         return await Paciente.findOne({ 
             where: { identificacion }, 
-            include: [{ model: Usuario, as: "usuario" }] 
+            include: [
+				{ 
+					model: Usuario, 
+					as: "usuario",
+                    include: [
+                        {
+                            model: RolUsuario,
+                            as: "rol" // Usa el alias definido en la relación Usuario -> RolUsuario
+                        }
+                    ]
+                },
+				{
+					model: Familiar,
+				},
+				{
+					model: InfoMilitar,
+				},
+				{
+					model: Residencia,
+					as: "residencia"
+				},
+				{
+					model: Seguro
+				}
+				] 
         });
     } catch (error) {
         throw new Error(`${errorMessages.errorObtenerPaciente}: ${error.message}`);
@@ -66,7 +90,12 @@ async function actualizarDatosPaciente(paciente, nuevosDatos) {
 async function obtenerPacientePorId(id_paciente) {
     try {
         const paciente = await Paciente.findByPk(id_paciente, {
-            include: [{ model: Usuario, as: "usuario" }]
+            include: [
+				{ 
+					model: Usuario, 
+					as: "usuario" },
+					
+					]
         });
 
         if (!paciente) {
