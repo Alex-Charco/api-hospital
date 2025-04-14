@@ -66,35 +66,6 @@ async function obtenerDatosUsuario(id_usuario) {
     }
 }
 
-
-/*async function obtenerDatosUsuario(id_usuario) {
-    try {
-        let datosUsuario = await Paciente.findOne({ 
-            where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
-        });
-
-        if (!datosUsuario) {
-            datosUsuario = await Medico.findOne({ 
-                where: { id_usuario }, 
-                attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
-            });
-        }
-
-        if (!datosUsuario) {
-            datosUsuario = await Administrador.findOne({ 
-                where: { id_usuario }, 
-                attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
-            });
-        }
-
-        return datosUsuario ? datosUsuario.toJSON() : null;
-    } catch (error) {
-        console.error(`Error al obtener datos del usuario: ${error.message}`);
-        return null;
-    }
-}*/
-
 async function actualizarEstatusUsuario(nombre_usuario, nuevoEstatus) {
     const usuario = await buscarUsuario(nombre_usuario);
     if (!usuario) return null;
@@ -103,7 +74,6 @@ async function actualizarEstatusUsuario(nombre_usuario, nuevoEstatus) {
     await usuario.save();
     return usuario;
 }
-
 
 module.exports = {
     buscarUsuario,
