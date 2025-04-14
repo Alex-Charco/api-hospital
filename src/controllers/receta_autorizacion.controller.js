@@ -1,6 +1,6 @@
-const pacienteService = require("../services/pacienteService");
-const familiarService = require("../services/familiarService");
-const personaExternaService = require("../services/personaExternaService");
+const pacienteService = require("../services/paciente.service");
+const familiarService = require("../services/familiar.service");
+const personaExternaService = require("../services/persona_externa.service");
 
 async function obtenerDatosAutorizado(req, res) {
     try {
