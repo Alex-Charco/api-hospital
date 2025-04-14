@@ -87,6 +87,24 @@ async function validarMedicoExistente(identificacion) {
     }
 }
 
+async function obtenerMedicoPorIdentificacion(identificacion) {
+    try {
+        return await Medico.findOne({
+            where: { identificacion },
+            include: [
+                { 
+                    model: Usuario, 
+                    as: "usuario",
+                    attributes: ['id_usuario', 'id_rol', 'nombre_usuario', 'estatus'],
+                },
+                { model: Especialidad, as: "especialidad" }
+            ]
+        });
+    } catch (error) {
+        throw new Error(`${errorMessages.errorObtenerMedicos}: ${error.message}`);
+    }
+}
+
 
 module.exports = {
     validarUsuarioParaMedico,
@@ -94,5 +112,6 @@ module.exports = {
     crearMedico,
     obtenerMedicos,
     actualizarDatosMedico,
-    validarMedicoExistente
+    validarMedicoExistente,
+	obtenerMedicoPorIdentificacion
 };
