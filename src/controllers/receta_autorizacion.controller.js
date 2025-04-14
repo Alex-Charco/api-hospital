@@ -1,4 +1,6 @@
-const { sequelize } = require("../models");
+const pacienteService = require("../services/pacienteService");
+const familiarService = require("../services/familiarService");
+const personaExternaService = require("../services/personaExternaService");
 
 async function obtenerDatosAutorizado(req, res) {
     try {
