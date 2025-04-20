@@ -32,7 +32,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | **👨‍👩‍👧 Familiar**       | Registrar, consultar, actualizar familiar          | ✔️ Completado |
 | **🏡 Residencia**        | Registrar, consultar, actualizar residencia       | ✔️ Completado |
 | **🛡️ Seguro**           | Registrar, consultar, actualizar seguro           | ✔️ Completado |
-| **⏰ Horario**           | Registrar, consultar, horario           | ✔️ Completado |
+| **⏰ Horario**           | Registrar, consultar, actualizar horario           | ✔️ Completado |
 | **📅 Cita**           | Registrar, consultar, cita          | ✔️ Completado |
 | **🔄 Turno**           | Consultar turno        | ✔️ Completado |
 | **🏥 Médico**           | Registrar, consultar, actualizar médico           | ✔️ Completado  |
@@ -75,6 +75,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 **Horario**                                                         |
 | GET     | `/api/horario/get/:identificacion` | Consultar horario       | ✅ |
 | POST    | `/api/horario/registrar`     | Registrar horario      | ✅ |
+ PUT     | `/api/horario/put/:id_horario` | Actualiza horario       | ✅ |
 **Cita**                                                         |
 | GET     | `/api/cita/get/paciente/:identificacionPaciente` | Consultar cita       | ✅ |
 | GET     | `/api/cita/get/medico/:identificacionMedico` | Consultar cita       | ✅ |
@@ -1173,10 +1174,66 @@ Este endpoint permite registrar un nuevo horario para un médico en el sistema.
 💡 Ejemplo de Body (Datos del horario)
 
     {
-        ...(datos del horario)
+		"institucion": "C.S. A FM MAS",
+		"fecha_horario": "2025-04-21",
+		"hora_inicio": "08:00:00",
+		"hora_fin": "12:00:00",
+		"consulta_maxima": 8,
+		"asignado": 0,
+		"seleccion": null,
+		"turno_extra": 0
     }
 
 ✅ Respuesta: Información del horario registrada.
+
+### 🔹 PUT - Actualizar Horario
+
+#### 📍 Endpoint  
+
+    PUT /api/horario/put/:id_horario
+
+🌐 URL Base (Local)
+
+    http://localhost:5000/api/horario/put/:id_horario
+    
+📝 **Descripción**
+
+Este endpoint permite editar el horario.
+
+🔐 **Requisitos**
+
+🔑 **Autenticación:** Se debe proporcionar un token de autenticación válido.
+
+🛠 **Autorización:** Solo el administrador puede editar horarios.
+
+📋 **Id_horario:** Se debe incluir el id_horario en la URL.
+
+📤 Headers Requeridos
+
+    {
+        "Authorization": "Bearer <TOKEN>",
+        "Content-Type": "application/json"
+    }
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/horario/put/99
+
+💡 Ejemplo de Body (Datos del horario)
+
+{
+    "id_medico": 9,
+    "institucion": "C.S. A FM MAS",
+    "fecha_horario": "2025-04-21",
+    "hora_inicio": "09:00:00",
+    "hora_fin": "12:00:00",
+    "consulta_maxima": 6,
+    "asignado": 0,
+    "seleccion": null,
+    "turno_extra": 0
+}
+
+✅ Respuesta: Información del horario actualizada.
 
 ---
 

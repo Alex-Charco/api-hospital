@@ -74,4 +74,50 @@ async function getByHorario(req, res) {
     }
 }
 
-module.exports = { registrarHorario, getByHorario };
+// Editar horario de un médico (solo administradores)
+async function editarHorario(req, res) {
+    const { id_horario } = req.params;
+    const { id_medico, hora_inicio, hora_fin, fecha_horario, ...otrosDatos } = req.body;
+
+    try {
+        const horario = await horarioService.obtenerHorarioPorId(id_horario);
+        if (!horario) {
+            return res.status(404).json({ message: errorMessages.horarioNoEncontrado });
+        }
+
+        if (horario.asignado !== 0) {
+            return res.status(400).json({ message: "El horario no puede ser editado porque ya está asignado." });
+        }
+
+        await horarioService.validarHorarioNuevo(
+            id_medico,
+            fecha_horario,
+            hora_inicio,
+            hora_fin,
+            id_horario
+        );
+
+        const horarioEditado = await horarioService.editarHorario(id_horario, {
+            hora_inicio,
+            hora_fin,
+            fecha_horario,
+            id_medico,
+            ...otrosDatos
+        });
+
+        const horarioFormateado = {
+            ...horarioEditado.toJSON(),
+            fecha_horario: formatFecha(horarioEditado.fecha_horario),
+        };
+
+        return res.status(200).json({
+            message: successMessages.editarExitoso,
+            horario: horarioFormateado
+        });
+    } catch (error) {
+        console.error("❌ Error en editarHorario:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+module.exports = { registrarHorario, getByHorario,  editarHorario };
