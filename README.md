@@ -1335,6 +1335,25 @@ Busca la cita buscando por la identificacion del médico o paciente + rango de f
 
 ✅ Respuesta: Muestra la cita que se esta buscando por los rangos de fechas + el estado.
 
+**4️⃣ Consultar por las citas desde la fecha actual a futuras**
+
+Busca la cita buscando por la identificacion del médico o paciente + desdeHoy=true.
+
+🌐 URL Base
+	
+	http://localhost:5000/api/cita/get/paciente/:identificacionPaciente?desdeHoy=true
+	
+	http://localhost:5000/api/cita/get/medico/:identificacionMedico?desdeHoy=true
+
+📌 URL Ejemplo:
+
+    http://localhost:5000/api/cita/get/paciente/1234569999?desdeHoy=true
+	
+	http://localhost:5000/api/cita/get/medico/1723456789?desdeHoy=true
+
+
+✅ Respuesta: Muestra la cita que se esta buscando desde la fecha actual a futuras.
+
 ---
 
 ### 🔹 GET - Consultar Turno
