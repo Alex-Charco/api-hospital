@@ -15,62 +15,6 @@ function getTodayDate() {
 }
 
 // ?? Función generica para obtener citas con filtros personalizados
-/*async function obtenerCitas(whereConditions, fechaInicio = null, fechaFin = null, estado = null) {
-    try {
-        let condiciones = { ...whereConditions };
-
-        // Agregar filtro por rango de fechas si se especifica
-        if (fechaInicio && fechaFin) {
-            condiciones['$turno.horario.fecha_horario$'] = { [Op.between]: [fechaInicio, fechaFin] };
-        }
-
-        // Agregar filtro por estado solo si la función recibe `estado`
-        if (estado !== null) {
-            condiciones['estado_cita'] = estado; // <- Asegúrate que sea el nombre correcto de tu columna
-        }
-
-        // DEBUG: Verificar que condiciones se están enviando a la consulta
-        console.log("Condiciones de búsqueda:", condiciones);
-
-        // Obtener citas
-        const citas = await Cita.findAll({
-            where: condiciones,
-            include: [
-                {
-                    model: Turno,
-                    as: 'turno',
-                    include: [
-                        {
-                            model: Horario,
-                            as: 'horario',
-                            include: [
-                                {
-                                    model: Medico,
-                                    as: 'medico',
-                                    include: [
-                                        { model: Especialidad, as: 'especialidad' }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                { model: Paciente, as: 'paciente' }
-            ]
-        });
-
-        // DEBUG: Mostrar resultado si es necesario
-        console.log("Citas encontradas:", JSON.stringify(citas, null, 2));
-
-        return Array.isArray(citas) ? citas : [];
-    } catch (error) {
-        console.error("Error en obtenerCitas:", error);
-        throw new Error("Error al obtener citas: " + error.message);
-    }
-}
-*/
-
-// Función genérica para obtener citas con filtros personalizados
 async function obtenerCitas(whereConditions, fechaInicio = null, fechaFin = null) {
     try {
         let condiciones = { ...whereConditions };
@@ -82,29 +26,34 @@ async function obtenerCitas(whereConditions, fechaInicio = null, fechaFin = null
 
         // Obtener citas del paciente
         const citas = await Cita.findAll({
-            where: condiciones,
-            include: [
-                {
-                    model: Turno,
-                    as: 'turno',
-                    include: [
-                        {
-                            model: Horario,
-                            as: 'horario',
-                            include: [
-                                {
-                                    model: Medico,
-                                    as: 'medico',
-                                    include: [
-                                        { model: Especialidad, as: 'especialidad' }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        });
+			where: condiciones,
+			include: [
+				{
+					model: Turno,
+					as: 'turno',
+					include: [
+						{
+							model: Horario,
+							as: 'horario',
+							include: [
+								{
+									model: Medico,
+									as: 'medico',
+									include: [
+										{ model: Especialidad, as: 'especialidad' }
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					model: Paciente,
+					as: 'paciente'
+				}
+			]
+		});
+
 
         return Array.isArray(citas) ? citas : [];
     } catch (error) {
@@ -121,18 +70,6 @@ async function obtenerCitasDelDiaActual(whereConditions) {
     });
 }
 
-// 🔍 Función para obtener citas desde hoy en adelante **Nueva** v1
-/*async function obtenerCitasDesdeHoy(whereConditions, estado = null) {
-    const today = getTodayDate();
-
-    return obtenerCitas({
-        ...whereConditions,
-        '$turno.horario.fecha_horario$': {
-            [Op.gte]: today
-        }
-    }, null, null, estado);
-}*/
-
 // Función para obtener citas desde hoy en adelante v2
 async function obtenerCitasDesdeHoy(whereConditions) {
     const today = getTodayDate();
@@ -144,12 +81,7 @@ async function obtenerCitasDesdeHoy(whereConditions) {
     });
 }
 
-// ? Función para obtener citas por rango de fechas y estado
-/*async function obtenerCitasPorRango(whereConditions, fechaInicio, fechaFin, estado = null) {
-    return obtenerCitas(whereConditions, fechaInicio, fechaFin, estado);
-}*/
-
-// Función para obtener citas por un rango de fechas
+// ? Función para obtener citas por rango de fechas
 async function obtenerCitasPorRango(whereConditions, fechaInicio, fechaFin) {
     return obtenerCitas(whereConditions, fechaInicio, fechaFin);
 }
@@ -289,7 +221,7 @@ const crearCita = async (id_turno, id_paciente) => {
 		});
 
 		// Verificar si ya hay  citas distintas
-		if (citasDelDia.length >= 2) {
+		if (citasDelDia.length >= 5) {
 			throw new Error("El paciente ya tiene 2 citas registradas para ese día.");
 		}
 

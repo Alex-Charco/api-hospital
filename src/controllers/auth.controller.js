@@ -137,7 +137,9 @@ async function login(req, res) {
                 primer_nombre: datosUsuario?.primer_nombre || null,
                 segundo_nombre: datosUsuario?.segundo_nombre || null,
                 primer_apellido: datosUsuario?.primer_apellido || null,
-                segundo_apellido: datosUsuario?.segundo_apellido || null
+                segundo_apellido: datosUsuario?.segundo_apellido || null,
+				identificacion: datosUsuario?.identificacion || null,
+				estatus: datosUsuario?.estatus || null
             }
         });
 

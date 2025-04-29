@@ -39,7 +39,7 @@ async function obtenerDatosUsuario(id_usuario) {
     try {
         let datosUsuario = await Paciente.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
 
@@ -47,7 +47,7 @@ async function obtenerDatosUsuario(id_usuario) {
 
         datosUsuario = await Medico.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
 
@@ -55,7 +55,7 @@ async function obtenerDatosUsuario(id_usuario) {
 
         datosUsuario = await Administrador.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'estatus'],
+            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
 
