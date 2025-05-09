@@ -81,7 +81,7 @@ async function registrarUsuario(req, res) {
     }
 }
 
-async function login(req, res) {
+/*async function login(req, res) {
     try {
         const { nombre_usuario, password } = req.body;
         const usuario = await buscarUsuario(nombre_usuario, true);
@@ -146,6 +146,93 @@ async function login(req, res) {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: errorMessages.errorServidor });
+    }
+}
+*/
+
+const loginAttempts = new Map();
+
+async function login(req, res) {
+    try {
+        const { nombre_usuario, password } = req.body;
+        const now = Date.now();
+        const attempt = loginAttempts.get(nombre_usuario) || { count: 0, firstAttempt: now };
+
+        // Verificar si está bloqueado
+        if (attempt.blockedUntil && now < attempt.blockedUntil) {
+            const waitSeconds = Math.ceil((attempt.blockedUntil - now) / 1000);
+            return res.status(429).json({
+                message: `Demasiados intentos fallidos. Intenta de nuevo en ${waitSeconds} segundos.`
+            });
+        }
+
+        const usuario = await buscarUsuario(nombre_usuario, true);
+
+        // Si credenciales inválidas
+        if (!usuario?.password || !(await verificarPassword(password, usuario.password))) {
+    if (!attempt) {
+        loginAttempts.set(nombre_usuario, { count: 1, firstAttempt: now });
+    } else {
+        attempt.count += 1;
+
+        if (attempt.count >= 3) {
+            attempt.blockedUntil = now + 15 * 60 * 1000;
+            loginAttempts.set(nombre_usuario, attempt);
+            return res.status(429).json({
+                message: 'Has superado el número máximo de intentos. Tu cuenta se ha bloqueado por 15 minutos.'
+            });
+        }
+
+        loginAttempts.set(nombre_usuario, attempt);
+    }
+
+    return res.status(401).json({ message: 'Credenciales inválidas.' });
+}
+
+        // Login exitoso: limpiar intentos fallidos
+        loginAttempts.delete(nombre_usuario);
+
+        // Validaciones adicionales...
+        if (usuario.estatus !== 1) {
+            return res.status(403).json({ message: 'Usuario inactivo.' });
+        }
+
+        if (!usuario.rol) {
+            return res.status(500).json({ message: 'Rol no asignado.' });
+        }
+
+        const datosUsuario = await obtenerDatosUsuario(usuario.id_usuario);
+        if (datosUsuario?.estatus !== 1) {
+            return res.status(403).json({ message: `La cuenta del ${datosUsuario.tipo} está inactiva.` });
+        }
+
+        const permisos = usuario.rol.permiso;
+
+        const payload = {
+            id_usuario: usuario.id_usuario,
+            nombre_usuario: usuario.nombre_usuario,
+            rol: {
+                id_rol: usuario.rol.id_rol,
+                nombre_rol: usuario.rol.nombre_rol,
+                permiso: permisos
+            }
+        };
+
+        return res.json({
+            message: 'Inicio de sesión exitoso.',
+            token: generarToken(payload),
+            user: {
+                id_usuario: usuario.id_usuario,
+                nombre_usuario: usuario.nombre_usuario,
+                fecha_creacion: formatFechaCompleta(usuario.fecha_creacion),
+                rol: usuario.rol,
+                ...datosUsuario
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error en el servidor.' });
     }
 }
 

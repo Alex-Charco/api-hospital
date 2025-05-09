@@ -57,20 +57,29 @@ module.exports = {
   },
 
   async resetPassword(token, nombre_usuario, newPassword) {
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
+  try {
+    // Verificar el token JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-      // Buscar usuario por id_usuario y validar nombre_usuario
-      const user = await Usuario.findOne({ where: { id_usuario: decoded.id_usuario, nombre_usuario } });
+    // Buscar el usuario por ID
+    const user = await Usuario.findOne({ where: { id_usuario: decoded.id_usuario } });
 
-      if (!user) throw new Error('El nombre de usuario no coincide con el usuario asociado al restablecimiento.');
-
-      user.password = await hashPassword(newPassword);
-      await user.save();
-
-    } catch (error) {
-      console.error('Error al verificar el token de restablecimiento de contraseña:', error);
-      throw new Error('El token es inválido o ha expirado.');
+    if (!user) {
+      throw new Error('No se encontró el usuario asociado al token.');
     }
+
+    // Verificar que el nombre de usuario coincida
+    if (user.nombre_usuario !== nombre_usuario) {
+      throw new Error('El nombre de usuario no coincide con el usuario asociado al restablecimiento.');
+    }
+
+    // Actualizar contraseña
+    user.password = await hashPassword(newPassword);
+    await user.save();
+
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error);
+    throw new Error('No se pudo restablecer la contraseña. ' + error.message);
   }
-};
+}
+}
