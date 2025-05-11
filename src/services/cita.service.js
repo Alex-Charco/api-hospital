@@ -3,7 +3,6 @@ const errorMessages = require("../utils/error_messages");
 const sequelize = require("../config/db");
 const { enviarCorreoConfirmacion } = require('./email.service');
 const { Op } = require('sequelize');
-const { formatFecha, formatFechaCompleta } = require('../utils/date_utils');
 
 // ?? Función para obtener la fecha actual en formato YYYY-MM-DD
 function getTodayDate() {
@@ -108,72 +107,6 @@ function getGrupoEtario(edad) {
     if (edad >= 65) return 'Adulto mayor';
     return 'Edad inválida';
 }
-
-// services/cita.service.js
-async function obtenerCitasAgrupadasPorPaciente(whereConditions, tipoConsulta, fechaInicio, fechaFin, estado) {
-    let citas;
-
-    if (tipoConsulta === 'rango') {
-        citas = await obtenerCitasPorRango(whereConditions, fechaInicio, fechaFin, estado);
-    } else if (tipoConsulta === 'desdeHoy') {
-        citas = await obtenerCitasDesdeHoy(whereConditions, estado);
-    } else {
-        citas = await obtenerCitasDelDiaActual(whereConditions);
-    }
-
-    if (!citas || citas.length === 0) return null;
-
-    // Asegurarse de que todas las citas son del mismo paciente
-    const paciente = citas[0].paciente;
-
-    // Filtrar citas solo para este paciente
-    const citasPaciente = citas.filter(cita => cita.paciente.id_paciente === paciente.id_paciente);
-
-    return {
-        paciente: {
-            id_paciente: paciente.id_paciente,
-            identificacion: paciente.identificacion,
-            nombre: [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido]
-                .filter(Boolean)
-                .join(' '),
-            correo: paciente.correo,
-            edad: paciente.fecha_nacimiento ? getEdad(paciente.fecha_nacimiento) : null,
-            grupo_etario: paciente.fecha_nacimiento ? getGrupoEtario(getEdad(paciente.fecha_nacimiento)) : null
-        },
-        citas: citasPaciente.map(cita => ({
-            id_cita: cita.id_cita,
-            estado_cita: cita.estado_cita,
-            fecha_creacion: formatFechaCompleta(cita.fecha_creacion),
-            turno: {
-                id_turno: cita.turno?.id_turno || null,
-                hora_turno: cita.turno?.hora_turno || null,
-                horario: {
-                    id_horario: cita.turno?.horario?.id_horario || null,
-                    fecha_horario: cita.turno?.horario?.fecha_horario ? formatFecha(cita.turno.horario.fecha_horario) : null,
-                }
-            },
-            medico: cita.turno?.horario?.medico
-                ? {
-                    id_medico: cita.turno.horario.medico.id_medico,
-                    identificacion: cita.turno.horario.medico.identificacion,
-                    nombre: [cita.turno.horario.medico.primer_nombre, cita.turno.horario.medico.segundo_nombre, cita.turno.horario.medico.primer_apellido, cita.turno.horario.medico.segundo_apellido]
-                        .filter(Boolean)
-                        .join(' '),
-                    correo: cita.turno.horario.medico.correo,
-                    especialidad: cita.turno.horario.medico.especialidad
-                        ? {
-                            id_especialidad: cita.turno.horario.medico.especialidad.id_especialidad,
-                            nombre: cita.turno.horario.medico.especialidad.nombre,
-                            atencion: cita.turno.horario.medico.especialidad.atencion,
-                            consultorio: cita.turno.horario.medico.especialidad.consultorio
-                        }
-                        : null
-                }
-                : null
-        }))
-    };
-}
-
 
 const crearCita = async (id_turno, id_paciente) => {
     try {
@@ -306,5 +239,4 @@ module.exports = {
     obtenerCitasPorRango,
 	getEdad,
     getGrupoEtario,
-	obtenerCitasAgrupadasPorPaciente,
 	crearCita };
