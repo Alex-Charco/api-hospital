@@ -26,7 +26,7 @@ app.disable("x-powered-by");
 const corsOptions = {
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);  // Permite solicitudes sin origen (ej: Postman, móviles)
-        callback(null, true);  // Permite cualquier origen
+        callback(null, true);  // Aqui permite cualquier origen
     },
     credentials: true,  // Permite enviar cookies y encabezados de autenticación
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
