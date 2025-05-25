@@ -1,0 +1,56 @@
+const { Usuario } = require('../models');
+const bcrypt = require('bcryptjs');
+const {
+    verificarUsuarioExistente,
+    cifrarPassword
+} = require('../services/user.service');
+
+jest.mock('../models', () => ({
+    Usuario: {
+        findOne: jest.fn(),
+    }
+}));
+
+jest.mock('bcryptjs', () => ({
+    hash: jest.fn(),
+}));
+
+describe('user.service.js - Registro de usuario', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('verificarUsuarioExistente', () => {
+        it('debe devolver un usuario si existe', async () => {
+            const mockUser = { id_usuario: 1, nombre_usuario: 'usuario1' };
+            Usuario.findOne.mockResolvedValue(mockUser);
+
+            const result = await verificarUsuarioExistente('usuario1');
+
+            expect(Usuario.findOne).toHaveBeenCalledWith({ where: { nombre_usuario: 'usuario1' } });
+            expect(result).toEqual(mockUser);
+        });
+
+        it('debe devolver null si el usuario no existe', async () => {
+            Usuario.findOne.mockResolvedValue(null);
+
+            const result = await verificarUsuarioExistente('noExiste');
+
+            expect(Usuario.findOne).toHaveBeenCalledWith({ where: { nombre_usuario: 'noExiste' } });
+            expect(result).toBeNull();
+        });
+    });
+
+    describe('cifrarPassword', () => {
+        it('debe devolver una contraseña cifrada', async () => {
+            const mockHash = 'hashedPassword123';
+            bcrypt.hash.mockResolvedValue(mockHash);
+
+            const password = 'miPasswordSegura';
+            const result = await cifrarPassword(password);
+
+            expect(bcrypt.hash).toHaveBeenCalledWith(password, 10);
+            expect(result).toBe(mockHash);
+        });
+    });
+});
