@@ -1,4 +1,3 @@
-// paciente.service.test.js
 const pacienteService = require('../services/paciente.service');
 
 jest.mock('../models', () => {
