@@ -54,6 +54,7 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 |                           **Paciente**                                |
 | GET     | `/api/paciente/get/:identificacion` | Consultar paciente       | ✅ |
 | GET     | `/api/paciente/get/id_usuario/:id_usuario` | Consultar paciente       | ✅ |
+| GET     | `/api/paciente/get/historial/:identificacion` | Consultar paciente       | ✅ |
 | POST    | `/api/paciente/registrar`     | Registrar paciente      | ✅ |
 | PUT     | `/api/paciente/put/:identificacion` | Actualizar paciente       | ✅ |
 |                           **Info militar**                                                         |
@@ -192,6 +193,17 @@ Crea un archivo emailService.js para manejar el envío de correos.
 5. Carga las variables con dotenv en server.js:
 
 	require('dotenv').config();
+
+#### 1.3.4 Instalar dependencia jest para pruebas unitarias
+Ejecutar en la terminal:
+
+	npm install --save-dev jest
+
+Agregar en package.json:
+
+	"scripts": {
+	  "test": "jest"
+	}
 
 ---
 
