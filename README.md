@@ -189,7 +189,7 @@ Crea un archivo emailService.js para manejar el envío de correos.
 
 	require('dotenv').config();
 
-#### 1.3.4 Instalar dependencia jest para pruebas unitarias
+#### 1.3.5 Instalar dependencia jest para pruebas unitarias
 Ejecutar en la terminal:
 
 	npm install --save-dev jest
@@ -200,6 +200,17 @@ Agregar en package.json:
 	  "test": "jest"
 	}
 
+Configuración en eslint.config.cjs para que no de errores por jest
+
+    {
+        files: ["**/*.test.js"], // 👈 Solo para archivos de pruebas
+        languageOptions: {
+        globals: {
+            ...globals.node,
+            ...globals.jest,
+        },
+        },
+    },
 ---
 
 ### 1.4 Levantar el servidor
