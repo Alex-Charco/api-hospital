@@ -1,6 +1,7 @@
 const { Paciente, Usuario, RolUsuario, Familiar, InfoMilitar, Residencia, Seguro, HistorialCambiosPaciente } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
+const { formatFechaCompleta } = require('../utils/date_utils');
 
 async function validarUsuarioParaPaciente(nombre_usuario) {
     try {
@@ -86,16 +87,24 @@ async function actualizarDatosPaciente(paciente, nuevosDatos, id_usuario_modific
 
         for (const campo in nuevosDatos) {
             if (nuevosDatos[campo] !== undefined && nuevosDatos[campo] != datosAnteriores[campo]) {
+                const valorAnterior = datosAnteriores[campo] instanceof Date
+                    ? datosAnteriores[campo].toISOString().split('T')[0] // o .toISOString() si prefieres la hora también
+                    : datosAnteriores[campo]?.toString();
+        
+                const valorNuevo = nuevosDatos[campo] instanceof Date
+                    ? nuevosDatos[campo].toISOString().split('T')[0]
+                    : nuevosDatos[campo]?.toString();
+        
                 cambios.push({
                     id_paciente: paciente.id_paciente,
                     id_usuario: id_usuario_modificador,
                     campo_modificado: campo,
-                    valor_anterior: datosAnteriores[campo]?.toString() || null,
-                    valor_nuevo: nuevosDatos[campo]?.toString() || null,
-                    fecha_cambio: new Date()
+                    valor_anterior: valorAnterior || null,
+                    valor_nuevo: valorNuevo || null,
+                    fecha_cambio: formatFechaCompleta(new Date())
                 });
             }
-        }
+        }        
 
         if (cambios.length > 0) {
             await paciente.update(nuevosDatos);
@@ -149,10 +158,18 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
             throw new Error("Paciente no encontrado con esa identificación.");
         }
 
-        return await HistorialCambiosPaciente.findAll({
+        const historial = await HistorialCambiosPaciente.findAll({
             where: { id_paciente: paciente.id_paciente },
             order: [['fecha_cambio', 'DESC']]
         });
+
+        // Formatear fechas
+        return historial.map(item => {
+            const json = item.toJSON();
+            json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+            return json;
+        });
+
     } catch (error) {
         throw new Error(`Error al obtener historial por identificación: ${error.message}`);
     }
