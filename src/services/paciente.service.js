@@ -78,14 +78,6 @@ async function obtenerPacientePorIdentificacion(identificacion) {
     }
 }
 
-/*async function actualizarDatosPaciente(paciente, nuevosDatos) {
-    try {
-        return await paciente.update(nuevosDatos);
-    } catch (error) {
-        throw new Error(`${errorMessages.errorActualizarPaciente}: ${error.message}`);
-    }
-}*/
-
 async function actualizarDatosPaciente(paciente, nuevosDatos, id_usuario_modificador) {
     try {
         const datosAnteriores = paciente.toJSON();
