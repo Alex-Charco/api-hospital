@@ -55,7 +55,7 @@ async function obtenerPacientePorIdentificacion(identificacion) {
                     include: [
                         {
                             model: RolUsuario,
-                            as: "rol" // Usa el alias definido en la relación Usuario -> RolUsuario
+                            as: "rol" 
                         }
                     ]
                 },
@@ -82,13 +82,12 @@ async function obtenerPacientePorIdentificacion(identificacion) {
 async function actualizarDatosPaciente(paciente, nuevosDatos, id_usuario_modificador) {
     try {
         const datosAnteriores = paciente.toJSON();
-
         const cambios = [];
 
         for (const campo in nuevosDatos) {
             if (nuevosDatos[campo] !== undefined && nuevosDatos[campo] != datosAnteriores[campo]) {
                 const valorAnterior = datosAnteriores[campo] instanceof Date
-                    ? datosAnteriores[campo].toISOString().split('T')[0] // o .toISOString() si prefieres la hora también
+                    ? datosAnteriores[campo].toISOString().split('T')[0] 
                     : datosAnteriores[campo]?.toString();
         
                 const valorNuevo = nuevosDatos[campo] instanceof Date
@@ -105,14 +104,11 @@ async function actualizarDatosPaciente(paciente, nuevosDatos, id_usuario_modific
                 });
             }
         }        
-
         if (cambios.length > 0) {
             await paciente.update(nuevosDatos);
             await HistorialCambiosPaciente.bulkCreate(cambios);
         }
-
         return paciente;
-
     } catch (error) {
         throw new Error(`Error al actualizar datos del paciente: ${error.message}`);
     }

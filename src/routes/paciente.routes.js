@@ -11,6 +11,6 @@ router.get('/get/id_usuario/:id_usuario', verificarToken, authorizeRole(["gestio
 // Actualizar información militar por paciente
 router.put('/put/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios"]), actualizarPaciente);
 // Ruta del hsitorial de cambios
-router.get('/get//historial/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios", "ver_paciente"]), getHistorialPorIdentificacion);
+router.get('/get/historial/:identificacion', verificarToken, authorizeRole(["gestionar_usuarios", "ver_paciente"]), getHistorialPorIdentificacion);
 
 module.exports = router;
