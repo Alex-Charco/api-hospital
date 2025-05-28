@@ -42,23 +42,18 @@ async function obtenerDatosUsuario(id_usuario) {
             attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
-
         if (datosUsuario) return { ...datosUsuario, tipo: 'paciente' };
-
         datosUsuario = await Medico.findOne({ 
             where: { id_usuario }, 
             attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
-
         if (datosUsuario) return { ...datosUsuario, tipo: 'medico' };
-
         datosUsuario = await Administrador.findOne({ 
             where: { id_usuario }, 
             attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
-
         return datosUsuario ? { ...datosUsuario, tipo: 'administrador' } : null;
     } catch (error) {
         console.error(`Error al obtener datos del usuario: ${error.message}`);

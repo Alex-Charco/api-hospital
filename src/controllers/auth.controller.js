@@ -89,16 +89,14 @@ async function login(req, res) {
         const now = Date.now();
         const attempt = loginAttempts.get(nombre_usuario) || { count: 0, firstAttempt: now };
 
-        // Verificar si está bloqueado
+        // Verificar si está bloquead_
         if (attempt.blockedUntil && now < attempt.blockedUntil) {
             const waitSeconds = Math.ceil((attempt.blockedUntil - now) / 1000);
             return res.status(429).json({
                 message: `Demasiados intentos fallidos. Intenta de nuevo en ${waitSeconds} segundos.`
             });
         }
-
         const usuario = await buscarUsuario(nombre_usuario, true);
-
         // Si credenciales inválidas
         if (!usuario?.password || !(await verificarPassword(password, usuario.password))) {
     if (!attempt) {
@@ -113,16 +111,12 @@ async function login(req, res) {
                 message: 'Has superado el número máximo de intentos. Tu cuenta se ha bloqueado por 15 minutos.'
             });
         }
-
         loginAttempts.set(nombre_usuario, attempt);
     }
-
     return res.status(401).json({ message: 'Credenciales inválidas.' });
 }
-
         // Login exitoso: limpiar intentos fallidos
         loginAttempts.delete(nombre_usuario);
-
         // Validaciones adicionales...
         if (usuario.estatus !== 1) {
             return res.status(403).json({ message: 'Usuario inactivo.' });

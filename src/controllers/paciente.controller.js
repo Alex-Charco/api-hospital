@@ -85,7 +85,9 @@ async function getPaciente(req, res) {
 // Función para actualizar la información del paciente
 async function actualizarPaciente(req, res) {
     const { identificacion } = req.params; 
-    const datosActualizados = req.body;
+    const { id_usuario_modificador, ...datosActualizados } = req.body;
+
+
     try {
         // Buscar al paciente por identificación
         const paciente = await pacienteService.obtenerPacientePorIdentificacion(identificacion);
@@ -95,7 +97,8 @@ async function actualizarPaciente(req, res) {
         }
 
         // Actualizar los datos del paciente
-        const pacienteActualizado = await pacienteService.actualizarDatosPaciente(paciente, datosActualizados);
+        const pacienteActualizado = await pacienteService.actualizarDatosPaciente(paciente, datosActualizados, id_usuario_modificador);
+
 
         // Formatear la fecha de nacimiento antes de devolverla
         const pacienteFormateado = {
@@ -115,4 +118,15 @@ async function actualizarPaciente(req, res) {
     }
 }
 
-module.exports = { registrarPaciente, getPaciente, actualizarPaciente };
+async function getHistorialPorIdentificacion(req, res) {
+    const { identificacion } = req.params;
+
+    try {
+        const historial = await pacienteService.obtenerHistorialPorIdentificacion(identificacion);
+        return res.status(200).json(historial);
+    } catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+}
+
+module.exports = { registrarPaciente, getPaciente, actualizarPaciente, getHistorialPorIdentificacion };

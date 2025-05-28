@@ -1,6 +1,7 @@
-const { Paciente, Usuario, RolUsuario, Familiar, InfoMilitar, Residencia, Seguro } = require("../models");
+const { Paciente, Usuario, RolUsuario, Familiar, InfoMilitar, Residencia, Seguro, HistorialCambiosPaciente } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
+const { formatFechaCompleta } = require('../utils/date_utils');
 
 async function validarUsuarioParaPaciente(nombre_usuario) {
     try {
@@ -23,7 +24,6 @@ async function validarUsuarioParaPaciente(nombre_usuario) {
         throw new Error(`${errorMessages.errorValidarUsuario}: ${error.message}`);
     }
 }
-
 
 async function validarIdentificacionPaciente(identificacion) {
     try {
@@ -55,7 +55,7 @@ async function obtenerPacientePorIdentificacion(identificacion) {
                     include: [
                         {
                             model: RolUsuario,
-                            as: "rol" // Usa el alias definido en la relación Usuario -> RolUsuario
+                            as: "rol" 
                         }
                     ]
                 },
@@ -79,11 +79,38 @@ async function obtenerPacientePorIdentificacion(identificacion) {
     }
 }
 
-async function actualizarDatosPaciente(paciente, nuevosDatos) {
+async function actualizarDatosPaciente(paciente, nuevosDatos, id_usuario_modificador) {
     try {
-        return await paciente.update(nuevosDatos);
+        const datosAnteriores = paciente.toJSON();
+        const cambios = [];
+
+        for (const campo in nuevosDatos) {
+            if (nuevosDatos[campo] !== undefined && nuevosDatos[campo] != datosAnteriores[campo]) {
+                const valorAnterior = datosAnteriores[campo] instanceof Date
+                    ? datosAnteriores[campo].toISOString().split('T')[0] 
+                    : datosAnteriores[campo]?.toString();
+        
+                const valorNuevo = nuevosDatos[campo] instanceof Date
+                    ? nuevosDatos[campo].toISOString().split('T')[0]
+                    : nuevosDatos[campo]?.toString();
+        
+                cambios.push({
+                    id_paciente: paciente.id_paciente,
+                    id_usuario: id_usuario_modificador,
+                    campo_modificado: campo,
+                    valor_anterior: valorAnterior || null,
+                    valor_nuevo: valorNuevo || null,
+                    fecha_cambio: formatFechaCompleta(new Date())
+                });
+            }
+        }        
+        if (cambios.length > 0) {
+            await paciente.update(nuevosDatos);
+            await HistorialCambiosPaciente.bulkCreate(cambios);
+        }
+        return paciente;
     } catch (error) {
-        throw new Error(`${errorMessages.errorActualizarPaciente}: ${error.message}`);
+        throw new Error(`Error al actualizar datos del paciente: ${error.message}`);
     }
 }
 
@@ -119,6 +146,31 @@ async function obtenerPacientePorIdUsuario(id_usuario) {
     }
 }
 
+async function obtenerHistorialPorIdentificacion(identificacion) {
+    try {
+        const paciente = await Paciente.findOne({ where: { identificacion } });
+
+        if (!paciente) {
+            throw new Error("Paciente no encontrado con esa identificación.");
+        }
+
+        const historial = await HistorialCambiosPaciente.findAll({
+            where: { id_paciente: paciente.id_paciente },
+            order: [['fecha_cambio', 'DESC']]
+        });
+
+        // Formatear fechas
+        return historial.map(item => {
+            const json = item.toJSON();
+            json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+            return json;
+        });
+
+    } catch (error) {
+        throw new Error(`Error al obtener historial por identificación: ${error.message}`);
+    }
+}
+
 module.exports = {
     validarUsuarioParaPaciente,
     validarIdentificacionPaciente,
@@ -126,5 +178,6 @@ module.exports = {
     obtenerPacientePorIdentificacion,
     actualizarDatosPaciente,
 	obtenerPacientePorId,
-	obtenerPacientePorIdUsuario
+	obtenerPacientePorIdUsuario,
+    obtenerHistorialPorIdentificacion
 };
