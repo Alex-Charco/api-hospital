@@ -26,11 +26,13 @@ describe('Servicios y controlador de Login', () => {
   let req;
   let res;
 
+  const PASSWORD_INCORRECTA = 'clave_incorrecta';
+  
   beforeEach(() => {
     req = {
       body: {
         nombre_usuario: 'usuario_test',
-        password: 'clave_incorrecta'
+        password: PASSWORD_INCORRECTA
       }
     };
     res = {
@@ -103,17 +105,19 @@ describe('Servicios y controlador de Login', () => {
     });
   });
 
+  const PASSWORD_VALIDA = '123456';
   describe('verificarPassword()', () => {
     test('debe retornar true si la contraseña es válida', async () => {
-      const password = '123456';
+      const password = PASSWORD_VALIDA;
       const hashed = await bcrypt.hash(password, 10);
 
       const result = await verificarPassword(password, hashed);
       expect(result).toBe(true);
     });
-
+    
+	const PASSWORD_INVALIDA = '123456';
     test('debe retornar false si la contraseña es inválida', async () => {
-      const password = '123456';
+      const password = PASSWORD_INVALIDA;
       const hashed = await bcrypt.hash('otra', 10);
 
       const result = await verificarPassword(password, hashed);
