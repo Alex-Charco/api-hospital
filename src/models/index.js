@@ -26,6 +26,7 @@ const RecetaAutorizacion = require("./receta_autorizacion.model");
 const Asistencia = require("./asistencia.model");
 const PersonaExterna = require("./persona_externa.model");
 const HistorialCambiosPaciente = require("./historial_cambios_paciente.model");
+const HistorialCambiosFamiliar = require('./historial_cambios_familiar.model');
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -113,6 +114,7 @@ InfoMilitar.belongsTo(Paciente, {
 // Relación entre Paciente y Familiar
 Paciente.hasMany(Familiar, {
     foreignKey: "id_paciente",
+	as: "familiares",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
@@ -438,6 +440,37 @@ HistorialCambiosPaciente.belongsTo(Usuario, {
     onUpdate: "CASCADE"
 });
 
+// *Familiar
+// Relación entre HistorialCambiosFamiliar y Familiar
+Familiar.hasMany(HistorialCambiosFamiliar, {
+    foreignKey: "id_familiar",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosFamiliar.belongsTo(Familiar, {
+    foreignKey: "id_familiar",
+    as: "familiar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosFamiliar y Usuario
+Usuario.hasMany(HistorialCambiosFamiliar, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosFamiliar.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 
 module.exports = {
     sequelize,
@@ -465,5 +498,6 @@ module.exports = {
 	Posologia,
     PersonaExterna,
 	RecetaAutorizacion,
-    HistorialCambiosPaciente
+    HistorialCambiosPaciente,
+	HistorialCambiosFamiliar
 };

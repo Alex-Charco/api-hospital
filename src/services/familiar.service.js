@@ -1,5 +1,6 @@
-const { Familiar } = require('../models');
+const { Familiar, HistorialCambiosFamiliar } = require('../models');
 const errorMessages = require("../utils/error_messages");
+const { formatFechaCompleta } = require('../utils/date_utils');
 
 async function validarFamiliarRegistrado(id_paciente, relacion) {
     const familiar = await Familiar.findOne({ where: { id_paciente, relacion } });
@@ -53,11 +54,40 @@ async function crearFamiliar(id_paciente, datosFamiliar) {
     }
 }
 
-async function actualizarFamiliar(familiar, nuevosDatos) {
+async function actualizarDatosFamiliar(familiar, nuevosDatos, id_usuario_modificador) {
     try {
-        return await familiar.update(nuevosDatos);
+        const datosAnteriores = familiar.toJSON();
+        const cambios = [];
+
+        for (const campo in nuevosDatos) {
+            if (nuevosDatos[campo] !== undefined && nuevosDatos[campo] != datosAnteriores[campo]) {
+                const valorAnterior = datosAnteriores[campo] instanceof Date
+                    ? datosAnteriores[campo].toISOString().split('T')[0]
+                    : datosAnteriores[campo]?.toString();
+
+                const valorNuevo = nuevosDatos[campo] instanceof Date
+                    ? nuevosDatos[campo].toISOString().split('T')[0]
+                    : nuevosDatos[campo]?.toString();
+
+                cambios.push({
+                    id_familiar: familiar.id_familiar,
+                    id_usuario: id_usuario_modificador,
+                    campo_modificado: campo,
+                    valor_anterior: valorAnterior || null,
+                    valor_nuevo: valorNuevo || null,
+                    fecha_cambio: formatFechaCompleta(new Date())
+                });
+            }
+        }
+
+        if (cambios.length > 0) {
+            await familiar.update(nuevosDatos);
+            await HistorialCambiosFamiliar.bulkCreate(cambios);
+        }
+
+        return familiar;
     } catch (error) {
-        throw new Error(errorMessages.errorActualizarFamiliar + error.message);
+        throw new Error(`Error al actualizar datos del familiar: ${error.message}`);
     }
 }
 
@@ -80,6 +110,6 @@ module.exports = {
     obtenerFamiliarCondicional,
     obtenerFamiliarPorIdentificacion,
     crearFamiliar,
-    actualizarFamiliar,
+    actualizarDatosFamiliar,
 	obtenerFamiliarPorId
 };

@@ -78,7 +78,7 @@ async function getByFamiliar(req, res) {
 // ✅ Actualizar información del familiar (solo administradores)
 async function actualizarFamiliar(req, res) {
     const { identificacionPaciente } = req.params;
-    const nuevosDatos = req.body;
+    const { id_usuario_modificador, ...nuevosDatos } = req.body;
 
     try {
         // Validar si el paciente existe
@@ -91,8 +91,8 @@ async function actualizarFamiliar(req, res) {
         // Buscar el familiar asociado al paciente
         const familiar = await familiarService.obtenerFamiliarCondicional({ id_paciente: paciente.id_paciente });
 
-        // Actualizar la información del familiar
-        const familiarActualizado = await familiarService.actualizarFamiliar(familiar, nuevosDatos);
+        // Actualizar la información del familiar con historial
+        const familiarActualizado = await familiarService.actualizarDatosFamiliar(familiar, nuevosDatos, id_usuario_modificador);
 
         const familiarFormateado = {
             ...familiarActualizado.toJSON(),
@@ -108,6 +108,5 @@ async function actualizarFamiliar(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
-
 
 module.exports = { registrarFamiliar, getByFamiliar, actualizarFamiliar };

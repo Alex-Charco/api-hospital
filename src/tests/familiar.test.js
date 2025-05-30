@@ -1,5 +1,5 @@
 const familiarService = require('../services/familiar.service');
-const { Familiar } = require('../models');
+const { Familiar, HistorialCambiosFamiliar } = require('../models');
 const errorMessages = require('../utils/error_messages');
 
 // Mock de Sequelize
@@ -8,6 +8,9 @@ jest.mock('../models', () => ({
         findOne: jest.fn(),
         findByPk: jest.fn(),
         create: jest.fn(),
+    },
+    HistorialCambiosFamiliar: {
+        bulkCreate: jest.fn(),
     },
 }));
 
@@ -90,28 +93,36 @@ describe('Familiar Service', () => {
     });
 
     describe('actualizarFamiliar', () => {
-        it('debe actualizar un familiar', async () => {
-            const mockFamiliar = {
-                update: jest.fn().mockResolvedValue({ nombre: 'NuevoNombre' }),
-            };
+		it('debe actualizar un familiar', async () => {
+			const mockFamiliar = {
+				id_familiar: 1,
+				nombre: 'AntiguoNombre',
+				toJSON: () => ({ id_familiar: 1, nombre: 'AntiguoNombre' }),
+				update: jest.fn().mockResolvedValue({ nombre: 'NuevoNombre' }),
+			};
 
-            const result = await familiarService.actualizarFamiliar(mockFamiliar, {
-                nombre: 'NuevoNombre',
-            });
+			const result = await familiarService.actualizarDatosFamiliar(mockFamiliar, {
+				nombre: 'NuevoNombre',
+			}, 123); // id_usuario_modificador
 
-            expect(result).toEqual({ nombre: 'NuevoNombre' });
-        });
+			expect(result).toEqual(mockFamiliar);
+		});
 
-        it('debe lanzar error si falla la actualización', async () => {
-            const mockFamiliar = {
-                update: jest.fn().mockRejectedValue(new Error('Update failed')),
-            };
+		it('debe lanzar error si falla la actualización', async () => {
+			const mockFamiliar = {
+				id_familiar: 1,
+				nombre: 'AntiguoNombre',
+				toJSON: () => ({ id_familiar: 1, nombre: 'AntiguoNombre' }),
+				update: jest.fn().mockRejectedValue(new Error('Update failed')),
+			};
 
-            await expect(
-                familiarService.actualizarFamiliar(mockFamiliar, { nombre: 'Error' })
-            ).rejects.toThrow(`${errorMessages.errorActualizarFamiliar}Update failed`);
-        });
-    });
+			await expect(
+				familiarService.actualizarDatosFamiliar(mockFamiliar, { nombre: 'Error' }, 123)
+			).rejects.toThrow(`Error al actualizar datos del familiar: Update failed`);
+
+		});
+	});
+
 
     describe('obtenerFamiliarPorId', () => {
         it('debe retornar el familiar si se encuentra', async () => {
