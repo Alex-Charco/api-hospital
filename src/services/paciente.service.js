@@ -148,24 +148,53 @@ async function obtenerPacientePorIdUsuario(id_usuario) {
 
 async function obtenerHistorialPorIdentificacion(identificacion) {
     try {
-        const paciente = await Paciente.findOne({ where: { identificacion } });
+        const paciente = await Paciente.findOne({
+            where: { identificacion },
+            include: [{ model: Familiar, as: "familiares" }]
+        });
 
         if (!paciente) {
             throw new Error("Paciente no encontrado con esa identificación.");
         }
 
-        const historial = await HistorialCambiosPaciente.findAll({
+        // Obtener historial del paciente
+        const historialPaciente = await HistorialCambiosPaciente.findAll({
             where: { id_paciente: paciente.id_paciente },
             order: [['fecha_cambio', 'DESC']]
         });
 
-        // Formatear fechas
-        return historial.map(item => {
+        const historialPacienteFormateado = historialPaciente.map(item => {
             const json = item.toJSON();
+            json.tipo = 'paciente';
             json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
             return json;
         });
 
+        // Obtener historial de todos los familiares asociados
+        const familiares = paciente.familiares || [];
+        let historialFamiliarTotal = [];
+
+        for (const familiar of familiares) {
+            const historialFamiliar = await require("../models").HistorialCambiosFamiliar.findAll({
+                where: { id_familiar: familiar.id_familiar },
+                order: [['fecha_cambio', 'DESC']]
+            });
+
+            const historialFamiliarFormateado = historialFamiliar.map(item => {
+                const json = item.toJSON();
+                json.tipo = 'familiar';
+                json.id_familiar = familiar.id_familiar;
+                json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+                return json;
+            });
+
+            historialFamiliarTotal = historialFamiliarTotal.concat(historialFamiliarFormateado);
+        }
+
+        return {
+            paciente: historialPacienteFormateado,
+            familiares: historialFamiliarTotal
+        };
     } catch (error) {
         throw new Error(`Error al obtener historial por identificación: ${error.message}`);
     }
