@@ -50,7 +50,6 @@ async function getByInfoMilitar(req, res) {
 }
 
 // ✅ Actualizar información militar (solo administradores)
-// ✅ Actualizar información militar (solo administradores)
 async function actualizarInfoMilitar(req, res) {
     const { identificacion } = req.params;
     const { id_usuario_modificador, ...datosActualizados } = req.body;
