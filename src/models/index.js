@@ -29,6 +29,7 @@ const HistorialCambiosPaciente = require("./historial_cambios_paciente.model");
 const HistorialCambiosFamiliar = require('./historial_cambios_familiar.model');
 const HistorialCambiosInfoMilitar = require('./historial_cambios_info_militar.model');
 const HistorialCambiosResidencia = require('./historial_cambios_residencia.model');
+const HistorialCambiosSeguro = require('./historial_cambios_seguro.model');
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -535,6 +536,37 @@ HistorialCambiosResidencia.belongsTo(Usuario, {
     onUpdate: "CASCADE"
 });
 
+// *Seguro
+// Relación entre HistorialCambiosSeguro y Seguro
+Seguro.hasMany(HistorialCambiosSeguro, {
+    foreignKey: "id_seguro",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosSeguro.belongsTo(Seguro, {
+    foreignKey: "id_seguro",
+    as: "info_militar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosSeguro y Usuario
+Usuario.hasMany(HistorialCambiosSeguro, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_seguro",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosSeguro.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 module.exports = {
     sequelize,
     Usuario,
@@ -565,4 +597,5 @@ module.exports = {
 	HistorialCambiosFamiliar,
 	HistorialCambiosInfoMilitar,
 	HistorialCambiosResidencia,
+	HistorialCambiosSeguro
 };
