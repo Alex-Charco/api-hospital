@@ -61,6 +61,7 @@ async function obtenerPacientePorIdentificacion(identificacion) {
                 },
 				{
 					model: Familiar,
+					as: "familiares"
 				},
 				{
 					model: InfoMilitar,
