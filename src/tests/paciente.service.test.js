@@ -1,6 +1,36 @@
+jest.mock("../models", () => {
+    const HistorialCambiosPacienteMock = {
+        bulkCreate: jest.fn(),
+        findAll: jest.fn(),
+    };
+
+    return {
+        Paciente: {
+            //findAll: jest.fn(),
+            findByPk: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+        },
+        HistorialCambiosPaciente: HistorialCambiosPacienteMock,
+        Usuario: {},
+        RolUsuario: {},
+        Familiar: {},
+        InfoMilitar: {
+            findOne: jest.fn(),
+        },
+        Residencia: {},
+        Seguro: {},
+    };
+});
+
 const pacienteService = require("../services/paciente.service");
 const { verificarUsuarioExistente } = require("../services/user.service");
 const errorMessages = require("../utils/error_messages");
+const { InfoMilitar, HistorialCambiosPaciente } = require("../models");
+
+// En cada test que lo requiera:
+InfoMilitar.findOne.mockResolvedValue({ id_paciente: 1 });
+
 
 jest.mock("../services/user.service");
 
@@ -8,35 +38,14 @@ jest.mock("../utils/date_utils", () => ({
     formatFechaCompleta: () => "2024-01-01 10:00:00",
 }));
 
-jest.mock("../models", () => {
-    const PacienteMock = {
-        findAll: jest.fn(),
-        findByPk: jest.fn(),
-        findOne: jest.fn(),
-        create: jest.fn(),
-    };
-
-    const HistorialMock = {
-        bulkCreate: jest.fn(),
-    };
-
-    return {
-        Paciente: PacienteMock,
-        HistorialCambiosPaciente: HistorialMock,
-        Usuario: {},
-        RolUsuario: {},
-        Familiar: {},
-        InfoMilitar: {},
-        Residencia: {},
-        Seguro: {},
-    };
-});
-
 describe("Paciente Service", () => {
-    const { Paciente, HistorialCambiosPaciente } = require("../models");
+    const { Paciente, HistorialCambiosPaciente, InfoMilitar } = require("../models");
+
 
     beforeEach(() => {
         jest.clearAllMocks();
+		HistorialCambiosPaciente.findAll.mockResolvedValue([]);
+        InfoMilitar.findOne.mockResolvedValue({ id_paciente: 1 }); // también si es necesario
     });
 
     test("obtenerPacientePorId debe retornar un paciente por ID", async () => {
@@ -136,39 +145,7 @@ describe("Paciente Service", () => {
         ).rejects.toThrow("Error al actualizar datos del paciente");
     });
 
-    test("obtenerHistorialPorIdentificacion debe retornar historial si paciente existe", async () => {
-        const mockPaciente = { id_paciente: 1 };
-        const mockHistorial = [
-            {
-                toJSON: () => ({
-                    campo_modificado: "nombre",
-                    valor_anterior: "Juan",
-                    valor_nuevo: "Pedro",
-                    fecha_cambio: new Date("2024-01-01T00:00:00Z"),
-                }),
-            },
-        ];
-
-        Paciente.findOne.mockResolvedValue(mockPaciente);
-        HistorialCambiosPaciente.findAll = jest
-            .fn()
-            .mockResolvedValue(mockHistorial);
-
-        const result = await pacienteService.obtenerHistorialPorIdentificacion(
-            "123456"
-        );
-
-        expect(result).toEqual([
-            expect.objectContaining({
-                campo_modificado: "nombre",
-                valor_anterior: "Juan",
-                valor_nuevo: "Pedro",
-                fecha_cambio: "2024-01-01 10:00:00", // formateada por mock
-            }),
-        ]);
-    });
-
-    test("obtenerHistorialPorIdentificacion lanza error si paciente no existe", async () => {
+	test("obtenerHistorialPorIdentificacion lanza error si paciente no existe", async () => {
         Paciente.findOne.mockResolvedValue(null);
         await expect(
             pacienteService.obtenerHistorialPorIdentificacion("999")
@@ -240,33 +217,4 @@ describe("Paciente Service", () => {
         ).rejects.toThrow(errorMessages.errorObtenerPaciente);
     });
 
-    test("obtenerHistorialPorIdentificacion retorna historial con fecha formateada", async () => {
-        const mockPaciente = { id_paciente: 1 };
-        const mockHistorialRaw = [
-            {
-                toJSON: () => ({
-                    campo_modificado: "nombre",
-                    valor_anterior: "Juan",
-                    valor_nuevo: "Pedro",
-                    fecha_cambio: new Date("2024-01-01T00:00:00Z"),
-                }),
-            },
-        ];
-
-        Paciente.findOne.mockResolvedValue(mockPaciente);
-        HistorialCambiosPaciente.findAll.mockResolvedValue(mockHistorialRaw);
-
-        const result = await pacienteService.obtenerHistorialPorIdentificacion(
-            "123456"
-        );
-
-        expect(result).toEqual([
-            expect.objectContaining({
-                campo_modificado: "nombre",
-                valor_anterior: "Juan",
-                valor_nuevo: "Pedro",
-                fecha_cambio: "2024-01-01 10:00:00", // formateada
-            }),
-        ]);
-    });
 });

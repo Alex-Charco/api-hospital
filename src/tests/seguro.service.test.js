@@ -6,8 +6,15 @@ jest.mock('../models', () => ({
     Seguro: {
         findOne: jest.fn(),
         create: jest.fn()
+    },
+    HistorialCambiosSeguro: {
+        bulkCreate: jest.fn()
+    },
+    sequelize: {
+        transaction: jest.fn().mockImplementation(cb => cb())
     }
 }));
+
 
 describe('Seguro Service', () => {
     afterEach(() => {
@@ -67,29 +74,33 @@ describe('Seguro Service', () => {
     });
 
     describe('actualizarSeguro', () => {
-        it('debe actualizar y retornar el seguro', async () => {
-            const seguroMock = {
-                update: jest.fn().mockResolvedValue({ nombre_seguro: 'Actualizado' })
-            };
+    it('debe actualizar y retornar el seguro', async () => {
+        const seguroMock = {
+            id_seguro: 1,
+            get: jest.fn().mockReturnValue({ tipo: 'A', beneficiario: 'Juan' }),
+            update: jest.fn().mockResolvedValue({ nombre_seguro: 'Actualizado' })
+        };
 
-            const result = await seguroService.actualizarSeguro(seguroMock, { nombre_seguro: 'Actualizado' });
-            expect(seguroMock.update).toHaveBeenCalledWith({ nombre_seguro: 'Actualizado' });
-            expect(result).toEqual({ nombre_seguro: 'Actualizado' });
-        });
+        const result = await seguroService.actualizarSeguro(
+            seguroMock,
+            { nombre_seguro: 'Actualizado' },
+            999 // <-- id_usuario
+        );
 
-        it('debe lanzar un error si ocurre un fallo al actualizar', async () => {
-            const seguroMock = {
-                update: jest.fn().mockRejectedValue(new Error('Update failed'))
-            };
-
-            await seguroService.actualizarSeguro(seguroMock, {})
-                .catch((error) => {
-                    expect(error).toBeInstanceOf(Error);
-                    expect(error.message).toContain(errorMessages.errorActualizarSeguro);
-                    expect(error.message).toBe('Error al actualizar el seguro: Update failed');
-                });
-
-
-        });
+        expect(seguroMock.update).toHaveBeenCalledWith({ nombre_seguro: 'Actualizado' }, expect.anything());
+        expect(result).toEqual({ nombre_seguro: 'Actualizado' });
     });
+
+    it('debe lanzar un error si ocurre un fallo al actualizar', async () => {
+        const seguroMock = {
+            id_seguro: 1,
+            get: jest.fn().mockReturnValue({}),
+            update: jest.fn().mockRejectedValue(new Error('Update failed'))
+        };
+
+        await expect(seguroService.actualizarSeguro(seguroMock, {}, 999))
+            .rejects.toThrow('Error al actualizar el seguro: Update failed');
+    });
+});
+
 });

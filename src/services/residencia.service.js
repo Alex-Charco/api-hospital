@@ -65,18 +65,19 @@ async function actualizarResidencia(residencia, nuevosDatos, id_usuario) {
     }
   }
 
-  return await sequelize.transaction(async (t) => {
-    // Guardar historial si hubo cambios
-    if (cambios.length > 0) {
-      await HistorialCambiosResidencia.bulkCreate(cambios, { transaction: t });
-      console.log(`🟢 Historial residencia guardado con ${cambios.length} cambio(s).`);
-    }
+  try {
+    return await sequelize.transaction(async (t) => {
+      if (cambios.length > 0) {
+        await HistorialCambiosResidencia.bulkCreate(cambios, { transaction: t });
+      }
 
-    // Actualizar residencia
-    const residenciaActualizada = await residencia.update(nuevosDatos, { transaction: t });
+      const residenciaActualizada = await residencia.update(nuevosDatos, { transaction: t });
 
-    return residenciaActualizada;
-  });
+      return residenciaActualizada;
+    });
+  } catch (error) {
+    throw new Error("No se pudo actualizar la residencia. " + error.message);
+  }
 }
 
 module.exports = {

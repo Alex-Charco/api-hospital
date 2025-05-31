@@ -68,16 +68,19 @@ async function actualizarSeguro(seguro, nuevosDatos, id_usuario) {
         }
     }
 
-    return await sequelize.transaction(async (t) => {
-        if (cambios.length > 0) {
-            await HistorialCambiosSeguro.bulkCreate(cambios, { transaction: t });
-            console.log(`🟢 Historial seguro guardado con ${cambios.length} cambio(s).`);
-        }
+   try {
+        return await sequelize.transaction(async (t) => {
+            if (cambios.length > 0) {
+                await HistorialCambiosSeguro.bulkCreate(cambios, { transaction: t });
+                console.log(`🟢 Historial seguro guardado con ${cambios.length} cambio(s).`);
+            }
 
-        const seguroActualizado = await seguro.update(nuevosDatos, { transaction: t });
-
-        return seguroActualizado;
-    });
+            const seguroActualizado = await seguro.update(nuevosDatos, { transaction: t });
+            return seguroActualizado;
+        });
+    } catch (error) {
+        throw new Error(`Error al actualizar el seguro: ${error.message}`);
+    }
 }
 
 module.exports = {
