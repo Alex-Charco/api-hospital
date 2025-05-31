@@ -148,6 +148,13 @@ async function obtenerPacientePorIdUsuario(id_usuario) {
 
 async function obtenerHistorialPorIdentificacion(identificacion) {
     try {
+        const { 
+            Paciente, Familiar, HistorialCambiosPaciente, HistorialCambiosFamiliar,
+            InfoMilitar, HistorialCambiosInfoMilitar,
+            Residencia, HistorialCambiosResidencia,
+            Seguro, HistorialCambiosSeguro
+        } = require("../models");
+
         const paciente = await Paciente.findOne({
             where: { identificacion },
             include: [{ model: Familiar, as: "familiares" }]
@@ -157,7 +164,7 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
             throw new Error("Paciente no encontrado con esa identificación.");
         }
 
-        // Obtener historial del paciente
+        // 1. Historial cambios de Paciente
         const historialPaciente = await HistorialCambiosPaciente.findAll({
             where: { id_paciente: paciente.id_paciente },
             order: [['fecha_cambio', 'DESC']]
@@ -170,12 +177,12 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
             return json;
         });
 
-        // Obtener historial de todos los familiares asociados
+        // 2. Historial cambios de Familiares
         const familiares = paciente.familiares || [];
         let historialFamiliarTotal = [];
 
         for (const familiar of familiares) {
-            const historialFamiliar = await require("../models").HistorialCambiosFamiliar.findAll({
+            const historialFamiliar = await HistorialCambiosFamiliar.findAll({
                 where: { id_familiar: familiar.id_familiar },
                 order: [['fecha_cambio', 'DESC']]
             });
@@ -191,10 +198,75 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
             historialFamiliarTotal = historialFamiliarTotal.concat(historialFamiliarFormateado);
         }
 
+        // 3. Historial cambios Info Militar
+        const infoMilitar = await InfoMilitar.findOne({
+            where: { id_paciente: paciente.id_paciente }
+        });
+
+        let historialInfoMilitarFormateado = [];
+        if (infoMilitar) {
+            const historialInfoMilitar = await HistorialCambiosInfoMilitar.findAll({
+                where: { id_info_militar: infoMilitar.id_info_militar },
+                order: [['fecha_cambio', 'DESC']]
+            });
+
+            historialInfoMilitarFormateado = historialInfoMilitar.map(item => {
+                const json = item.toJSON();
+                json.tipo = 'info_militar';
+                json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+                return json;
+            });
+        }
+
+        // 4. Historial cambios Residencia
+        const residencia = await Residencia.findOne({
+            where: { id_paciente: paciente.id_paciente }
+        });
+
+        let historialResidenciaFormateado = [];
+        if (residencia) {
+            const historialResidencia = await HistorialCambiosResidencia.findAll({
+                where: { id_residencia: residencia.id_residencia },
+                order: [['fecha_cambio', 'DESC']]
+            });
+
+            historialResidenciaFormateado = historialResidencia.map(item => {
+                const json = item.toJSON();
+                json.tipo = 'residencia';
+                json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+                return json;
+            });
+        }
+
+        // 5. Historial cambios Seguro
+        const seguro = await Seguro.findOne({
+            where: { id_paciente: paciente.id_paciente }
+        });
+
+        let historialSeguroFormateado = [];
+        if (seguro) {
+            const historialSeguro = await HistorialCambiosSeguro.findAll({
+                where: { id_seguro: seguro.id_seguro },
+                order: [['fecha_cambio', 'DESC']]
+            });
+
+            historialSeguroFormateado = historialSeguro.map(item => {
+                const json = item.toJSON();
+                json.tipo = 'seguro';
+                json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+                return json;
+            });
+        }
+
+        // Devolver todo junto
         return {
             paciente: historialPacienteFormateado,
-            familiares: historialFamiliarTotal
+            familiares: historialFamiliarTotal,
+            info_militar: historialInfoMilitarFormateado,
+            residencia: historialResidenciaFormateado,
+            seguro: historialSeguroFormateado
         };
+
     } catch (error) {
         throw new Error(`Error al obtener historial por identificación: ${error.message}`);
     }
