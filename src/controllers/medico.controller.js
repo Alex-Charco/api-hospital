@@ -108,4 +108,16 @@ async function actualizarMedico(req, res) {
     }
 }
 
-module.exports = { registrarMedico, obtenerMedicos, actualizarMedico };
+// Obtener historial de cambios de un médico
+async function getHistorialPorIdentificacionMedico(req, res) {
+    const { identificacion } = req.params;
+
+    try {
+        const historial = await medicoService.obtenerHistorialPorIdentificacionMedico(identificacion);
+        return res.status(200).json(historial);
+    } catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+}
+
+module.exports = { registrarMedico, obtenerMedicos, actualizarMedico, getHistorialPorIdentificacionMedico };

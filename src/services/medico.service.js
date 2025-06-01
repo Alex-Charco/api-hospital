@@ -1,6 +1,7 @@
 const { Medico, Usuario, Especialidad, HistorialCambiosMedico, sequelize } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
+const { formatFechaCompleta } = require('../utils/date_utils');
 
 async function validarUsuarioParaMedico(nombre_usuario) {
     try {
@@ -149,6 +150,31 @@ async function obtenerMedicoPorIdentificacion(identificacion) {
     }
 }
 
+// Función par aobtener el historial de cambios
+async function obtenerHistorialPorIdentificacionMedico(identificacion) {
+    try {
+        const medico = await Medico.findOne({ where: { identificacion } });
+
+        if (!medico) {
+            throw new Error("Medico no encontrado con esa identificación.");
+        }
+
+        const historial = await HistorialCambiosMedico.findAll({
+            where: { id_medico: medico.id_medico },
+            order: [['fecha_cambio', 'DESC']]
+        });
+
+        // Formatear fechas
+        return historial.map(item => {
+            const json = item.toJSON();
+            json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+            return json;
+        });
+
+    } catch (error) {
+        throw new Error(`Error al obtener historial por identificación: ${error.message}`);
+    }
+}
 
 module.exports = {
     validarUsuarioParaMedico,
@@ -157,5 +183,6 @@ module.exports = {
     obtenerMedicos,
     actualizarDatosMedico,
     validarMedicoExistente,
-	obtenerMedicoPorIdentificacion
+	obtenerMedicoPorIdentificacion,
+	obtenerHistorialPorIdentificacionMedico
 };
