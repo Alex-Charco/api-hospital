@@ -1,4 +1,4 @@
-const { Medico, Usuario, Especialidad } = require("../models");
+const { Medico, Usuario, Especialidad, HistorialCambiosMedico, sequelize } = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
 
@@ -63,11 +63,55 @@ async function obtenerMedicos(identificacion = null) {
     }
 }
 
-async function actualizarDatosMedico(medico, nuevosDatos) {
+async function actualizarDatosMedico(medico, nuevosDatos, id_usuario) {
+    if (!id_usuario) {
+        throw new Error("id_usuario es obligatorio para guardar el historial de cambios del médico");
+    }
+
     try {
-        return await medico.update(nuevosDatos);
+        const valoresPrevios = medico.get({ plain: true });
+
+        const camposAChequear = [
+            'id_especialidad', 'identificacion', 'fecha_nacimiento',
+            'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido',
+            'genero', 'reg_msp', 'celular', 'telefono', 'correo', 'estatus'
+        ];
+
+        const cambios = [];
+
+        for (const campo of camposAChequear) {
+            const valorAnterior = valoresPrevios[campo];
+            const valorNuevo = nuevosDatos[campo];
+
+            const cambioDetectado = (
+                valorNuevo !== undefined &&
+                String(valorAnterior)?.trim() !== String(valorNuevo)?.trim()
+            );
+
+            if (cambioDetectado) {
+                cambios.push({
+                    id_medico: medico.id_medico,
+                    campo_modificado: campo,
+                    valor_anterior: valorAnterior,
+                    valor_nuevo: valorNuevo,
+                    fecha_cambio: new Date(),
+                    id_usuario
+                });
+            }
+        }
+
+        return await sequelize.transaction(async (t) => {
+            if (cambios.length > 0) {
+                await HistorialCambiosMedico.bulkCreate(cambios, { transaction: t });
+                console.log(`🟢 Historial médico guardado con ${cambios.length} cambio(s).`);
+            }
+
+            const medicoActualizado = await medico.update(nuevosDatos, { transaction: t });
+            return medicoActualizado;
+        });
     } catch (error) {
-        throw new Error(`${errorMessages.errorActualizarMedico}: ${error.message}`);
+        console.error("❌ Error en actualizarDatosMedico:", error.message);
+        throw new Error("Error al actualizar los datos del médico y guardar el historial.");
     }
 }
 

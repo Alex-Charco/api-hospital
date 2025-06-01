@@ -30,6 +30,7 @@ const HistorialCambiosFamiliar = require('./historial_cambios_familiar.model');
 const HistorialCambiosInfoMilitar = require('./historial_cambios_info_militar.model');
 const HistorialCambiosResidencia = require('./historial_cambios_residencia.model');
 const HistorialCambiosSeguro = require('./historial_cambios_seguro.model');
+const HistorialCambiosMedico = require('./historial_cambios_medico.model');
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -516,7 +517,7 @@ Residencia.hasMany(HistorialCambiosResidencia, {
 
 HistorialCambiosResidencia.belongsTo(Residencia, {
     foreignKey: "id_residencia",
-    as: "info_militar",
+    as: "residencia",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
@@ -547,7 +548,7 @@ Seguro.hasMany(HistorialCambiosSeguro, {
 
 HistorialCambiosSeguro.belongsTo(Seguro, {
     foreignKey: "id_seguro",
-    as: "info_militar",
+    as: "seguro",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
@@ -566,6 +567,38 @@ HistorialCambiosSeguro.belongsTo(Usuario, {
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
+
+// *Medico
+// Relación entre HistorialCambiosMedico y Medico
+Medico.hasMany(HistorialCambiosMedico, {
+    foreignKey: "id_medico",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosMedico.belongsTo(Medico, {
+    foreignKey: "id_medico",
+    as: "medico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosMedico y Usuario
+Usuario.hasMany(HistorialCambiosMedico, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_medico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosMedico.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 
 module.exports = {
     sequelize,
@@ -597,5 +630,6 @@ module.exports = {
 	HistorialCambiosFamiliar,
 	HistorialCambiosInfoMilitar,
 	HistorialCambiosResidencia,
-	HistorialCambiosSeguro
+	HistorialCambiosSeguro,
+	HistorialCambiosMedico
 };

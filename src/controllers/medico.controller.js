@@ -81,8 +81,8 @@ async function obtenerMedicos(req, res) {
 // Actualizar la información de un médico
 async function actualizarMedico(req, res) {
     const { identificacion } = req.params;
-    const datosActualizados = req.body;
-    
+    const { id_usuario_modificador, ...datosActualizados } = req.body;
+
     try {
         const medico = await medicoService.obtenerMedicoPorIdentificacion(identificacion);
 
@@ -90,7 +90,7 @@ async function actualizarMedico(req, res) {
             return res.status(404).json({ message: errorMessages.medicoNoEncontrado });
         }
 
-        const medicoActualizado = await medicoService.actualizarDatosMedico(medico, datosActualizados);
+        const medicoActualizado = await medicoService.actualizarDatosMedico(medico, datosActualizados, id_usuario_modificador);
 
         const medicoFormateado = {
             ...medicoActualizado.toJSON(),
@@ -104,7 +104,7 @@ async function actualizarMedico(req, res) {
 
     } catch (error) {
         console.warn(`Error al actualizar el médico: ${error.message}`);
-        return res.status(500).json({ message: errorMessages.errorServidor });
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
 
