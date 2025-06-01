@@ -1,3 +1,19 @@
+jest.mock('../models', () => ({
+  Medico: {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    findAll: jest.fn()
+  },
+  Usuario: {},
+  Especialidad: {},
+  HistorialCambiosMedico: {
+    bulkCreate: jest.fn(),
+  },
+  sequelize: {
+    transaction: jest.fn((callback) => callback({})),
+  },
+}));
+
 const { 
   validarUsuarioParaMedico,
   validarIdentificacionMedico,
@@ -7,21 +23,9 @@ const {
   validarMedicoExistente,
   obtenerMedicoPorIdentificacion
 } = require("../services/medico.service");
-
-const { Medico, Usuario, Especialidad } = require("../models");
+const { Medico, Usuario, Especialidad, HistorialCambiosMedico, sequelize  } = require("../models");
 const { verificarUsuarioExistente } = require("../services/user.service");
 const errorMessages = require("../utils/error_messages");
-
-// 🔧 Mocks
-jest.mock("../models", () => ({
-  Medico: {
-    findOne: jest.fn(),
-    create: jest.fn(),
-    findAll: jest.fn()
-  },
-  Usuario: {},
-  Especialidad: {}
-}));
 
 jest.mock("../services/user.service", () => ({
   verificarUsuarioExistente: jest.fn()
@@ -112,12 +116,38 @@ describe("medico.service.js", () => {
   });
 
   describe("actualizarDatosMedico", () => {
-    it("debe actualizar y devolver el médico", async () => {
-      const medico = { update: jest.fn().mockResolvedValue({ id_medico: 1, nombre: "Nuevo Nombre" }) };
-      const result = await actualizarDatosMedico(medico, { nombre: "Nuevo Nombre" });
-      expect(result).toEqual({ id_medico: 1, nombre: "Nuevo Nombre" });
-    });
+  it("debe actualizar y devolver el médico", async () => {
+    const medico = {
+      id_medico: 1,
+      get: jest.fn().mockReturnValue({
+        primer_nombre: "Viejo Nombre",
+        id_medico: 1,
+      }),
+      update: jest.fn().mockResolvedValue({ id_medico: 1, primer_nombre: "Nuevo Nombre" }),
+    };
+
+    const nuevosDatos = { primer_nombre: "Nuevo Nombre" };
+    const id_usuario = 123;
+
+    const result = await actualizarDatosMedico(medico, nuevosDatos, id_usuario);
+
+    expect(HistorialCambiosMedico.bulkCreate).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          campo_modificado: "primer_nombre",
+          valor_anterior: "Viejo Nombre",
+          valor_nuevo: "Nuevo Nombre",
+          id_usuario: 123,
+        }),
+      ]),
+      expect.any(Object)
+    );
+
+    expect(medico.update).toHaveBeenCalledWith(nuevosDatos, expect.any(Object));
+    expect(result).toEqual({ id_medico: 1, primer_nombre: "Nuevo Nombre" });
   });
+});
+
 
   describe("validarMedicoExistente", () => {
     it("debe retornar el médico si existe", async () => {
