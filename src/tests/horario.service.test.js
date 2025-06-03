@@ -69,11 +69,13 @@ describe('horarioService', () => {
   });
 
   describe('obtenerHorario', () => {
-    it('debería lanzar error si no encuentra horarios', async () => {
-      Horario.findAll.mockResolvedValue([]);
+    it('debería devolver médico undefined y horarios vacío si no hay horarios', async () => {
+	  Horario.findAll.mockResolvedValue([]);
+	  Medico.findOne.mockResolvedValue(undefined); // importante
 
-      await expect(horarioService.obtenerHorario(1)).rejects.toThrow(errorMessages.horarioNoEncontrado);
-    });
+	  const result = await horarioService.obtenerHorario(1);
+	  expect(result).toEqual({ medico: undefined, horarios: [] });
+	});
 
     it('debería lanzar error si no encuentra al médico', async () => {
       Horario.findAll.mockResolvedValue([{ id: 1 }]);

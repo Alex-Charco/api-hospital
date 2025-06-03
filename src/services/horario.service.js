@@ -66,8 +66,14 @@ async function obtenerHorario(id_medico, incluirPasados = false) {
     });
 
     if (!horarios || horarios.length === 0) {
-        throw new Error(errorMessages.horarioNoEncontrado);
-    }
+		return {
+			medico: await Medico.findOne({
+				where: { id_medico },
+				include: [{ model: Especialidad, as: "especialidad" }]
+			}),
+			horarios: [] // Devuelve un array vacío
+		};
+	}
 
     // Obtener una sola vez el médico (con especialidad)
     const medico = await Medico.findOne({
@@ -109,10 +115,6 @@ async function buscarHorarioPorFecha({ id_medico, fechaBusquedaInicio, fechaBusq
         where: whereCondition,
         include: [{ model: Turno, as: "turnos" }]
     });
-
-    if (!horarios || horarios.length === 0) {
-        throw new Error(errorMessages.horarioNoEncontrado);
-    }
 
     return horarios;
 }
