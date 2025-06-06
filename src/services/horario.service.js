@@ -21,12 +21,12 @@ async function validarHorarioNuevo(idMedico, fecha, hora_inicio, hora_fin, idHor
         let query = `
             SELECT * FROM horario 
             WHERE id_medico = :idMedico
-              AND fecha_horario = :fecha
-              AND (
-                  (hora_inicio BETWEEN :hora_inicio AND :hora_fin) OR
-                  (hora_fin BETWEEN :hora_inicio AND :hora_fin) OR
-                  (:hora_inicio BETWEEN hora_inicio AND hora_fin)
-              )
+                AND fecha_horario = :fecha
+                AND (
+                    (hora_inicio BETWEEN :hora_inicio AND :hora_fin) OR
+                    (hora_fin BETWEEN :hora_inicio AND :hora_fin) OR
+                    (:hora_inicio BETWEEN hora_inicio AND hora_fin)
+                )
         `;
 
         if (idHorarioIgnorar !== null) {
@@ -50,7 +50,7 @@ async function validarHorarioNuevo(idMedico, fecha, hora_inicio, hora_fin, idHor
 
 // funciona trae los horarios desde la fecha actual a posterior
 async function obtenerHorario(id_medico, incluirPasados = false) {
-    const fechaActualStr = new Date().toISOString().split("T")[0]; 
+    const fechaActualStr = new Date().toISOString().split("T")[0];
     const fechaActual = new Date(fechaActualStr);
 
     const whereCondition = incluirPasados
@@ -66,14 +66,14 @@ async function obtenerHorario(id_medico, incluirPasados = false) {
     });
 
     if (!horarios || horarios.length === 0) {
-		return {
-			medico: await Medico.findOne({
-				where: { id_medico },
-				include: [{ model: Especialidad, as: "especialidad" }]
-			}),
-			horarios: [] // Devuelve un array vacío
-		};
-	}
+        return {
+            medico: await Medico.findOne({
+                where: { id_medico },
+                include: [{ model: Especialidad, as: "especialidad" }]
+            }),
+            horarios: [] // Devuelve un array vacío
+        };
+    }
 
     // Obtener una sola vez el médico (con especialidad)
     const medico = await Medico.findOne({
@@ -168,6 +168,6 @@ module.exports = {
     obtenerHorario,
     buscarHorarioPorFecha,
     crearHorario,
-	obtenerHorarioPorId,
+    obtenerHorarioPorId,
     editarHorario
 };

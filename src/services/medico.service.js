@@ -25,7 +25,6 @@ async function validarUsuarioParaMedico(nombre_usuario) {
     }
 }
 
-
 async function validarIdentificacionMedico(identificacion) {
     try {
         const medico = await Medico.findOne({ where: { identificacion } });
@@ -68,27 +67,21 @@ async function actualizarDatosMedico(medico, nuevosDatos, id_usuario) {
     if (!id_usuario) {
         throw new Error("id_usuario es obligatorio para guardar el historial de cambios del médico");
     }
-
     try {
         const valoresPrevios = medico.get({ plain: true });
-
         const camposAChequear = [
             'id_especialidad', 'identificacion', 'fecha_nacimiento',
             'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido',
             'genero', 'reg_msp', 'celular', 'telefono', 'correo', 'estatus'
         ];
-
         const cambios = [];
-
         for (const campo of camposAChequear) {
             const valorAnterior = valoresPrevios[campo];
             const valorNuevo = nuevosDatos[campo];
-
             const cambioDetectado = (
                 valorNuevo !== undefined &&
                 String(valorAnterior)?.trim() !== String(valorNuevo)?.trim()
             );
-
             if (cambioDetectado) {
                 cambios.push({
                     id_medico: medico.id_medico,
@@ -100,13 +93,11 @@ async function actualizarDatosMedico(medico, nuevosDatos, id_usuario) {
                 });
             }
         }
-
         return await sequelize.transaction(async (t) => {
             if (cambios.length > 0) {
                 await HistorialCambiosMedico.bulkCreate(cambios, { transaction: t });
                 console.log(`🟢 Historial médico guardado con ${cambios.length} cambio(s).`);
             }
-
             const medicoActualizado = await medico.update(nuevosDatos, { transaction: t });
             return medicoActualizado;
         });
@@ -154,23 +145,19 @@ async function obtenerMedicoPorIdentificacion(identificacion) {
 async function obtenerHistorialPorIdentificacionMedico(identificacion) {
     try {
         const medico = await Medico.findOne({ where: { identificacion } });
-
         if (!medico) {
             throw new Error("Medico no encontrado con esa identificación.");
         }
-
         const historial = await HistorialCambiosMedico.findAll({
             where: { id_medico: medico.id_medico },
             order: [['fecha_cambio', 'DESC']]
         });
-
         // Formatear fechas
         return historial.map(item => {
             const json = item.toJSON();
             json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
             return json;
         });
-
     } catch (error) {
         throw new Error(`Error al obtener historial por identificación: ${error.message}`);
     }

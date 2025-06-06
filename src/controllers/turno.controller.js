@@ -18,4 +18,16 @@ async function getTurnos(req, res) {
     }
 }
 
-module.exports = { getTurnos };
+// Obtener todos los turnos DISPONIBLES sin filtros
+async function getTurnosDisponibles(req, res) {
+    try {
+        const turnos = await turnoService.obtenerTurnosDisponibles();
+        return res.status(200).json(turnos);
+    } catch (error) {
+        console.error("❌ Error en getTurnosDisponibles:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+
+module.exports = { getTurnos, getTurnosDisponibles };

@@ -12,7 +12,9 @@ async function obtenerTurnos({ fecha = null, estado = "DISPONIBLE", fechaInicio 
         } else if (fechaInicio && fechaFin) {
             whereHorario.fecha_horario = { [Op.between]: [new Date(fechaInicio), new Date(fechaFin)] };
         } else {
-            whereHorario.fecha_horario = { [Op.gte]: new Date().toISOString().split("T")[0] };
+            const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			whereHorario.fecha_horario = { [Op.gte]: today };
         }
 
         const whereTurno = estado ? { estado } : {};
@@ -77,4 +79,43 @@ function formatTurnoData(turno) {
     };
 }
 
-module.exports = { obtenerTurnos };
+// Obtener todos los turnos DISPONIBLES sin filtros
+async function obtenerTurnosDisponibles() {
+    try {
+        const turnos = await Turno.findAll({
+            where: { estado: 'DISPONIBLE' },
+            include: [
+                {
+                    model: Horario,
+                    as: 'horario',
+                    include: [
+                        {
+                            model: Medico,
+                            as: 'medico',
+                            attributes: ['id_medico', 'identificacion', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'correo'],
+                            include: [
+                                {
+                                    model: Especialidad,
+                                    as: 'especialidad',
+                                    attributes: ['id_especialidad', 'nombre', 'atencion', 'consultorio']
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (!turnos || turnos.length === 0) {
+            return { message: 'No hay turnos disponibles', turnos: [] };
+        }
+
+        return turnos.map(formatTurnoData);
+    } catch (error) {
+        console.error("❌ Error en obtenerTurnosDisponibles:", error);
+        throw new Error(errorMessages.errorServidor);
+    }
+}
+
+
+module.exports = { obtenerTurnos, obtenerTurnosDisponibles };
