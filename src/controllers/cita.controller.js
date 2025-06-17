@@ -1,5 +1,5 @@
 const citaService = require('../services/cita.service');
-const { Paciente, Usuario, Medico } = require('../models');
+const { Paciente, Usuario, Medico, Turno } = require('../models');
 const { formatFecha, formatFechaCompleta } = require('../utils/date_utils');
 const errorMessages = require("../utils/error_messages");
 const successMessages = require('../utils/success_messages');
@@ -36,6 +36,7 @@ async function getCitasPorPaciente(req, res) {
         if (!citas || citas.length === 0) return res.status(404).json({ message: errorMessages.citasNoEncontradas });
 
         const pacienteData = {
+			id_paciente: paciente.id_paciente,
             identificacion: paciente.identificacion,
             nombre: [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido]
                 .filter(Boolean)
@@ -51,6 +52,7 @@ async function getCitasPorPaciente(req, res) {
 
                 return {
                     datos_cita: {
+						id_cita: cita.id_cita,
                         estado_cita: cita.estado_cita,
                         fecha_creacion: formatFechaCompleta(cita.fecha_creacion)
                     },

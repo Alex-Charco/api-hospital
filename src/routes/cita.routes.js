@@ -9,6 +9,6 @@ router.get('/get/paciente/:identificacionPaciente',  verificarToken, authorizeRo
 //  Ruta para medico/
 router.get('/get/medico/:identificacionMedico', verificarToken, authorizeRole(["gestionar_cita", "ver_informacion"]), getCitasPorMedico);
 
-router.post('/registrar', verificarToken, authorizeRole(["gestionar_cita", "registrar_cita"]), registrarCita);
+router.post('/registrar', verificarToken, authorizeRole(["gestionar_cita", "registrar_cita", "reagendar_cita"]), registrarCita);
 
 module.exports = router;

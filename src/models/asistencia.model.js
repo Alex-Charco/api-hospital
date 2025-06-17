@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Asistencia = sequelize.define("Asistencia", {
@@ -13,7 +13,8 @@ const Asistencia = sequelize.define("Asistencia", {
     },
     fecha_asistencia: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: Sequelize.NOW // <- CORREGIDO
     },
     estado_asistencia: {
         type: DataTypes.ENUM("CONFIRMADA", "CANCELADA", "REAGENDADA", "NO_ASISTIO"),
@@ -29,3 +30,4 @@ const Asistencia = sequelize.define("Asistencia", {
 });
 
 module.exports = Asistencia;
+

@@ -17,6 +17,7 @@ const recetaRoutes = require("./routes/receta.routes");
 const recetaAutorizacionRoutes = require("./routes/receta_autorizacion.routes");
 const personaExternaRoutes = require("./routes/persona_externa.routes");
 const passwordRoutes = require("./routes/password.routes");
+const asistenciaRoutes = require("./routes/asistencia.routes");
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/receta', recetaRoutes);
 app.use('/api/receta-autorizacion', recetaAutorizacionRoutes);
 app.use('/api/persona-externa', personaExternaRoutes);
 app.use('/auth/', passwordRoutes);
+app.use('/api/asistencia/', asistenciaRoutes);
 
 // 📌 Sincronizar Base de Datos con Sequelize
 const PORT = process.env.PORT || 5000;

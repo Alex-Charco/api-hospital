@@ -1,23 +1,11 @@
 require("dotenv").config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Crear el transporte para enviar el correo
-function crearTransporter() {
-    return nodemailer.createTransport({
-        //service: "gmail",
-        host: "smtp.gmail.com",
-        port: 465, // Puerto seguro para SSL
-        secure: true, // Usa SSL para encriptar la conexión
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
-}
+// Inicializar Resend con la API Key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Crear el contenido del correo para paciente y médico
+// Crear los contenidos del correo
 function crearMensaje(cita) {
-    // Mensaje común que se usará para ambos
     const mensajePaciente = `
         <h2>Detalles de su cita</h2>
         <p><strong>Fecha de creación:</strong> ${cita.fecha_creacion}</p>
@@ -27,11 +15,12 @@ function crearMensaje(cita) {
         <p>${cita.turno.horario.medico.primer_nombre} ${cita.turno.horario.medico.segundo_nombre || ""} ${cita.turno.horario.medico.primer_apellido} ${cita.turno.horario.medico.segundo_apellido || ""}</p>
         <h3>Detalles de la cita</h3>
         <p><strong>Fecha de la cita:</strong> ${cita.turno.horario.fecha_horario}</p>
-        <p><strong>Turno:</strong> ${cita.turno.numero_turno} - ${cita.turno.hora_turno}</p>
+        <p><strong>No. Turno:</strong> ${cita.turno.numero_turno}</p>
+		<p><strong>Hora Turno:</strong> ${cita.turno.hora_turno}</p>
         <p><strong>Especialidad:</strong> ${cita.turno.horario.medico.especialidad.nombre}</p>
         <p><strong>Atención:</strong> ${cita.turno.horario.medico.especialidad.atencion}</p>
         <p><strong>Consultorio:</strong> ${cita.turno.horario.medico.especialidad.consultorio}</p>
-        <p><strong>Mensaje para el paciente:</strong> Recuerde asistir a la cita médica el día y hora mencionados. Si tiene alguna duda, no dude en contactarnos.</p>
+        <p><strong>Mensaje:</strong> Recuerde asistir a la cita médica 20 minutos antes del día y hora mencionados.</p>
     `;
 
     const mensajeMedico = `
@@ -43,62 +32,51 @@ function crearMensaje(cita) {
         <p>${cita.turno.horario.medico.primer_nombre} ${cita.turno.horario.medico.segundo_nombre || ""} ${cita.turno.horario.medico.primer_apellido} ${cita.turno.horario.medico.segundo_apellido || ""}</p>
         <h3>Detalles de la cita</h3>
         <p><strong>Fecha de la cita:</strong> ${cita.turno.horario.fecha_horario}</p>
-        <p><strong>Turno:</strong> ${cita.turno.numero_turno} - ${cita.turno.hora_turno}</p>
+        <p><strong>No. Turno:</strong> ${cita.turno.numero_turno}</p>
+		<p><strong>Hora Turno:</strong> ${cita.turno.hora_turno}</p>
         <p><strong>Especialidad:</strong> ${cita.turno.horario.medico.especialidad.nombre}</p>
         <p><strong>Atención:</strong> ${cita.turno.horario.medico.especialidad.atencion}</p>
         <p><strong>Consultorio:</strong> ${cita.turno.horario.medico.especialidad.consultorio}</p>
-        <p><strong>Mensaje para el médico:</strong> Usted tiene una cita programada con el paciente mencionado anteriormente. Por favor, asegúrese de que el paciente reciba la atención necesaria.</p>
+        <p><strong>Mensaje:</strong> Usted tiene una cita programada con este paciente.</p>
     `;
 
-    // Devolver el mensaje adecuado dependiendo del destinatario
     return {
         paciente: mensajePaciente,
         medico: mensajeMedico
     };
 }
 
-
-// Función principal para enviar el correo
+// Enviar correo a paciente y médico usando Resend
 async function enviarCorreoConfirmacion(cita) {
-    // Verificación de los datos necesarios
     if (!cita?.paciente || !cita?.turno?.horario?.medico) {
         throw new Error("Faltan datos para enviar el correo.");
     }
-    
 
     try {
-        // Crear el transporte
-        let transporter = crearTransporter();
-        
-        // Crear los mensajes para paciente y médico
-        let mensajes = crearMensaje(cita);
+        const mensajes = crearMensaje(cita);
 
-        // Enviar correo al paciente
-        let mailOptionsPaciente = {
-            from: process.env.EMAIL_USER,
+        // Enviar al paciente
+        const correoPaciente = await resend.emails.send({
+            from: 'onboarding@resend.dev',
             to: cita.paciente.correo,
-            subject: "Confirmación de Cita Médica",
-            html: mensajes.paciente
-        };
-        await transporter.sendMail(mailOptionsPaciente);
-        console.log("Correo enviado al paciente");
+            subject: 'Confirmación de Cita Médica',
+            html: mensajes.paciente,
+        });
+        console.log("📩 Correo enviado al paciente:", correoPaciente);
 
-        // Enviar correo al médico
-        let mailOptionsMedico = {
-            from: process.env.EMAIL_USER,
+        // Enviar al médico
+        const correoMedico = await resend.emails.send({
+            from: 'onboarding@resend.dev',
             to: cita.turno.horario.medico.correo,
-            subject: "Confirmación de Cita Médica",
-            html: mensajes.medico
-        };
-        await transporter.sendMail(mailOptionsMedico);
-        console.log("Correo enviado al médico");
+            subject: 'Confirmación de Cita Médica',
+            html: mensajes.medico,
+        });
+        console.log("📩 Correo enviado al médico:", correoMedico);
 
     } catch (error) {
-        console.error("Error enviando correo:", error);
+        console.error("❌ Error al enviar correos con Resend:", error);
         throw new Error("No se pudo enviar el correo de confirmación.");
     }
 }
-
-
 
 module.exports = { enviarCorreoConfirmacion };

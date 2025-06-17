@@ -631,5 +631,6 @@ module.exports = {
 	HistorialCambiosInfoMilitar,
 	HistorialCambiosResidencia,
 	HistorialCambiosSeguro,
-	HistorialCambiosMedico
+	HistorialCambiosMedico,
+	Asistencia
 };
