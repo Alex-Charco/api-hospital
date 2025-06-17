@@ -26,6 +26,11 @@ const RecetaAutorizacion = require("./receta_autorizacion.model");
 const Asistencia = require("./asistencia.model");
 const PersonaExterna = require("./persona_externa.model");
 const HistorialCambiosPaciente = require("./historial_cambios_paciente.model");
+const HistorialCambiosFamiliar = require('./historial_cambios_familiar.model');
+const HistorialCambiosInfoMilitar = require('./historial_cambios_info_militar.model');
+const HistorialCambiosResidencia = require('./historial_cambios_residencia.model');
+const HistorialCambiosSeguro = require('./historial_cambios_seguro.model');
+const HistorialCambiosMedico = require('./historial_cambios_medico.model');
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -113,6 +118,7 @@ InfoMilitar.belongsTo(Paciente, {
 // Relación entre Paciente y Familiar
 Paciente.hasMany(Familiar, {
     foreignKey: "id_paciente",
+	as: "familiares",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
@@ -438,6 +444,161 @@ HistorialCambiosPaciente.belongsTo(Usuario, {
     onUpdate: "CASCADE"
 });
 
+// *Familiar
+// Relación entre HistorialCambiosFamiliar y Familiar
+Familiar.hasMany(HistorialCambiosFamiliar, {
+    foreignKey: "id_familiar",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosFamiliar.belongsTo(Familiar, {
+    foreignKey: "id_familiar",
+    as: "familiar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosFamiliar y Usuario
+Usuario.hasMany(HistorialCambiosFamiliar, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosFamiliar.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// *InfoMilitar
+// Relación entre HistorialCambiosInfoMilitar y InfoMilitar
+InfoMilitar.hasMany(HistorialCambiosInfoMilitar, {
+    foreignKey: "id_info_militar",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosInfoMilitar.belongsTo(InfoMilitar, {
+    foreignKey: "id_info_militar",
+    as: "info_militar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosInfoMilitar y Usuario
+Usuario.hasMany(HistorialCambiosInfoMilitar, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_info_militar",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosInfoMilitar.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// *Residencia
+// Relación entre HistorialCambiosResidencia y Residencia
+Residencia.hasMany(HistorialCambiosResidencia, {
+    foreignKey: "id_residencia",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosResidencia.belongsTo(Residencia, {
+    foreignKey: "id_residencia",
+    as: "residencia",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosResidencia y Usuario
+Usuario.hasMany(HistorialCambiosResidencia, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_residencia",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosResidencia.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// *Seguro
+// Relación entre HistorialCambiosSeguro y Seguro
+Seguro.hasMany(HistorialCambiosSeguro, {
+    foreignKey: "id_seguro",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosSeguro.belongsTo(Seguro, {
+    foreignKey: "id_seguro",
+    as: "seguro",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosSeguro y Usuario
+Usuario.hasMany(HistorialCambiosSeguro, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_seguro",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosSeguro.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// *Medico
+// Relación entre HistorialCambiosMedico y Medico
+Medico.hasMany(HistorialCambiosMedico, {
+    foreignKey: "id_medico",
+    as: "cambios",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosMedico.belongsTo(Medico, {
+    foreignKey: "id_medico",
+    as: "medico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+// Relación entre HistorialCambiosMedico y Usuario
+Usuario.hasMany(HistorialCambiosMedico, {
+    foreignKey: "id_usuario",
+    as: "historial_cambios_realizados_medico",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
+HistorialCambiosMedico.belongsTo(Usuario, {
+    foreignKey: "id_usuario",
+    as: "usuario",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE"
+});
+
 
 module.exports = {
     sequelize,
@@ -465,5 +626,11 @@ module.exports = {
 	Posologia,
     PersonaExterna,
 	RecetaAutorizacion,
-    HistorialCambiosPaciente
+    HistorialCambiosPaciente,
+	HistorialCambiosFamiliar,
+	HistorialCambiosInfoMilitar,
+	HistorialCambiosResidencia,
+	HistorialCambiosSeguro,
+	HistorialCambiosMedico,
+	Asistencia
 };

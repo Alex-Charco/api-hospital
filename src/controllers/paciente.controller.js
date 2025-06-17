@@ -118,12 +118,16 @@ async function actualizarPaciente(req, res) {
     }
 }
 
+// Función para obtener el historial de cambios paciente, familiar...
 async function getHistorialPorIdentificacion(req, res) {
     const { identificacion } = req.params;
 
     try {
         const historial = await pacienteService.obtenerHistorialPorIdentificacion(identificacion);
-        return res.status(200).json(historial);
+        return res.status(200).json({
+            message: "Historial encontrado con éxito",
+            historial
+        });
     } catch (error) {
         return res.status(400).json({ error: error.message });
     }

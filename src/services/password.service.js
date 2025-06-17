@@ -1,11 +1,15 @@
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const Usuario = require('../models/usuario.model');
 const Medico = require('../models/medico.model');
 const Administrador = require('../models/administrador.model');
 const Paciente = require('../models/paciente.model');
 const { JWT_SECRET } = require('../utils/config');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
+console.log("🔐 RESEND_API_KEY:", process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
@@ -33,27 +37,22 @@ module.exports = {
     // Generar un token con id_usuario
     const token = jwt.sign({ id_usuario: user.id_usuario }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Enviar correo con el enlace de restablecimiento
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465, // Usa 465 para SSL o 587 con STARTTLS
-      secure: true, // true para SSL/TLS
-      auth: {
-        user: process.env.EMAIL_USER, // Usa variables de entorno
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
     const resetUrl = `http://localhost:3000/auth/reset-password/reset?token=${token}`;
 
-    const mailOptions = {
-      to: email,
-      from: 'support@yourapp.com',
-      subject: 'Restablecer contraseña',
-      text: `Para restablecer tu contraseña, haz clic en el siguiente enlace: ${resetUrl}`
-    };
+    // ✅ Enviar con Resend
+    try {
+      const response = await resend.emails.send({
+        from: 'onboarding@resend.dev', // dirección oficial de pruebas permitida por Resend
+		to: 'awladimircharco@gmail.com',
+        subject: 'Restablecer contraseña',
+        text: `Hola, haz clic en el siguiente enlace para restablecer tu contraseña: ${resetUrl}`,
+      });
 
-    await transporter.sendMail(mailOptions);
+      console.log("✅ Correo enviado con Resend:", response);
+    } catch (error) {
+      console.error("❌ Error al enviar correo con Resend:", error);
+      throw new Error("Fallo al enviar el correo de restablecimiento.");
+    }
   },
 
   async resetPassword(token, nombre_usuario, newPassword) {

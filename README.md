@@ -189,6 +189,11 @@ Crea un archivo emailService.js para manejar el envío de correos.
 
 	require('dotenv').config();
 
+CAMBIO POR ERROR
+
+	npm install resend
+
+
 #### 1.3.5 Instalar dependencia jest para pruebas unitarias
 Ejecutar en la terminal:
 
@@ -211,6 +216,12 @@ Configuración en eslint.config.cjs para que no de errores por jest
         },
         },
     },
+	
+#### 1.3.6 Instalar dependencia luxon para dar fechas exactas de la zona horaria
+	
+	npm install luxon
+
+Maneja zonas horarias de forma más explícita
 ---
 
 ### 1.4 Levantar el servidor

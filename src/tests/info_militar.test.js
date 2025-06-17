@@ -1,15 +1,27 @@
+
+const sequelize = {
+  transaction: jest.fn((callback) => callback({}))
+};
 // Mock manual para los modelos para evitar conexión real
+const transactionMock = jest.fn((callback) => callback({}));
+
 jest.mock('../models', () => ({
-    InfoMilitar: {
-        findOne: jest.fn(),
-        create: jest.fn(),
-    },
-    Paciente: {
-        findOne: jest.fn(),
-    }
+  sequelize: {
+    transaction: jest.fn((callback) => callback({})), // función inline aquí
+  },
+  InfoMilitar: {
+    findOne: jest.fn(),
+    create: jest.fn(),
+  },
+  Paciente: {
+    findOne: jest.fn(),
+  },
+  HistorialCambiosInfoMilitar: {
+    bulkCreate: jest.fn(), // ✅ Añadir este mock
+  },
 }));
 
-const { InfoMilitar, Paciente } = require('../models');
+const { InfoMilitar, Paciente, HistorialCambiosInfoMilitar } = require('../models');
 const errorMessages = require('../utils/error_messages');
 const infoMilitarService = require('../services/info_militar.service');
 
@@ -101,16 +113,24 @@ describe('info_militar.service', () => {
     });
 
     describe('actualizarInfoMilitar', () => {
-        it('debe actualizar info militar y retornar', async () => {
-            const mockInfoMilitar = { update: jest.fn() };
-            const nuevosDatos = { grado: 'Capitán' };
-            const mockUpdated = { id_info: 1, grado: 'Capitán' };
+    it('debe actualizar info militar y retornar', async () => {
+        const mockInfoMilitar = {
+            id_info_militar: 1,
+            get: jest.fn().mockReturnValue({ grado: 'Teniente' }),
+            update: jest.fn()
+        };
 
-            mockInfoMilitar.update.mockResolvedValue(mockUpdated);
+        const nuevosDatos = { grado: 'Capitán' };
+        const mockUpdated = { id_info: 1, grado: 'Capitán' };
 
-            const result = await infoMilitarService.actualizarInfoMilitar(mockInfoMilitar, nuevosDatos);
-            expect(mockInfoMilitar.update).toHaveBeenCalledWith(nuevosDatos);
-            expect(result).toBe(mockUpdated);
-        });
+        mockInfoMilitar.update.mockResolvedValue(mockUpdated);
+
+        const result = await infoMilitarService.actualizarInfoMilitar(mockInfoMilitar, nuevosDatos, 123); // ⬅️ id_usuario agregado
+
+        expect(mockInfoMilitar.update).toHaveBeenCalledWith(nuevosDatos, expect.any(Object)); // incluye { transaction }
+		expect(HistorialCambiosInfoMilitar.bulkCreate).toHaveBeenCalled();
+        expect(result).toBe(mockUpdated);
     });
+});
+
 });

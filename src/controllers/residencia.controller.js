@@ -91,17 +91,13 @@ async function getByResidencia(req, res) {
 // Actualizar residencia (solo administradores)
 async function actualizarResidencia(req, res) {
     const { identificacion } = req.params;
-    const nuevosDatos = req.body;
+    const { id_usuario_modificador, ...nuevosDatos } = req.body;
 
     try {
-        // Buscar paciente por identificación
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
-
-        // Obtener la residencia asociada al paciente
         const residencia = await residenciaService.obtenerResidencia(paciente.id_paciente);
 
-        // Actualizar la información de la residencia
-        const residenciaActualizada = await residenciaService.actualizarResidencia(residencia, nuevosDatos);
+        const residenciaActualizada = await residenciaService.actualizarResidencia(residencia, nuevosDatos, id_usuario_modificador);
 
         const residenciaFormateado = {
             ...residenciaActualizada.toJSON(),

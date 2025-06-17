@@ -39,19 +39,19 @@ async function obtenerDatosUsuario(id_usuario) {
     try {
         let datosUsuario = await Paciente.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
+            attributes: ['id_paciente','primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
         if (datosUsuario) return { ...datosUsuario, tipo: 'paciente' };
         datosUsuario = await Medico.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
+            attributes: ['id_medico','primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
         if (datosUsuario) return { ...datosUsuario, tipo: 'medico' };
         datosUsuario = await Administrador.findOne({ 
             where: { id_usuario }, 
-            attributes: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
+            attributes: ['id_admin','primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'identificacion', 'estatus'],
             raw: true
         });
         return datosUsuario ? { ...datosUsuario, tipo: 'administrador' } : null;

@@ -1,17 +1,26 @@
+jest.mock('../models', () => ({
+  Residencia: {
+    findOne: jest.fn(),
+    create: jest.fn(),
+  },
+  HistorialCambiosResidencia: {
+    bulkCreate: jest.fn(),
+  },
+  sequelize: {
+	  transaction: jest.fn(async (cb) => await cb({})), // 👈 async y await
+	},
+}));
+
 const residenciaService = require('../services/residencia.service');
 const { Residencia } = require('../models');
 const errorMessages = require("../utils/error_messages");
 
-// Mock del modelo
-jest.mock('../models', () => {
-    return {
-        Residencia: {
-            findOne: jest.fn(),
-            create: jest.fn(),
-        }
-    };
-});
+jest.mock('../config/db', () => ({
+  transaction: jest.fn((callback) => callback({}))
+}));
 
+jest.spyOn(console, 'log').mockImplementation(() => {});
+	
 describe('validarResidenciaRegistrada', () => {
     it('debe lanzar un error si ya existe una residencia', async () => {
         Residencia.findOne.mockResolvedValue({ id_residencia: 1 });
@@ -72,22 +81,50 @@ describe('crearResidencia', () => {
 
 describe('actualizarResidencia', () => {
     it('debe actualizar y devolver la residencia', async () => {
-        const mockResidencia = {
-            update: jest.fn().mockResolvedValue({ id_residencia: 1, direccion: 'Nueva dirección' })
-        };
+    const mockResidencia = {
+      get: jest.fn().mockReturnValue({ direccion: 'Antigua dirección' }),
+      id_residencia: 1,
+      update: jest.fn().mockResolvedValue({ id_residencia: 1, direccion: 'Nueva dirección' })
+    };
 
-        const result = await residenciaService.actualizarResidencia(mockResidencia, { direccion: 'Nueva dirección' });
-        expect(result).toEqual({ id_residencia: 1, direccion: 'Nueva dirección' });
-    });
+    const result = await residenciaService.actualizarResidencia(
+      mockResidencia,
+      { direccion: 'Nueva dirección' },
+      123 // id_usuario
+    );
 
-    it('debe lanzar un error si ocurre un fallo al actualizar', async () => {
-        const mockResidencia = {
-            update: jest.fn().mockRejectedValue(new Error('Update failed'))
-        };
+    expect(mockResidencia.update).toHaveBeenCalledWith(
+      { direccion: 'Nueva dirección' },
+      expect.any(Object)
+    );
+    expect(result).toEqual({ id_residencia: 1, direccion: 'Nueva dirección' });
+  });
 
-        await expect(residenciaService.actualizarResidencia(mockResidencia, {}))
-            .rejects
-            .toThrow(new Error(errorMessages.errorActualizarResidencia + "Update failed"));
+	it('debe lanzar un error si ocurre un fallo al actualizar', async () => {
+    const mockResidencia = {
+      id_residencia: 1,
+      lugar_nacimiento: "Quito",
+      pais: "Ecuador",
+      nacionalidad: "Ecuatoriana",
+      provincia: "Pichincha",
+      canton: "Quito",
+      parroquia: "Centro",
+      direccion: "Av. Siempre Viva 123",
+      get: jest.fn().mockReturnValue({
+        lugar_nacimiento: "Quito",
+        pais: "Ecuador",
+        nacionalidad: "Ecuatoriana",
+        provincia: "Pichincha",
+        canton: "Quito",
+        parroquia: "Centro",
+        direccion: "Av. Siempre Viva 123",
+      }),
 
-    });
+      update: jest.fn().mockRejectedValue(new Error("Update failed")),
+    };
+
+    await expect(residenciaService.actualizarResidencia(mockResidencia, {}, 123))
+      .rejects
+      .toThrow(new Error("No se pudo actualizar la residencia. Update failed"));
+  });
 });

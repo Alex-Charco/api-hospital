@@ -75,7 +75,11 @@ async function getBySeguro(req, res) {
 // Actualizar seguro de un paciente (solo administradores)
 async function actualizarSeguro(req, res) {
     const { identificacion } = req.params;
-    const nuevosDatos = req.body;
+    const { id_usuario_modificador, ...nuevosDatos } = req.body;
+
+    if (!id_usuario_modificador) {
+        return res.status(400).json({ message: "El id_usuario_modificador es obligatorio para registrar cambios." });
+    }
 
     try {
         // Validar que el paciente existe
@@ -87,13 +91,13 @@ async function actualizarSeguro(req, res) {
         // Obtener el seguro asociado al paciente
         const seguro = await seguroService.obtenerSeguro(paciente.id_paciente);
 
-        // Actualizar el seguro
-        const seguroActualizado = await seguroService.actualizarSeguro(seguro, nuevosDatos);
+        // Actualizar el seguro y registrar historial
+        const seguroActualizado = await seguroService.actualizarSeguro(seguro, nuevosDatos, id_usuario_modificador);
 
         const seguroFormateado = {
             ...seguroActualizado.toJSON(),
-            fecha_inicio: formatFecha(seguro.fecha_inicio),
-            fecha_fin: formatFecha(seguro.fecha_fin)
+            fecha_inicio: formatFecha(seguroActualizado.fecha_inicio),
+            fecha_fin: formatFecha(seguroActualizado.fecha_fin)
         };
 
         return res.status(200).json({

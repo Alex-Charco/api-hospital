@@ -42,12 +42,13 @@ describe('user.service.js - Registro de usuario', () => {
         });
     });
 
+	const dummySegura = 'miPasswordSegura';
     describe('cifrarPassword', () => {
         it('debe devolver una contraseña cifrada', async () => {
             const mockHash = 'hashedPassword123';
             bcrypt.hash.mockResolvedValue(mockHash);
 
-            const password = 'miPasswordSegura';
+            const password = dummySegura;
             const result = await cifrarPassword(password);
 
             expect(bcrypt.hash).toHaveBeenCalledWith(password, 10);

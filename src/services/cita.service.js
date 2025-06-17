@@ -154,7 +154,7 @@ const crearCita = async (id_turno, id_paciente) => {
 		});
 
 		// Verificar si ya hay  citas distintas
-		if (citasDelDia.length >= 5) {
+		if (citasDelDia.length >= 2) {
 			throw new Error("El paciente ya tiene 2 citas registradas para ese día.");
 		}
 

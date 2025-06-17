@@ -52,18 +52,22 @@ async function getByInfoMilitar(req, res) {
 // ✅ Actualizar información militar (solo administradores)
 async function actualizarInfoMilitar(req, res) {
     const { identificacion } = req.params;
-    const nuevosDatos = req.body;
+    const { id_usuario_modificador, ...datosActualizados } = req.body;
+
+    if (!id_usuario_modificador) {
+        return res.status(400).json({ message: "id_usuario_modificador es obligatorio" });
+    }
 
     try {
         const paciente = await infoMilitarService.validarPacienteExistente(identificacion);
 
-        // Verificar si el paciente no fue encontrado
         if (!paciente) {
             return res.status(404).json({ message: errorMessages.pacienteNoEncontrado });
         }
-        
+
         const infoMilitar = await infoMilitarService.obtenerInfoMilitar(paciente.id_paciente);
-        const infoMilitarActualizado = await infoMilitarService.actualizarInfoMilitar(infoMilitar, nuevosDatos);
+
+        const infoMilitarActualizado = await infoMilitarService.actualizarInfoMilitar(infoMilitar, datosActualizados, id_usuario_modificador);
 
         return res.status(200).json({
             message: successMessages.informacionActualizada,
@@ -74,4 +78,5 @@ async function actualizarInfoMilitar(req, res) {
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
+
 module.exports = { registrarInfoMilitar, getByInfoMilitar, actualizarInfoMilitar };

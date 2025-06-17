@@ -69,12 +69,13 @@ describe('Servicios de contraseña', () => {
         .toThrow('No se encontró un usuario con este correo.');
     });
   });
-
+  
+  const dummyNueva = 'nueva_password';
   describe('resetPassword()', () => {
     test('debería cambiar la contraseña si el token y nombre de usuario son correctos', async () => {
       const token = 'valid_token';
       const nombre_usuario = 'usuario_test';
-      const newPassword = 'nueva_password';
+      const newPassword = dummyNueva;
 
       jwt.verify.mockReturnValue({ id_usuario: 1 });
 
