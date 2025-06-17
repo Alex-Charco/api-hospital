@@ -1,6 +1,6 @@
 const { PersonaExterna } = require("../models");
 const errorMessages = require("../utils/error_messages");
-const { formatFecha } = require('../utils/date_utils'); // Importa la función de formateo
+const { formatFecha } = require('../utils/date_utils');
 
 async function obtenerPersonaExternaPorId(id_persona_externa) {
     try {
