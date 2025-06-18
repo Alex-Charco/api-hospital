@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const passwordService = require('../services/password.service');
+
+// Mocks de paquetes externos
+jest.mock('resend');
+jest.mock('jsonwebtoken');
 
 // Mocks de los modelos
 jest.mock('../models/usuario.model', () => ({ findOne: jest.fn() }));
@@ -9,9 +11,17 @@ jest.mock('../models/medico.model', () => ({ findOne: jest.fn() }));
 jest.mock('../models/administrador.model', () => ({ findOne: jest.fn() }));
 jest.mock('../models/paciente.model', () => ({ findOne: jest.fn() }));
 
-// Mocks de paquetes externos
-jest.mock('jsonwebtoken');
-jest.mock('nodemailer');
+// Antes de requerir el servicio, preparamos el mock de Resend
+const { Resend } = require('resend');
+Resend.prototype.emails = {
+  send: jest.fn().mockResolvedValue({
+    data: { id: 'fake-id' },
+    error: null
+  })
+};
+
+// Ahora sí importamos el servicio (ya tiene el mock activo)
+const passwordService = require('../services/password.service');
 
 const Usuario = require('../models/usuario.model');
 const Medico = require('../models/medico.model');
@@ -26,7 +36,6 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-
 describe('Servicios de contraseña', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -34,28 +43,19 @@ describe('Servicios de contraseña', () => {
 
   describe('sendPasswordResetEmail()', () => {
     test('debería enviar un correo si el usuario existe como médico', async () => {
-      const email = 'medico@correo.com';
-      const mockUser = { id_usuario: 1 };
-
       Medico.findOne.mockResolvedValue({ id_usuario: 1 });
       Administrador.findOne.mockResolvedValue(null);
       Paciente.findOne.mockResolvedValue(null);
-      Usuario.findOne.mockResolvedValue(mockUser);
-
-      const sendMailMock = jest.fn().mockResolvedValue(true);
-
-      nodemailer.createTransport.mockReturnValue({
-        sendMail: sendMailMock
-      });
+      Usuario.findOne.mockResolvedValue({ id_usuario: 1 });
 
       jwt.sign.mockReturnValue('fake_token');
 
-      await passwordService.sendPasswordResetEmail(email);
+      await passwordService.sendPasswordResetEmail('medico@correo.com');
 
-      expect(sendMailMock).toHaveBeenCalledWith(expect.objectContaining({
-        to: email,
+      expect(Resend.prototype.emails.send).toHaveBeenCalledWith(expect.objectContaining({
+        to: 'awladimircharco@gmail.com',
         subject: expect.any(String),
-        text: expect.stringContaining('fake_token')
+        text: expect.stringContaining('http://localhost:3000/auth/reset-password/reset?token=fake_token')
       }));
     });
 
