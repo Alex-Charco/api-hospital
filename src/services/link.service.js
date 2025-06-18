@@ -1,5 +1,5 @@
 const { Link } = require('../models');
-
+//crea link
 async function crearLink(data, transaction) {
     try {
         return await Link.create(data, { transaction });
