@@ -1,5 +1,5 @@
 const citaService = require('../services/cita.service');
-const { Paciente, Usuario, Medico, Turno } = require('../models');
+const { Paciente, Usuario, Medico } = require('../models');
 const { formatFecha, formatFechaCompleta } = require('../utils/date_utils');
 const errorMessages = require("../utils/error_messages");
 const successMessages = require('../utils/success_messages');
@@ -40,7 +40,13 @@ async function getCitasPorPaciente(req, res) {
             identificacion: paciente.identificacion,
             nombre: [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido]
                 .filter(Boolean)
-                .join(' ')
+                .join(' '),
+			fecha_nacimiento: formatFecha(paciente.fecha_nacimiento),
+			celular: paciente.celular,
+			telefono: paciente.telefono,
+			genero: paciente.genero,
+			edad: citaService.getEdad(paciente.fecha_nacimiento),
+			grupo_etario: citaService.getGrupoEtario(citaService.getEdad(paciente.fecha_nacimiento))
         };
 
         res.json({
@@ -147,14 +153,28 @@ async function getCitasPorMedico(req, res) {
                         fecha_horario: cita.turno?.horario?.fecha_horario ? formatFecha(cita.turno.horario.fecha_horario) : null,
                     }
                 },
-                paciente: {
-                    id_paciente: cita.paciente?.id_paciente || null,
-                    identificacion: cita.paciente?.identificacion || null,
-                    correo: cita.paciente?.correo || null,
-                    nombre_usuario: cita.paciente?.nombre_usuario || null,
-                    nombre: [cita.paciente?.primer_nombre, cita.paciente?.segundo_nombre, cita.paciente?.primer_apellido, cita.paciente?.segundo_apellido]
-                        .filter(Boolean).join(' ')
-                }
+                paciente: cita.paciente ? (() => {
+					const edad = citaService.getEdad(cita.paciente.fecha_nacimiento);
+					const grupo_etario = citaService.getGrupoEtario(edad);
+					return {
+						id_paciente: cita.paciente.id_paciente,
+						identificacion: cita.paciente.identificacion,
+						correo: cita.paciente.correo,
+						nombre_usuario: cita.paciente.nombre_usuario,
+						nombre: [
+							cita.paciente.primer_nombre,
+							cita.paciente.segundo_nombre,
+							cita.paciente.primer_apellido,
+							cita.paciente.segundo_apellido
+						].filter(Boolean).join(' '),
+						fecha_nacimiento: formatFecha(cita.paciente.fecha_nacimiento),
+						celular: cita.paciente.celular,
+						telefono: cita.paciente.telefono,
+						genero: cita.paciente.genero,
+						edad,
+						grupo_etario
+					};
+				})() : null
             }))
         });
     } catch (error) {
