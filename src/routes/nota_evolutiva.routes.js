@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     registrarNotaEvolutiva,
     obtenerNotaEvolutiva,
+	obtenerNotaEvolutivaPorId,
     actualizarNotaEvolutiva
 } = require('../controllers/nota_evolutiva.controller');
 const { verificarToken, authorizeRole } = require('../middlewares/auth.middleware');
@@ -12,6 +13,9 @@ router.post('/registrar', verificarToken, authorizeRole(["gestionar_historial"])
 
 // Obtener nota evolutiva por ID de cita o cédula de paciente
 router.get('/get', verificarToken, authorizeRole(["gestionar_historial"]), obtenerNotaEvolutiva);
+
+// Obtener nota evolutiva por ID nota evolutiva
+router.get('/get/nota/:id_nota_evolutiva', verificarToken, authorizeRole(["gestionar_historial"]), obtenerNotaEvolutivaPorId);
 
 // Actualizar nota evolutiva
 router.put('/put/:id_nota_evolutiva', verificarToken, authorizeRole(["gestionar_historial"]), actualizarNotaEvolutiva);

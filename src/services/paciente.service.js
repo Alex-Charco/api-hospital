@@ -1,7 +1,22 @@
-const { Paciente, Usuario, RolUsuario, Familiar, InfoMilitar, Residencia, Seguro, HistorialCambiosPaciente } = require("../models");
+const { 
+	Paciente, 
+	Usuario, 
+	RolUsuario, 
+	Familiar, 
+	InfoMilitar, 
+	Residencia, 
+	Seguro, 
+	HistorialCambiosPaciente,
+	Cita,
+	Turno,
+	Horario,
+	Medico, 
+	Especialidad
+} = require("../models");
 const { verificarUsuarioExistente } = require("./user.service");
 const errorMessages = require("../utils/error_messages");
 const { formatFechaCompleta } = require('../utils/date_utils');
+const { getEdad, getGrupoEtario } = require("../utils/edad_utils");
 
 async function validarUsuarioParaPaciente(nombre_usuario) {
     try {
@@ -273,6 +288,97 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
     }
 }
 
+// Función auxiliar para concatenar nombres evitando espacios dobles
+function construirNombreCompleto(...nombres) {
+    return nombres.filter(n => n && n.trim() !== '').join(' ');
+}
+
+async function obtenerDetallePacientePorCita(id_cita) {
+    try {
+        if (!id_cita) {
+            throw new Error("Se requiere el id_cita");
+        }
+
+        const cita = await Cita.findOne({
+            where: { id_cita },
+            include: [
+                {
+                    model: Turno,
+                    as: 'turno',
+                    include: [
+                        {
+                            model: Horario,
+                            as: 'horario',
+                            include: [
+                                {
+                                    model: Medico,
+                                    as: 'medico',
+                                    include: [
+                                        { model: Especialidad, as: 'especialidad' }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: Paciente,
+                    as: 'paciente'
+                }
+            ]
+        });
+
+        if (!cita) {
+            throw new Error(errorMessages.citaNoEncontrada);
+        }
+
+        const paciente = cita.paciente;
+        if (!paciente) {
+            throw new Error(errorMessages.pacienteNoEncontrado);
+        }
+
+        const seguro = await Seguro.findOne({ where: { id_paciente: paciente.id_paciente } });
+
+        const edad = getEdad(paciente.fecha_nacimiento);
+        const grupo_etario = getGrupoEtario(edad);
+
+        const medico = cita.turno?.horario?.medico;
+        const especialidad = medico?.especialidad;
+
+        return {
+            identificacion: paciente.identificacion,
+            nombres: construirNombreCompleto(
+                paciente.primer_nombre,
+                paciente.segundo_nombre,
+                paciente.primer_apellido,
+                paciente.segundo_apellido
+            ),
+            fecha_nacimiento: paciente.fecha_nacimiento,
+            genero: paciente.genero,
+            estado_civil: paciente.estado_civil,
+            edad,
+            grupo_etario,
+            seguro: seguro ? {
+                tipo: seguro.tipo,
+                beneficiario: seguro.beneficiario,
+                codigo_seguro: seguro.codigo
+            } : null,
+            medico: medico ? {
+                nombres_medico: construirNombreCompleto(
+                    medico.primer_nombre,
+                    medico.segundo_nombre,
+                    medico.primer_apellido,
+                    medico.segundo_apellido
+                ),
+                especialidad: especialidad?.nombre || null
+            } : null
+        };
+
+    } catch (error) {
+        throw new Error(`${errorMessages.errorObtenerPaciente}: ${error.message}`);
+    }
+}
+
 module.exports = {
     validarUsuarioParaPaciente,
     validarIdentificacionPaciente,
@@ -281,5 +387,6 @@ module.exports = {
     actualizarDatosPaciente,
 	obtenerPacientePorId,
 	obtenerPacientePorIdUsuario,
-    obtenerHistorialPorIdentificacion
+    obtenerHistorialPorIdentificacion,
+	obtenerDetallePacientePorCita
 };

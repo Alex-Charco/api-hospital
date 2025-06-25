@@ -39,6 +39,11 @@ const NotaEvolutiva = sequelize.define('NotaEvolutiva', {
     reporte_decision: {
         type: DataTypes.TEXT,
         allowNull: false
+    },
+	fecha_creacion: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     }
 }, {
     tableName: 'nota_evolutiva',

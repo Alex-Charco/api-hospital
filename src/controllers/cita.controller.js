@@ -76,7 +76,9 @@ async function getCitasPorPaciente(req, res) {
                                 medico.segundo_apellido
                             ]
                                 .filter(Boolean)
-                                .join(' ')
+                                .join(' '),
+								celular: medico.celular || null,
+								correo: medico.correo || null
                         }
                         : null,
                     datos_especialidad: especialidad

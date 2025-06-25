@@ -20,9 +20,17 @@ const Link = sequelize.define("Link", {
         type: DataTypes.ENUM("EXAMEN", "PEDIDO", "CERTIFICADO", "OTRO", "TRANSFERIR"),
         allowNull: false
     },
+	nombre_documento: {
+        type: DataTypes.STRING(250),
+        allowNull: false
+    },
     url: {
         type: DataTypes.STRING(300),
         allowNull: false
+    },
+	descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
     tableName: "link",

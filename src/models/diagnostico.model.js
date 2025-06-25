@@ -20,6 +20,10 @@ const Diagnostico = sequelize.define('Diagnostico', {
         type: DataTypes.STRING(100),
         allowNull: false
     },
+	tipo: {
+        type: DataTypes.STRING(150),
+        allowNull: false
+    },
     cie_10: {
         type: DataTypes.STRING(10),
         allowNull: false

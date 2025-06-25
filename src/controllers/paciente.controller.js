@@ -133,4 +133,27 @@ async function getHistorialPorIdentificacion(req, res) {
     }
 }
 
-module.exports = { registrarPaciente, getPaciente, actualizarPaciente, getHistorialPorIdentificacion };
+// Función para obtener datos personalizados del paciente para nota evolutiva
+async function obtenerDetallePorCita(req, res) {
+    try {
+        const { id_cita } = req.params;
+
+        const detalle = await pacienteService.obtenerDetallePacientePorCita(id_cita);
+
+        return res.status(200).json({
+            message: successMessages.pacienteEncontrado,
+            paciente: detalle
+        });
+    } catch (error) {
+        console.error("Error al obtener detalle paciente por cita:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+module.exports = { 
+	registrarPaciente, 
+	getPaciente, 
+	actualizarPaciente, 
+	getHistorialPorIdentificacion,
+	obtenerDetallePorCita
+};
