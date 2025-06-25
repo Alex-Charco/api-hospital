@@ -1,14 +1,15 @@
-const { NotaEvolutiva, Cita, Paciente, Diagnostico, Procedimiento, Link } = require('../models');
+const { NotaEvolutiva, Cita, Paciente, Diagnostico, Procedimiento, Link, SignosVitales } = require('../models');
 const diagnosticoService = require("./diagnostico.service");
 const procedimientoService = require("./procedimiento.service");
 const linkService = require("./link.service");
 const errorMessages = require("../utils/error_messages");
+const { formatFechaCompletaLocal } = require('../utils/date_utils');
 
 async function crearNota(data, transaction) {
     try {
-        const { id_cita, motivo_consulta, diagnosticos = [], procedimientos = [], links = [], ...datosNotaEvolutiva } = data;
+        const { id_cita, motivo_consulta, diagnosticos = [], links = [], signos_vitales = null, ...datosNotaEvolutiva } = data;
 
-        // 1️⃣ Obtener la cita y su id_paciente
+        // 1️⃣ Validar que la cita exista
         const cita = await obtenerCitaPorId(id_cita);
         if (!cita) {
             throw new Error("Cita no encontrada");
@@ -19,7 +20,7 @@ async function crearNota(data, transaction) {
             throw new Error("Paciente no encontrado");
         }
 
-        // 2️⃣ Crear la nota evolutiva
+        // 2️⃣ Crear la nota evolutiva principal
         const nota = await NotaEvolutiva.create({
             id_cita,
             id_paciente,
@@ -27,32 +28,55 @@ async function crearNota(data, transaction) {
             ...datosNotaEvolutiva
         }, { transaction });
 
-        // 3️⃣ Insertar diagnósticos
-        const diagnosticosGuardados = await Promise.all(diagnosticos.map(async diag => {
-            return await diagnosticoService.crearDiagnostico({
+        // 3️⃣ Insertar signos vitales (solo si existen)
+        let signosVitalesGuardados = null;
+        if (signos_vitales) {
+            signosVitalesGuardados = await SignosVitales.create({
                 id_nota_evolutiva: nota.id_nota_evolutiva,
-                ...diag
-            }, transaction);
-        }));
+                ...signos_vitales
+            }, { transaction });
+        }
 
-        // 4️⃣ Insertar procedimientos vinculados a los diagnósticos creados
-        const procedimientosGuardados = await Promise.all(procedimientos.map(async (proc, index) => {
-            const diagnosticoAsociado = diagnosticosGuardados[index]; // Vincular con diagnóstico correspondiente
-            return diagnosticoAsociado ? await procedimientoService.crearProcedimiento({
-                id_diagnostico: diagnosticoAsociado.id_diagnostico,
-                ...proc
-            }, transaction) : null;
-        }));
+        // 4️⃣ Insertar diagnósticos
+        const diagnosticosGuardados = [];
 
-        // 5️⃣ Insertar links asociados
-        const linksGuardados = await Promise.all(links.map(async link => {
-            return await linkService.crearLink({
+        for (const diag of diagnosticos) {
+            const nuevoDiagnostico = await diagnosticoService.crearDiagnostico({
                 id_nota_evolutiva: nota.id_nota_evolutiva,
-                ...link
+                condicion: diag.condicion,
+				tipo: diag.tipo,
+                cie_10: diag.cie_10,
+                descripcion: diag.descripcion
             }, transaction);
-        }));
 
-        return { nota, diagnosticosGuardados, procedimientosGuardados, linksGuardados };
+            diagnosticosGuardados.push(nuevoDiagnostico);
+
+            // Procedimientos
+            if (diag.procedimientos && Array.isArray(diag.procedimientos)) {
+                for (const proc of diag.procedimientos) {
+                    await procedimientoService.crearProcedimiento({
+                        id_diagnostico: nuevoDiagnostico.id_diagnostico,
+                        codigo: proc.codigo,
+                        descripcion_proc: proc.descripcion_proc
+                    }, transaction);
+                }
+            }
+        }
+
+        // 5️⃣ Insertar links
+        const linksGuardados = await Promise.all(
+            links.map(async link => {
+                return await linkService.crearLink({
+                    id_nota_evolutiva: nota.id_nota_evolutiva,
+                    categoria: link.categoria,
+                    nombre_documento: link.nombre_documento,
+                    url: link.url,
+                    descripcion: link.descripcion || null
+                }, transaction);
+            })
+        );
+
+        return { nota, diagnosticosGuardados, linksGuardados, signosVitalesGuardados };
 
     } catch (error) {
         throw new Error("Error al crear la nota evolutiva: " + error.message);
@@ -60,54 +84,105 @@ async function crearNota(data, transaction) {
 }
 
 // Obtener todas las notas evolutivas por ID de cita o identificación del paciente
-async function obtenerNotasDetalladas({ id_cita = null, identificacion = null }) {
-    let whereClause = {};
+async function obtenerNotasDetalladas({ id_cita = null, identificacion = null, id_paciente = null, page = 1, limit = 5 }) {
+    const offset = (page - 1) * limit;
 
+    const includeOptions = [
+        {
+            model: Diagnostico,
+            as: 'Diagnosticos',
+            include: [
+                { model: Procedimiento, as: 'Procedimientos' }
+            ]
+        },
+        { model: Link, as: 'links' },
+		{ model: SignosVitales, as: 'signosVitales' }
+    ];
+
+    if (!id_cita) {
+        if (!id_paciente && identificacion) {
+            const paciente = await Paciente.findOne({ where: { identificacion } });
+            if (!paciente) throw new Error(errorMessages.pacienteNoEncontrado);
+            id_paciente = paciente.id_paciente;
+        }
+
+        includeOptions.push({
+            model: Cita,
+            as: 'cita',
+            where: { id_paciente: id_paciente }
+        });
+    } else {
+        includeOptions.push({
+            model: Cita,
+            as: 'cita'
+        });
+    }
+
+    const whereClause = {};
     if (id_cita) {
         whereClause.id_cita = id_cita;
-    } else if (identificacion) {
-        const paciente = await Paciente.findOne({ where: { identificacion } });
-
-        if (!paciente) {
-            throw new Error(errorMessages.pacienteNoEncontrado);
-        }
-
-        const citas = await Cita.findAll({ where: { id_paciente: paciente.id_paciente } });
-
-        if (!citas || citas.length === 0) {
-            throw new Error(errorMessages.citaNoEncontrada);
-        }
-
-        const idsCitas = citas.map(cita => cita.id_cita);
-        whereClause.id_cita = idsCitas;
     }
 
-    // Buscar notas evolutivas con diagnósticos, procedimientos y links asociados
-    const notas = await NotaEvolutiva.findAll({
+    const total = await NotaEvolutiva.count({
         where: whereClause,
-        include: [
-            {
-                model: Diagnostico,
-                as: 'Diagnosticos',
-                include: [
-                    {
-                        model: Procedimiento,
-                        as: 'Procedimientos'
-                    }
-                ]
-            },
-            {
-                model: Link,
-                as: 'links' // Incluir links
-            }
-        ]
+        include: includeOptions
     });
 
-    if (!notas || notas.length === 0) {
-        throw new Error(errorMessages.notaNoEncontrada);
+    const notas = await NotaEvolutiva.findAll({
+        where: whereClause,
+        include: includeOptions,
+        order: [['id_nota_evolutiva', 'DESC']],
+        limit: limit,
+        offset: offset
+    });
+
+    const notasFormateadas = notas.map(nota => {
+        const notaJson = nota.toJSON();
+        notaJson.fecha_creacion = formatFechaCompletaLocal(notaJson.fecha_creacion);
+        if (notaJson.cita && notaJson.cita.fecha_creacion) {
+            notaJson.cita.fecha_creacion = formatFechaCompletaLocal(notaJson.cita.fecha_creacion);
+        }
+        return notaJson;
+    });
+
+    return {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        data: notasFormateadas
+    };
+}
+
+// Obtener una nota evolutiva por ID de nota_evolutiva
+async function obtenerNotaDetalladaPorId(id_nota_evolutiva) {
+    const includeOptions = [
+        {
+            model: Diagnostico,
+            as: 'Diagnosticos',
+            include: [
+                { model: Procedimiento, as: 'Procedimientos' }
+            ]
+        },
+        { model: Link, as: 'links' },
+        { model: Cita, as: 'cita' },
+		{ model: SignosVitales, as: 'signosVitales' }
+    ];
+
+    const nota = await NotaEvolutiva.findByPk(id_nota_evolutiva, {
+        include: includeOptions
+    });
+
+    if (!nota) return null;
+
+    const notaJson = nota.toJSON();
+
+    // Formatear fechas si es necesario
+    notaJson.fecha_creacion = formatFechaCompletaLocal(notaJson.fecha_creacion);
+    if (notaJson.cita && notaJson.cita.fecha_creacion) {
+        notaJson.cita.fecha_creacion = formatFechaCompletaLocal(notaJson.cita.fecha_creacion);
     }
 
-    return notas;
+    return notaJson;
 }
 
 async function obtenerCitaPorId(id_cita) {
@@ -178,6 +253,7 @@ async function actualizarNota(id_nota_evolutiva, nuevosDatos) {
 module.exports = {
     crearNota,
     obtenerNotasDetalladas,
+	obtenerNotaDetalladaPorId,
 	obtenerCitaPorId,
 	actualizarNota
 };

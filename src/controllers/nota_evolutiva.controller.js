@@ -6,7 +6,7 @@ const successMessages = require('../utils/success_messages');
 
 // Registrar una nueva nota evolutiva con diagnóstico, procedimiento y link v2
 async function registrarNotaEvolutiva(req, res) {
-    const { id_cita, motivo_consulta, diagnosticos, procedimientos, links, ...datosNotaEvolutiva } = req.body;
+    const { id_cita, motivo_consulta, diagnosticos, links, signos_vitales, ...datosNotaEvolutiva } = req.body;
 
     if (!id_cita || !motivo_consulta) {
         return res.status(400).json({ message: errorMessages.faltanDatos });
@@ -20,8 +20,8 @@ async function registrarNotaEvolutiva(req, res) {
             id_cita,
             motivo_consulta,
             diagnosticos,
-            procedimientos,
             links,
+			signos_vitales,
             ...datosNotaEvolutiva
         }, transaction);
 
@@ -36,28 +36,55 @@ async function registrarNotaEvolutiva(req, res) {
 }
 
 // Obtener nota evolutiva por ID de cita o identificación del paciente
-async function obtenerNotaEvolutiva(req, res) {
+async function obtenerNotaEvolutiva(req, res) { 
     try {
-        const { id_cita, identificacion } = req.query;
+        const { id_cita, identificacion, id_paciente, page = 1, limit = 5 } = req.query;
 
-        if (!id_cita && !identificacion) {
+        if (!id_cita && !identificacion && !id_paciente) {
             return res.status(400).json({ message: errorMessages.filtroRequerido });
         }
 
-        // Obtener la nota evolutiva junto con diagnósticos, procedimientos y links
-        const nota = await notaEvolutivaService.obtenerNotasDetalladas({ id_cita, identificacion });
-
-        if (!nota || nota.length === 0) {
-            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
-        }
+        const resultado = await notaEvolutivaService.obtenerNotasDetalladas({
+            id_cita,
+            identificacion,
+            id_paciente,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        });
 
         return res.status(200).json({ 
             message: successMessages.notaEncontrada, 
-            nota
+            ...resultado
         });
 
     } catch (error) {
         console.error("❌ Error en obtenerNotaEvolutiva:", error.message);
+        return res.status(500).json({ message: error.message || errorMessages.errorServidor });
+    }
+}
+
+// Obtener nota evolutiva por ID de nota_evolutiva
+async function obtenerNotaEvolutivaPorId(req, res) {
+    try {
+        const { id_nota_evolutiva } = req.params;
+
+        if (!id_nota_evolutiva) {
+            return res.status(400).json({ message: errorMessages.filtroRequerido });
+        }
+
+        const notaDetallada = await notaEvolutivaService.obtenerNotaDetalladaPorId(id_nota_evolutiva);
+
+        if (!notaDetallada) {
+            return res.status(404).json({ message: errorMessages.notaNoEncontrada });
+        }
+
+        return res.status(200).json({
+            message: successMessages.notaEncontrada,
+            data: notaDetallada
+        });
+
+    } catch (error) {
+        console.error("❌ Error en obtenerNotaEvolutivaPorId:", error.message);
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }
 }
@@ -94,5 +121,6 @@ async function actualizarNotaEvolutiva(req, res) {
 module.exports = {
     registrarNotaEvolutiva,
     obtenerNotaEvolutiva,
+	obtenerNotaEvolutivaPorId,
     actualizarNotaEvolutiva
 };
