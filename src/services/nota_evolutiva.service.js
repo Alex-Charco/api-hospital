@@ -189,7 +189,7 @@ async function obtenerCitaPorId(id_cita) {
     try {
         return await Cita.findOne({ where: { id_cita } });
     } catch (error) {
-        throw new Error(errorMessages.errorObtenerCita + error.message);
+        throw new Error(errorMessages.errorObtenerCitas + error.message);
     }
 }
 
