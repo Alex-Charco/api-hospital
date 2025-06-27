@@ -1,4 +1,3 @@
-// tests/nota_evolutiva.service.test.js
 const notaService = require('../services/nota_evolutiva.service');
 const {
   NotaEvolutiva,
@@ -55,47 +54,47 @@ describe('nota_evolutiva.service', () => {
   // ---------- crearNota ----------
   describe('crearNota', () => {
     it('✅ debe crear una nota evolutiva correctamente', async () => {
-    const data = {
-      id_cita: 1,
-      motivo_consulta: 'Dolor abdominal',
-      diagnosticos: [{
-        condicion: 'Definitivo',
-        tipo: 'Primera',
-        cie_10: 'K021',
-        descripcion: 'Caries',
-        procedimientos: [{ codigo: '001', descripcion_proc: 'Limpieza' }]
-      }],
-      links: [{
-        categoria: 'Radiografía',
-        nombre_documento: 'rayos.pdf',
-        url: 'http://test.com'
-      }],
-      signos_vitales: {
-        presion: '120/80',
-        temperatura: 36.5
-      }
-    };
+      const data = {
+        id_cita: 1,
+        motivo_consulta: 'Dolor abdominal',
+        diagnosticos: [{
+          condicion: 'Definitivo',
+          tipo: 'Primera',
+          cie_10: 'K021',
+          descripcion: 'Caries',
+          procedimientos: [{ codigo: '001', descripcion_proc: 'Limpieza' }]
+        }],
+        links: [{
+          categoria: 'Radiografía',
+          nombre_documento: 'rayos.pdf',
+          url: 'http://test.com'
+        }],
+        signos_vitales: {
+          presion: '120/80',
+          temperatura: 36.5
+        }
+      };
 
-    Cita.findOne.mockResolvedValue({ id_cita: 1, id_paciente: 2 });
+      Cita.findOne.mockResolvedValue({ id_cita: 1, id_paciente: 2 });
 
 
-    NotaEvolutiva.create.mockResolvedValue({
-	  id_nota_evolutiva: 10,
-	  toJSON: () => ({ id_nota_evolutiva: 10 })
-	});
-    SignosVitales.create.mockResolvedValue({});
-    diagnosticoService.crearDiagnostico.mockResolvedValue({ id_diagnostico: 20 });
-    procedimientoService.crearProcedimiento.mockResolvedValue({});
-    linkService.crearLink.mockResolvedValue({});
+      NotaEvolutiva.create.mockResolvedValue({
+        id_nota_evolutiva: 10,
+        toJSON: () => ({ id_nota_evolutiva: 10 })
+      });
+      SignosVitales.create.mockResolvedValue({});
+      diagnosticoService.crearDiagnostico.mockResolvedValue({ id_diagnostico: 20 });
+      procedimientoService.crearProcedimiento.mockResolvedValue({});
+      linkService.crearLink.mockResolvedValue({});
 
-    const result = await notaService.crearNota(data, mockTransaction);
-    console.log('Resultado de crearNota:', result);
-    expect(result).toHaveProperty('nota');
-    expect(result.nota).toEqual(expect.objectContaining({ id_nota_evolutiva: 10 }));
+      const result = await notaService.crearNota(data, mockTransaction);
+      console.log('Resultado de crearNota:', result);
+      expect(result).toHaveProperty('nota');
+      expect(result.nota).toEqual(expect.objectContaining({ id_nota_evolutiva: 10 }));
 
-    expect(result.nota).toHaveProperty('id_nota_evolutiva', 10);
+      expect(result.nota).toHaveProperty('id_nota_evolutiva', 10);
 
-  });
+    });
 
     it('❌ debe lanzar error si la cita no existe', async () => {
       Cita.findOne.mockResolvedValue(null);

@@ -274,7 +274,6 @@ async function obtenerHistorialPorIdentificacion(identificacion) {
             });
         }
 
-        // Devolver todo junto
         return {
             paciente: historialPacienteFormateado,
             familiares: historialFamiliarTotal,
