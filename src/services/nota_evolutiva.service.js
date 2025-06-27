@@ -1,4 +1,4 @@
-const { NotaEvolutiva, Cita, Paciente, Diagnostico, Procedimiento, Link, SignosVitales } = require('../models');
+const { NotaEvolutiva, Cita, Paciente, Diagnostico, Procedimiento, Link, SignoVital } = require('../models');
 const diagnosticoService = require("./diagnostico.service");
 const procedimientoService = require("./procedimiento.service");
 const linkService = require("./link.service");
@@ -7,7 +7,7 @@ const { formatFechaCompletaLocal } = require('../utils/date_utils');
 
 async function crearNota(data, transaction) {
     try {
-        const { id_cita, motivo_consulta, diagnosticos = [], links = [], signos_vitales = null, ...datosNotaEvolutiva } = data;
+        const { id_cita, motivo_consulta, diagnosticos = [], links = [], signo_vital = null, ...datosNotaEvolutiva } = data;
 
         // 1️⃣ Validar que la cita exista
         const cita = await obtenerCitaPorId(id_cita);
@@ -29,11 +29,11 @@ async function crearNota(data, transaction) {
         }, { transaction });
 
         // 3️⃣ Insertar signos vitales (solo si existen)
-        let signosVitalesGuardados = null;
-        if (signos_vitales) {
-            signosVitalesGuardados = await SignosVitales.create({
+        let signoVitalGuardados = null;
+        if (signo_vital) {
+            signoVitalGuardados = await SignoVital.create({
                 id_nota_evolutiva: nota.id_nota_evolutiva,
-                ...signos_vitales
+                ...signo_vital
             }, { transaction });
         }
 
@@ -76,7 +76,7 @@ async function crearNota(data, transaction) {
             })
         );
 
-        return { nota, diagnosticosGuardados, linksGuardados, signosVitalesGuardados };
+        return { nota, diagnosticosGuardados, linksGuardados, signoVitalGuardados };
 
     } catch (error) {
         throw new Error("Error al crear la nota evolutiva: " + error.message);
@@ -96,7 +96,7 @@ async function obtenerNotasDetalladas({ id_cita = null, identificacion = null, i
             ]
         },
         { model: Link, as: 'links' },
-		{ model: SignosVitales, as: 'signosVitales' }
+		{ model: SignoVital, as: 'signoVital' }
     ];
 
     if (!id_cita) {
@@ -165,7 +165,7 @@ async function obtenerNotaDetalladaPorId(id_nota_evolutiva) {
         },
         { model: Link, as: 'links' },
         { model: Cita, as: 'cita' },
-		{ model: SignosVitales, as: 'signosVitales' }
+		{ model: SignoVital, as: 'signoVital' }
     ];
 
     const nota = await NotaEvolutiva.findByPk(id_nota_evolutiva, {

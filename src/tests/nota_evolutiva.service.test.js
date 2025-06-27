@@ -3,7 +3,7 @@ const {
   NotaEvolutiva,
   Cita,
   Paciente,
-  SignosVitales
+  SignoVital
 } = require('../models');
 const diagnosticoService = require('../services/diagnostico.service');
 const procedimientoService = require('../services/procedimiento.service');
@@ -27,7 +27,7 @@ jest.mock('../models', () => {
     Diagnostico: {},
     Procedimiento: {},
     Link: {},
-    SignosVitales: {
+    SignoVital: {
       create: jest.fn(),
     },
     sequelize: {
@@ -69,7 +69,7 @@ describe('nota_evolutiva.service', () => {
           nombre_documento: 'rayos.pdf',
           url: 'http://test.com'
         }],
-        signos_vitales: {
+        signo_vital: {
           presion: '120/80',
           temperatura: 36.5
         }
@@ -82,7 +82,7 @@ describe('nota_evolutiva.service', () => {
         id_nota_evolutiva: 10,
         toJSON: () => ({ id_nota_evolutiva: 10 })
       });
-      SignosVitales.create.mockResolvedValue({});
+      SignoVital.create.mockResolvedValue({});
       diagnosticoService.crearDiagnostico.mockResolvedValue({ id_diagnostico: 20 });
       procedimientoService.crearProcedimiento.mockResolvedValue({});
       linkService.crearLink.mockResolvedValue({});

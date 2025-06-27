@@ -31,7 +31,7 @@ const HistorialCambiosInfoMilitar = require('./historial_cambios_info_militar.mo
 const HistorialCambiosResidencia = require('./historial_cambios_residencia.model');
 const HistorialCambiosSeguro = require('./historial_cambios_seguro.model');
 const HistorialCambiosMedico = require('./historial_cambios_medico.model');
-const SignosVitales = require('./signos_vitales.model');
+const SignoVital = require("./signo_vital.model")
 
 // Definir relaciones con claves foráneas
 RolUsuario.hasMany(Usuario, {
@@ -277,16 +277,16 @@ Link.belongsTo(NotaEvolutiva, {
     onUpdate: "CASCADE"
 });
 
-// Relación 1 a 1: Una NotaEvolutiva tiene un único registro de SignosVitales
-NotaEvolutiva.hasOne(SignosVitales, {
+// Relación 1 a 1: Una NotaEvolutiva tiene un único registro del SignoVital
+NotaEvolutiva.hasOne(SignoVital, {
     foreignKey: 'id_nota_evolutiva',
-    as: 'signosVitales',
+    as: 'signoVital',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
 
-// Relación inversa: Los SignosVitales pertenecen a una NotaEvolutiva
-SignosVitales.belongsTo(NotaEvolutiva, {
+// Relación inversa: De SignoVital pertenecen a una NotaEvolutiva
+SignoVital.belongsTo(NotaEvolutiva, {
     foreignKey: 'id_nota_evolutiva',
     as: 'notaEvolutiva',
     onDelete: 'CASCADE',
@@ -650,5 +650,5 @@ module.exports = {
 	HistorialCambiosSeguro,
 	HistorialCambiosMedico,
 	Asistencia,
-	SignosVitales
+	SignoVital
 };
