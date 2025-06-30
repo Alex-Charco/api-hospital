@@ -9,8 +9,7 @@ const Medicamento = sequelize.define("Medicamento", {
     },
     cum: {
         type: DataTypes.STRING(50),
-        allowNull: false,
-        unique: true
+        allowNull: true,
     },
     nombre_medicamento: {
         type: DataTypes.STRING(100),

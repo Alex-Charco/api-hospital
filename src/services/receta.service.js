@@ -1,4 +1,4 @@
-const { Receta, Medicacion, Medicamento, Posologia, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia, Cita } = require('../models');
+const { Receta, Medicacion, Medicamento, Posologia, Diagnostico, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia, Cita } = require('../models');
 const medicacionService = require("./medicacion.service");
 const medicamentoService = require("./medicamento.service");
 const posologiaService = require("./posologia.service");
@@ -27,7 +27,7 @@ async function crearReceta(data, transaction) {
 
         // Formatear fechas
         const fechaPrescripcionFormatted = formatFecha(fecha_prescripcion);
-        const fechaVigenciaFormatted = formatFecha(new Date(new Date(fecha_prescripcion).setDate(new Date(fecha_prescripcion).getDate() + 3)));
+        const fechaVigenciaFormatted = formatFecha(new Date(new Date(fecha_prescripcion).setDate(new Date(fecha_prescripcion).getDate() + 2)));
 
         // Crear receta
         const receta = await Receta.create({
@@ -47,7 +47,7 @@ async function crearReceta(data, transaction) {
             // Crear medicamento
             const medicamentoCreado = await medicamentoService.crearMedicamento({
                 nombre_medicamento: med.medicamento.nombre_medicamento,
-                cum: med.medicamento.cum || '',
+                cum: med.medicamento.cum ?? null,
                 forma_farmaceutica: med.medicamento.forma_farmaceutica || '',
                 via_administracion: med.medicamento.via_administracion || '',
                 concentracion: med.medicamento.concentracion || '',
@@ -155,34 +155,27 @@ async function obtenerNotaEvolutivaPorId(id_nota_evolutiva) {
     }
 }
 
-async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null }) {
+async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificacion = null, page = 1, limit = 5 }) {
+    const offset = (page - 1) * limit;
     let whereClause = {};
 
     if (id_nota_evolutiva) {
         whereClause.id_nota_evolutiva = id_nota_evolutiva;
     } else if (identificacion) {
-        // Buscar al paciente por su identificación
         const paciente = await Paciente.findOne({ where: { identificacion } });
-        if (!paciente) {
-            throw new Error(errorMessages.notaNoEncontrada);
-        }
+        if (!paciente) throw new Error(errorMessages.notaNoEncontrada);
 
-        // Buscar la cita asociada al paciente
         const cita = await Cita.findOne({ where: { id_paciente: paciente.id_paciente } });
-        if (!cita) {
-            throw new Error(errorMessages.notaNoEncontrada);
-        }
+        if (!cita) throw new Error(errorMessages.notaNoEncontrada);
 
-        // Buscar la nota evolutiva con el id_cita obtenido
         const notaEvolutiva = await NotaEvolutiva.findOne({ where: { id_cita: cita.id_cita } });
-        if (!notaEvolutiva) {
-            throw new Error(errorMessages.notaNoEncontrada);
-        }
+        if (!notaEvolutiva) throw new Error(errorMessages.notaNoEncontrada);
 
         whereClause.id_nota_evolutiva = notaEvolutiva.id_nota_evolutiva;
     }
 
-    // Buscar recetas con todos los datos necesarios
+    const total = await Receta.count({ where: whereClause });
+
     const recetas = await Receta.findAll({
         where: whereClause,
         include: [
@@ -198,8 +191,8 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                 model: RecetaAutorizacion,
                 as: 'receta_autorizacion',
                 include: [
-                    { 
-                        model: Paciente, 
+                    {
+                        model: Paciente,
                         as: 'paciente',
                         attributes: ['id_paciente', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo'],
                         include: [
@@ -210,26 +203,25 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                             }
                         ]
                     },
-                    { 
-                        model: Familiar, 
+                    {
+                        model: Familiar,
                         as: 'familiar',
                         attributes: ['id_familiar', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
                     },
-                    { 
-                        model: PersonaExterna, 
+                    {
+                        model: PersonaExterna,
                         as: 'persona_externa',
                         attributes: ['id_persona_externa', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'celular', 'telefono', 'correo']
                     }
                 ]
             }
-        ]
+        ],
+        order: [['id_receta', 'DESC']],
+        limit,
+        offset
     });
 
-    if (!recetas || recetas.length === 0) {
-        throw new Error(errorMessages.notaNoEncontrada);
-    }
-
-    return recetas.map(receta => {
+    const recetasFormateadas = recetas.map(receta => {
         const recetaAutorizacion = receta.receta_autorizacion || {};
         const paciente = recetaAutorizacion.paciente;
         const familiar = recetaAutorizacion.familiar;
@@ -257,11 +249,7 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                 tipo_autorizado: recetaAutorizacion.tipo_autorizado,
                 paciente: paciente ? {
                     id_paciente: paciente.id_paciente,
-                    nombre: paciente
-                    ? [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido]
-                        .filter(Boolean) // Elimina valores nulos o undefined
-                        .join(' ') // Une los nombres con un solo espacio
-                    : "",
+                    nombre: [paciente.primer_nombre, paciente.segundo_nombre, paciente.primer_apellido, paciente.segundo_apellido].filter(Boolean).join(' '),
                     celular: paciente.celular,
                     telefono: paciente.telefono,
                     correo: paciente.correo,
@@ -269,22 +257,14 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
                 } : null,
                 familiar: familiar ? {
                     id_familiar: familiar.id_familiar,
-                    nombre: familiar
-                    ? [familiar.primer_nombre, familiar.segundo_nombre, familiar.primer_apellido, familiar.segundo_apellido]
-                        .filter(Boolean) // Elimina valores nulos o undefined
-                        .join(' ') // Une los nombres con un solo espacio
-                    : "",
+                    nombre: [familiar.primer_nombre, familiar.segundo_nombre, familiar.primer_apellido, familiar.segundo_apellido].filter(Boolean).join(' '),
                     celular: familiar.celular,
                     telefono: familiar.telefono,
                     correo: familiar.correo
                 } : null,
                 persona_externa: personaExterna ? {
                     id_persona_externa: personaExterna.id_persona_externa,
-                    nombre: personaExterna
-                    ? [personaExterna.primer_nombre, personaExterna.segundo_nombre, personaExterna.primer_apellido, personaExterna.segundo_apellido]
-                        .filter(Boolean) // Elimina valores nulos o undefined
-                        .join(' ') // Une los nombres con un solo espacio
-                    : "",
+                    nombre: [personaExterna.primer_nombre, personaExterna.segundo_nombre, personaExterna.primer_apellido, personaExterna.segundo_apellido].filter(Boolean).join(' '),
                     celular: personaExterna.celular,
                     telefono: personaExterna.telefono,
                     correo: personaExterna.correo
@@ -292,6 +272,43 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
             }
         };
     });
+
+    return {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        data: recetasFormateadas
+    };
+}
+
+const obtenerDiagnosticosPorNota = async (id_nota_evolutiva) => {
+  const diagnosticos = await Diagnostico.findAll({
+    where: { id_nota_evolutiva }
+  });
+  return diagnosticos;
+};
+
+async function obtenerPacienteYFamiliarPorId(id_paciente) {
+  try {
+    const paciente = await Paciente.findOne({
+      where: { id_paciente },
+      include: [{
+        model: Residencia,
+        as: 'residencia'
+      }]
+    });
+
+    if (!paciente) return { paciente: null, familiar: null };
+
+    const familiar = await Familiar.findOne({
+      where: { id_paciente, estatus: 1 }
+    });
+
+    return { paciente, familiar };
+
+  } catch (error) {
+    throw new Error("Error al obtener datos de paciente y familiar: " + error.message);
+  }
 }
 
 async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
@@ -384,5 +401,12 @@ async function actualizarRecetaDetallada(id_receta, nuevosDatos) {
     };
 }
 
-module.exports = { crearReceta, obtenerDatosAutorizado, obtenerRecetasDetalladas, actualizarRecetaDetallada };
+module.exports = { 
+	crearReceta, 
+	obtenerDatosAutorizado, 
+	obtenerRecetasDetalladas,
+	obtenerDiagnosticosPorNota,
+	obtenerPacienteYFamiliarPorId,
+	actualizarRecetaDetallada
+};
 
