@@ -6,7 +6,7 @@ const successMessages = require('../utils/success_messages');
 
 // Registrar una nueva nota evolutiva con diagnóstico, procedimiento y link v2
 async function registrarNotaEvolutiva(req, res) {
-    const { id_cita, motivo_consulta, diagnosticos, links, signos_vitales, ...datosNotaEvolutiva } = req.body;
+    const { id_cita, motivo_consulta, diagnosticos, links, signo_vital, ...datosNotaEvolutiva } = req.body;
 
     if (!id_cita || !motivo_consulta) {
         return res.status(400).json({ message: errorMessages.faltanDatos });
@@ -21,7 +21,7 @@ async function registrarNotaEvolutiva(req, res) {
             motivo_consulta,
             diagnosticos,
             links,
-			signos_vitales,
+			signo_vital,
             ...datosNotaEvolutiva
         }, transaction);
 

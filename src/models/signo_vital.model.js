@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const NotaEvolutiva = require('./nota_evolutiva.model');
 
-const SignosVitales = sequelize.define('SignosVitales', {
+const SignoVital = sequelize.define('SignoVital', {
     id_signo_vital: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -60,8 +60,8 @@ const SignosVitales = sequelize.define('SignosVitales', {
         allowNull: true
     }
 }, {
-    tableName: 'signos_vitales',
+    tableName: 'signo_vital',
     timestamps: false
 });
 
-module.exports = SignosVitales;
+module.exports = SignoVital;
