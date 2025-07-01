@@ -20,6 +20,5 @@ async function actualizarContraseñas() {
         console.error('Error al actualizar las contraseñas:', error);
     }
 }
-
 // Ejecutar la función
 actualizarContraseñas();
