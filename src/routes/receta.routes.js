@@ -5,6 +5,7 @@ const {
     obtenerRecetas,
 	obtenerDiagnosticosPorNota,
 	obtenerOpcionesAutorizado,
+	obtenerRecetaPorCita,
     actualizarReceta
 } = require('../controllers/receta.controller');
 const { verificarToken, authorizeRole } = require('../middlewares/auth.middleware');
@@ -20,6 +21,9 @@ router.get('/get/diagnostico-por-nota/:id_nota_evolutiva', verificarToken, autho
 
 // Obtener datos paciente/familiar por ID paciente
 router.get('/get/autorizacion/opciones', verificarToken, authorizeRole(["gestionar_receta"]), obtenerOpcionesAutorizado);
+
+// Obtener datos por id_cita
+router.get('/get/por-cita', verificarToken, authorizeRole(['gestionar_receta']), obtenerRecetaPorCita);
 
 // Actualizar nota evolutiva
 router.put('/put/:id_receta', verificarToken, authorizeRole(["gestionar_receta"]), actualizarReceta);

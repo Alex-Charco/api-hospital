@@ -1,4 +1,4 @@
-const { Receta, Medicacion, Medicamento, Posologia, Diagnostico, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia, Cita } = require('../models');
+const { Receta, Medicacion, Medicamento, Posologia, Diagnostico, RecetaAutorizacion, NotaEvolutiva, Paciente, Familiar, PersonaExterna, Residencia, Cita, Turno, Horario, Medico, Especialidad } = require('../models');
 const medicacionService = require("./medicacion.service");
 const medicamentoService = require("./medicamento.service");
 const posologiaService = require("./posologia.service");
@@ -9,6 +9,7 @@ const familiarService = require("./familiar.service");
 const personaExternaService = require("./persona_externa.service");
 const errorMessages = require("../utils/error_messages");
 const { formatFecha } = require('../utils/date_utils');
+const { getEdad: calcularEdad } = require('../utils/edad_utils');
 
 async function crearReceta(data, transaction) {
     try {
@@ -282,36 +283,184 @@ async function obtenerRecetasDetalladas({ id_nota_evolutiva = null, identificaci
 }
 
 const obtenerDiagnosticosPorNota = async (id_nota_evolutiva) => {
-  const diagnosticos = await Diagnostico.findAll({
-    where: { id_nota_evolutiva }
-  });
-  return diagnosticos;
+    const diagnosticos = await Diagnostico.findAll({
+        where: { id_nota_evolutiva }
+    });
+    return diagnosticos;
 };
 
 async function obtenerPacienteYFamiliarPorId(id_paciente) {
-  try {
-    const paciente = await Paciente.findOne({
-      where: { id_paciente },
-      include: [{
-        model: Residencia,
-        as: 'residencia'
-      }]
-    });
+    try {
+        const paciente = await Paciente.findOne({
+            where: { id_paciente },
+            include: [{
+                model: Residencia,
+                as: 'residencia'
+            }]
+        });
 
-    if (!paciente) return { paciente: null, familiar: null };
+        if (!paciente) return { paciente: null, familiar: null };
 
-    const familiar = await Familiar.findOne({
-      where: { id_paciente, estatus: 1 }
-    });
+        const familiar = await Familiar.findOne({
+            where: { id_paciente, estatus: 1 }
+        });
 
-    return { paciente, familiar };
+        return { paciente, familiar };
 
-  } catch (error) {
-    throw new Error("Error al obtener datos de paciente y familiar: " + error.message);
-  }
+    } catch (error) {
+        throw new Error("Error al obtener datos de paciente y familiar: " + error.message);
+    }
 }
 
-async function actualizarRecetaDetallada(id_receta, nuevosDatos) { 
+async function obtenerRecetaPorCita(id_cita) {
+    if (!id_cita) throw new Error("id_cita requerido");
+
+    const nota = await NotaEvolutiva.findOne({
+        where: { id_cita },
+        attributes: ['id_nota_evolutiva']
+    });
+    if (!nota) throw new Error("No se encontró nota evolutiva para la cita");
+
+    const receta = await Receta.findOne({
+        where: { id_nota_evolutiva: nota.id_nota_evolutiva },
+        include: [
+            {
+                model: RecetaAutorizacion,
+                as: 'receta_autorizacion',
+                include: [
+                    {
+                        model: Paciente,
+                        as: 'paciente',
+                        attributes: ['identificacion', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero']
+                    },
+                    {
+                        model: Familiar,
+                        as: 'familiar',
+                        attributes: ['identificacion', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
+                    },
+                    {
+                        model: PersonaExterna,
+                        as: 'persona_externa',
+                        attributes: ['identificacion', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido']
+                    }
+                ]
+            },
+            {
+                model: Medicacion,
+                as: 'medicaciones',
+                include: [
+                    { model: Medicamento, as: 'medicamento' },
+                    { model: Posologia, as: 'posologias' }
+                ]
+            }
+        ]
+    });
+
+    if (!receta) throw new Error("No se encontró receta asociada");
+
+    // Aquí traemos al médico mediante joins desde la cita hasta horario -> médico
+    const cita = await Cita.findByPk(id_cita, {
+        include: [
+            {
+                model: Turno,
+                as: 'turno',
+                include: {
+                    model: Horario,
+                    as: 'horario',
+                    include: {
+                        model: Medico,
+                        as: 'medico',
+                        include: {
+                            model: Especialidad,
+                            as: 'especialidad',
+                            attributes: ['nombre', 'atencion']
+                        }
+                    }
+                }
+            },
+            {
+                model: Paciente, // ✅ Ahora está correctamente como segundo include
+                as: 'paciente',
+                attributes: [
+                    'identificacion',
+                    'primer_nombre',
+                    'segundo_nombre',
+                    'primer_apellido',
+                    'segundo_apellido',
+                    'fecha_nacimiento',
+                    'genero'
+                ]
+            }
+        ]
+    });
+
+
+    const medico = cita?.turno?.horario?.medico;
+
+    const recetaAut = receta.receta_autorizacion || {};
+    let autorizado = null;
+    if (recetaAut.tipo_autorizado === 'PACIENTE') autorizado = recetaAut.paciente;
+    else if (recetaAut.tipo_autorizado === 'FAMILIAR') autorizado = recetaAut.familiar;
+    else if (recetaAut.tipo_autorizado === 'EXTERNO') autorizado = recetaAut.persona_externa;
+
+    return {
+        fecha_prescripcion: receta.fecha_prescripcion,
+        fecha_vigencia: receta.fecha_vigencia,
+
+        paciente: cita.paciente ? {
+            nombre: [
+                cita.paciente.primer_nombre,
+                cita.paciente.segundo_nombre,
+                cita.paciente.primer_apellido,
+                cita.paciente.segundo_apellido
+            ].filter(Boolean).join(" "),
+            identificacion: cita.paciente.identificacion,
+            edad: calcularEdad(cita.paciente.fecha_nacimiento),
+            sexo: cita.paciente.genero
+        } : null,
+
+        autorizado: autorizado ? {
+            nombre: [
+                autorizado.primer_nombre,
+                autorizado.segundo_nombre,
+                autorizado.primer_apellido,
+                autorizado.segundo_apellido
+            ].filter(Boolean).join(" "),
+            identificacion: autorizado.identificacion
+        } : null,
+
+        medico: medico ? {
+            nombre: [
+                medico.primer_nombre,
+                medico.segundo_nombre,
+                medico.primer_apellido,
+                medico.segundo_apellido
+            ].filter(Boolean).join(" "),
+            especialidad: medico.especialidad, // o incluir Especialidad como relación si es necesario
+            celular: medico.celular,
+            correo: medico.correo
+        } : null,
+
+        medicamentos: receta.medicaciones.map((m, idx) => ({
+            orden: idx + 1,
+            medicamento: [
+                m.medicamento?.nombre_medicamento,
+                m.medicamento?.forma_farmaceutica,
+                m.medicamento?.concentracion
+            ].filter(Boolean).join(' '),
+            cantidad: m.medicamento?.cantidad,
+            via_administracion: m.medicamento?.via_administracion,
+            calcular: m.posologias?.[0]?.calcular || null,
+
+            indicacion: m.indicacion,
+            signo_alarma: m.signo_alarma,
+            indicacion_no_farmacologica: m.indicacion_no_farmacologica,
+            recomendacion_no_farmacologica: m.recomendacion_no_farmacologica
+        }))
+    };
+}
+
+async function actualizarRecetaDetallada(id_receta, nuevosDatos) {
     const receta = await Receta.findByPk(id_receta, {
         include: [
             {
@@ -401,12 +550,13 @@ async function actualizarRecetaDetallada(id_receta, nuevosDatos) {
     };
 }
 
-module.exports = { 
-	crearReceta, 
-	obtenerDatosAutorizado, 
-	obtenerRecetasDetalladas,
-	obtenerDiagnosticosPorNota,
-	obtenerPacienteYFamiliarPorId,
-	actualizarRecetaDetallada
+module.exports = {
+    crearReceta,
+    obtenerDatosAutorizado,
+    obtenerRecetasDetalladas,
+    obtenerDiagnosticosPorNota,
+    obtenerPacienteYFamiliarPorId,
+    obtenerRecetaPorCita,
+    actualizarRecetaDetallada
 };
 
