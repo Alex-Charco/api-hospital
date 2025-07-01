@@ -557,6 +557,7 @@ module.exports = {
     obtenerDiagnosticosPorNota,
     obtenerPacienteYFamiliarPorId,
     obtenerRecetaPorCita,
+	obtenerNotaEvolutivaPorId,
     actualizarRecetaDetallada
 };
 
