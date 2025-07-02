@@ -92,8 +92,8 @@ const errorMessages = {
     errorActualizarMedic: "Error al actualizar al médico. ",
 	
 	// Mensajes de nota evolutiva
-	errorCrearNota: "Error al crear la nota evoluiva. ",
-	notaNoEncontrada: "Nota evoluiva no encontrada. ",
+	errorCrearNota: "Error al crear la nota evolutiva. ",
+	notaNoEncontrada: "Nota evolutiva no encontrada. ",
     filtroRequerido: "Se requiere el id_cita o la identificación. ",
     idNotaRequerido:"Se requiere el id de la nota evolutiva",
 	errorObtenerNotaEvolutiva: "Error al obtener la nota evolutiva",
