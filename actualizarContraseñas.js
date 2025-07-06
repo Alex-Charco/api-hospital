@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const { Usuario } = require('./models');
-
 async function actualizarContraseñas() {
     try {
         // Obtener todos los usuarios
