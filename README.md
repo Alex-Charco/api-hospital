@@ -250,6 +250,17 @@ Ejecutar las pruebas de integración
 
 	npm test tests/integration
 
+**Se desabilitan las pruebas de integración por seguridad**
+
+Cambiar nombre de archivo y carpeta:
+
+	Carpeta: integration.disabled/
+
+	Archivos: .test.disabled.js
+
+Así se evita la ejecución.
+
+
 ---
 
 ### 1.4 Levantar el servidor
