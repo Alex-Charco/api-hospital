@@ -9,6 +9,12 @@ const diagnosticoService = require('../services/diagnostico.service');
 const procedimientoService = require('../services/procedimiento.service');
 const linkService = require('../services/link.service');
 
+beforeAll(() => {
+    // Silenciar console.log y console.error en todo este describe
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
 jest.mock('../models', () => {
 
   return {

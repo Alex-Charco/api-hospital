@@ -95,6 +95,10 @@ API REST desarrollada con Node.js, JavaScript y Express.js, utilizando Sequelize
 | GET     | `/api/receta/get` | Consultar receta      | ✅ |
 | POST    | `/api/receta/registrar`     | Registrar receta      | ✅ |
 | PUT     | `/api/receta/put/:id_receta` | Actualiza receta       | ✅ |
+**Asistencia**                                                        |
+| GET     | `/api/asistencia/get/:id_cita` | Consultar asistencia      | ✅ |
+| POST    | `/api/asistencia/registrar`     | Registrar asistencia      | ✅ |
+
 
 ---
 
@@ -222,6 +226,30 @@ Configuración en eslint.config.cjs para que no de errores por jest
 	npm install luxon
 
 Maneja zonas horarias de forma más explícita
+
+#### 1.3.5 Instalar dependencia supertest para pruebas de integracion con jest
+
+	npm install --save-dev supertest
+	
+***Pasos pruebas integración***
+
+1. Instalar dependencia supertest
+2. Separar la app de Express de la lógica del servidor, para que Supertest pueda testear la API sin levantar el servidor real
+3. Crear archivo con pruebas de integración***
+4. Crear copia de base de datos **hospital_test**
+5. Crear un archivo .env.test
+6. Copia de respaldo de la base de datos, por seguridad.
+
+**Para ejecutar pruebas en local**
+
+Ejecutar todas las pruebas:
+
+    npm test
+
+Ejecutar las pruebas de integración
+
+	npm test tests/integration
+
 ---
 
 ### 1.4 Levantar el servidor

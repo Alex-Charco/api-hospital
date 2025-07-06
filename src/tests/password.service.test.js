@@ -29,6 +29,7 @@ const Administrador = require('../models/administrador.model');
 const Paciente = require('../models/paciente.model');
 
 beforeEach(() => {
+  jest.spyOn(console, 'log').mockImplementation(() => {});
   jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 

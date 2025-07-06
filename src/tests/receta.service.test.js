@@ -11,21 +11,9 @@ const {
 
 const {
   Receta,
-  Medicacion,
-  Medicamento,
-  Posologia,
   Diagnostico,
-  RecetaAutorizacion,
   NotaEvolutiva,
   Paciente,
-  Familiar,
-  PersonaExterna,
-  Cita,
-  Turno,
-  Horario,
-  Medico,
-  Especialidad,
-  sequelize
 } = require('../models');
 
 const medicacionService = require("../services/medicacion.service");
@@ -34,10 +22,6 @@ const posologiaService = require("../services/posologia.service");
 const recetaAutorizacionService = require("../services/receta_autorizacion.service");
 const notaEvolutivaService = require("../services/nota_evolutiva.service");
 const pacienteService = require("../services/paciente.service");
-const familiarService = require("../services/familiar.service");
-const personaExternaService = require("../services/persona_externa.service");
-const { formatFecha } = require('../utils/date_utils');
-const { getEdad } = require('../utils/edad_utils');
 
 jest.mock('../models', () => ({
   Receta: { count: jest.fn(), findAll: jest.fn() },
@@ -147,6 +131,84 @@ describe("receta.service.js", () => {
   });
 
   describe("crearReceta", () => {
+    it("debería crear receta correctamente", async () => {
+      NotaEvolutiva.findOne.mockResolvedValue({ id_cita: 1 });
+      notaEvolutivaService.obtenerCitaPorId.mockResolvedValue({ id_paciente: 99 });
+
+      const mockReceta = { id_receta: 10, toJSON: () => ({ id_receta: 10 }) };
+      Receta.create = jest.fn().mockResolvedValue(mockReceta);
+
+      const mockMedicamento = { id_medicamento: 5 };
+      medicamentoService.crearMedicamento.mockResolvedValue(mockMedicamento);
+
+      const mockMedicacion = { id_medicacion: 50 };
+      medicacionService.crearMedicacion.mockResolvedValue(mockMedicacion);
+
+      const mockPosologia = { id_posologia: 500 };
+      posologiaService.crearPosologia.mockResolvedValue(mockPosologia);
+
+      const mockAutorizacion = { id_receta_autorizacion: 1000 };
+      recetaAutorizacionService.crearRecetaAutorizacion.mockResolvedValue(mockAutorizacion);
+      pacienteService.obtenerPacientePorId.mockResolvedValue({
+        primer_nombre: "Juan",
+        segundo_nombre: "Carlos",
+        primer_apellido: "Pérez",
+        segundo_apellido: "Gómez",
+        celular: "0999999999",
+        telefono: "022345678",
+        correo: "juan@example.com",
+        direccion: "Calle Falsa 123"
+      });
+
+      const result = await crearReceta({
+        id_nota_evolutiva: 1,
+        fecha_prescripcion: "2025-07-01",
+        medicaciones: [{
+          externo: 0,
+          indicacion: "Tomar después de las comidas",
+          signo_alarma: "Dolor intenso",
+          indicacion_no_farmacologica: "Reposo",
+          recomendacion_no_farmacologica: "Hidratación",
+          medicamento: {
+            nombre_medicamento: "Paracetamol",
+            cum: "12345",
+            forma_farmaceutica: "Tableta",
+            via_administracion: "Oral",
+            concentracion: "500mg",
+            presentacion: "Caja x 10",
+            tipo: "AGUDO",
+            cantidad: 10
+          },
+          posologias: [{
+            dosis_numero: 1,
+            dosis_tipo: "TABLETA",
+            frecuencia_numero: 8,
+            frecuencia_tipo: "HORAS",
+            duracion_numero: 5,
+            duracion_tipo: "DÍAS",
+            fecha_inicio: "2025-07-01",
+            hora_inicio: "08:00:00",
+            via: "ORAL"
+          }]
+        }],
+        receta_autorizacion: {
+          tipo_autorizado: "PACIENTE",
+          id_paciente: 99
+        }
+      }, {}); // transaction puede ser vacía porque se mockea internamente
+
+      expect(Receta.create).toHaveBeenCalled();
+      expect(medicamentoService.crearMedicamento).toHaveBeenCalled();
+      expect(medicacionService.crearMedicacion).toHaveBeenCalled();
+      expect(posologiaService.crearPosologia).toHaveBeenCalled();
+      expect(recetaAutorizacionService.crearRecetaAutorizacion).toHaveBeenCalled();
+
+      expect(result).toHaveProperty("receta");
+      expect(result).toHaveProperty("medicacionesGuardadas");
+      expect(result).toHaveProperty("posologiasGuardadas");
+      expect(result).toHaveProperty("recetaAutorizacion");
+    });
+
     it("debería lanzar error si nota evolutiva no existe", async () => {
       NotaEvolutiva.findOne.mockResolvedValue(null);
       await expect(crearReceta({ id_nota_evolutiva: 123, fecha_prescripcion: "2025-07-01" }, {}))

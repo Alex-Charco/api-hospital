@@ -5,6 +5,17 @@ const { buscarUsuario } = require("../services/user.service");
 
 // Middleware para verificar el JWT y añadir los datos del usuario a la request
 const verificarToken = async (req, res, next) => {
+	if (process.env.NODE_ENV === 'test') {
+		// Usa el nombre desde el header especial (solo en tests)
+		const nombre_usuario_test = req.header("x-test-usuario") || "usuario_prueba";
+		req.usuario = {
+			id_usuario: 999,
+			nombre_usuario: nombre_usuario_test,
+			rol: { id_rol: 1, nombre_rol: "ASISTENCIA", permiso: { asistencia: true } }
+		};
+		return next();
+	}
+
     try {
         // Obtener el token del header y eliminar el prefijo "Bearer "
         const token = req.header("Authorization")?.replace("Bearer ", "").trim();
@@ -61,6 +72,9 @@ const verificarToken = async (req, res, next) => {
 // Middleware para autorizar roles específicos
 const authorizeRole = (requiredPermissions) => {
     return (req, res, next) => {
+		// ⛔ Saltar autorización si es entorno de prueba
+        if (process.env.NODE_ENV === 'test') return next();
+		
         try {
             const { rol } = req.usuario;
 
