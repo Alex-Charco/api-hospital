@@ -91,6 +91,7 @@ Especialidad.hasMany(Medico, {
 // Relación entre Usuario y Administrador
 Usuario.hasOne(Administrador, {
     foreignKey: "id_usuario",
+	as: "administrador",
     onDelete: "CASCADE",
     onUpdate: "CASCADE"
 });
