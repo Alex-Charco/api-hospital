@@ -93,6 +93,13 @@ async function getCitasPorPaciente(req, res) {
         });
 
     } catch (error) {
+		// Errores esperados
+        if (error.message.includes('no disponible') || 
+            error.message.includes('ya tiene 2 citas') || 
+            error.message.includes(errorMessages.errorCitaAgendada)) {
+            return res.status(400).json({ message: error.message });
+        }
+
         res.status(500).json({ message: errorMessages.errorObtenerCitas + error.message });
     }
 }
@@ -180,6 +187,13 @@ async function getCitasPorMedico(req, res) {
             }))
         });
     } catch (error) {
+		// Errores esperados
+        if (error.message.includes('no disponible') || 
+            error.message.includes('ya tiene 2 citas') || 
+            error.message.includes(errorMessages.errorCitaAgendada)) {
+            return res.status(400).json({ message: error.message });
+        }
+
         res.status(500).json({ message: errorMessages.errorObtenerCitas + error.message });
     }
 }
@@ -215,6 +229,13 @@ const registrarCita = async (req, res) => {
         });
 
     } catch (error) {
+        // Errores esperados
+        if (error.message.includes('no disponible') || 
+            error.message.includes('ya tiene 2 citas') || 
+            error.message.includes(errorMessages.errorCitaAgendada)) {
+            return res.status(400).json({ message: error.message });
+        }
+		// Otros errores no controlados
         console.error("❌ Error en registrarCita:", error.message);
         return res.status(500).json({ message: error.message || errorMessages.errorServidor });
     }

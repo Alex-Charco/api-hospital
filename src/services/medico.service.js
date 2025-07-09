@@ -143,24 +143,74 @@ async function obtenerMedicoPorIdentificacion(identificacion) {
 
 // Función par aobtener el historial de cambios
 async function obtenerHistorialPorIdentificacionMedico(identificacion) {
-    try {
-        const medico = await Medico.findOne({ where: { identificacion } });
-        if (!medico) {
-            throw new Error("Medico no encontrado con esa identificación.");
-        }
-        const historial = await HistorialCambiosMedico.findAll({
-            where: { id_medico: medico.id_medico },
-            order: [['fecha_cambio', 'DESC']]
-        });
-        // Formatear fechas
-        return historial.map(item => {
-            const json = item.toJSON();
-            json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
-            return json;
-        });
-    } catch (error) {
-        throw new Error(`Error al obtener historial por identificación: ${error.message}`);
+  try {
+    const { Medico, HistorialCambiosMedico, Usuario, Administrador } = require("../models");
+
+    const medico = await Medico.findOne({ where: { identificacion } });
+
+    if (!medico) {
+      return null; // Esto permite devolver un mensaje amigable desde el controller
     }
+
+    // Helper para nombre del admin
+    const obtenerNombreAdministrador = (usuario) => {
+      const admin = usuario?.administrador;
+      return admin
+        ? [admin.primer_nombre, admin.segundo_nombre, admin.primer_apellido, admin.segundo_apellido]
+            .filter(Boolean)
+            .join(" ")
+        : "Desconocido";
+    };
+
+    // Obtener historial incluyendo quien lo hizo
+    const historial = await HistorialCambiosMedico.findAll({
+      where: { id_medico: medico.id_medico },
+      include: [
+        {
+          model: Usuario,
+          as: "usuario",
+          required: false,
+          include: [
+            {
+              model: Administrador,
+              as: "administrador",
+              attributes: [
+                "primer_nombre",
+                "segundo_nombre",
+                "primer_apellido",
+                "segundo_apellido"
+              ],
+              required: false
+            }
+          ]
+        }
+      ],
+      order: [["fecha_cambio", "DESC"]]
+    });
+
+    const historialFormateado = historial.map((item) => {
+      const json = item.toJSON();
+      json.fecha_cambio = formatFechaCompleta(json.fecha_cambio);
+      json.realizado_por = obtenerNombreAdministrador(item.usuario);
+      return json;
+    });
+
+    return {
+      datos_medico: {
+        identificacion: medico.identificacion,
+        primer_nombre: medico.primer_nombre,
+        segundo_nombre: medico.segundo_nombre,
+        primer_apellido: medico.primer_apellido,
+        segundo_apellido: medico.segundo_apellido,
+        celular: medico.celular,
+        correo: medico.correo
+      },
+      historial: historialFormateado
+    };
+
+  } catch (error) {
+    throw new Error(`Error al obtener historial por identificación: ${error.message}`);
+  }
 }
 
 module.exports = {

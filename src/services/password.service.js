@@ -8,7 +8,7 @@ const { JWT_SECRET } = require('../utils/config');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-console.log("🔐 RESEND_API_KEY:", process.env.RESEND_API_KEY);
+//console.log("🔐 RESEND_API_KEY:", process.env.RESEND_API_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function hashPassword(password) {
@@ -80,6 +80,11 @@ module.exports = {
     } catch (error) {
       // 6. Manejar errores y mostrar un mensaje adecuado
       console.error('Error al restablecer la contraseña:', error);
+	  
+	  if (error.name === 'JsonWebTokenError') {
+		throw new Error('Token inválido.');
+	  }
+  
       throw new Error('No se pudo restablecer la contraseña. ' + error.message);
     }
   }

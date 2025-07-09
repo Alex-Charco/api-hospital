@@ -14,6 +14,12 @@ jest.mock('../models', () => ({
   },
 }));
 
+beforeAll(() => {
+    // Silenciar console.log y console.error en todo este describe
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
 const { 
   validarUsuarioParaMedico,
   validarIdentificacionMedico,
@@ -23,7 +29,7 @@ const {
   validarMedicoExistente,
   obtenerMedicoPorIdentificacion
 } = require("../services/medico.service");
-const { Medico, Usuario, Especialidad, HistorialCambiosMedico, sequelize  } = require("../models");
+const { Medico, HistorialCambiosMedico  } = require("../models");
 const { verificarUsuarioExistente } = require("../services/user.service");
 const errorMessages = require("../utils/error_messages");
 

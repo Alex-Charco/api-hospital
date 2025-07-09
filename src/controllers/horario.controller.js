@@ -11,7 +11,10 @@ async function registrarHorario(req, res) {
 
     try {
         // Validar que el médico existe
-        const medico = await infoMedicoService.validarMedicoExistente(identificacion);
+        console.log("Identificación recibida en la ruta:", identificacion);
+		const medico = await infoMedicoService.validarMedicoExistente(identificacion);
+		console.log("Resultado de búsqueda del médico:", medico);
+
         if (!medico) {
             return res.status(404).json({ message: errorMessages.medicoNoEncontrado });
         }

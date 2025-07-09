@@ -109,15 +109,29 @@ async function actualizarMedico(req, res) {
 }
 
 // Obtener historial de cambios de un médico
-async function getHistorialPorIdentificacionMedico(req, res) {
+const getHistorialPorIdentificacionMedico = async (req, res) => {
     const { identificacion } = req.params;
 
     try {
         const historial = await medicoService.obtenerHistorialPorIdentificacionMedico(identificacion);
-        return res.status(200).json(historial);
+
+        if (!historial) {
+            return res.status(200).json({
+                historial: [],
+                message: "No se encontró un médico con esa identificación."
+            });
+        }
+
+        return res.status(200).json({
+            historial,
+            message: "Historial obtenido con éxito"
+        });
+
     } catch (error) {
-        return res.status(400).json({ error: error.message });
+        console.error("Error interno:", error);
+        return res.status(500).json({ error: "Error interno del servidor" });
     }
-}
+};
+
 
 module.exports = { registrarMedico, obtenerMedicos, actualizarMedico, getHistorialPorIdentificacionMedico };

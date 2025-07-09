@@ -17,7 +17,7 @@ const Seguro = sequelize.define('Seguro', {
         }
     },
     tipo: {
-        type: DataTypes.ENUM('SEGURO', 'ISSFA'),
+        type: DataTypes.ENUM('SEGURO ISSFA'),
         allowNull: false
     },
     beneficiario: {
